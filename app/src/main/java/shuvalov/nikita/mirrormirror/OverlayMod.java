@@ -1,9 +1,12 @@
 package shuvalov.nikita.mirrormirror;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Picture;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -23,6 +26,7 @@ import android.view.View;
 public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback {
     private GraphicThread mGraphicThread;
     private Paint mPaint;
+    private Bitmap mBitmap;
 
 
 
@@ -31,10 +35,13 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback {
         SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         surfaceHolder.addCallback(this);
-        mPaint = new Paint();
-        mPaint.setColor(Color.BLUE);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(3.0f);
+
+        mBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.beautify_mirror);
+
+//        mPaint = new Paint();
+//        mPaint.setColor(Color.BLUE);
+//        mPaint.setStyle(Paint.Style.STROKE);
+//        mPaint.setStrokeWidth(3.0f);
 
     }
 
@@ -46,7 +53,9 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback {
         if(face!=null){
             Log.d("OverlayMod", "onDraw: "+ face.centerY() + ","+ face.centerX());
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
-            canvas.drawRect(face, mPaint);
+            Rect rect = new Rect();
+            face.round(rect);
+            canvas.drawBitmap(mBitmap,null, rect,null);
         }
     }
 
