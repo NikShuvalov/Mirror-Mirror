@@ -2,6 +2,7 @@ package shuvalov.nikita.mirrormirror;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.provider.MediaStore;
 import android.speech.RecognitionListener;
@@ -10,6 +11,7 @@ import android.speech.SpeechRecognizer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.widget.FrameLayout;
 
 
@@ -22,6 +24,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         FrameLayout previewContainer = (FrameLayout) findViewById(R.id.preview);
+        FrameLayout faceDetect = (FrameLayout)findViewById(R.id.face_detect);
+
+        Display display = getWindow().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int x = size.x;
+        int y = size.y;
+
+
+        FaceTracker.getInstance().setScreenOffset(x/2, y/2);
 
 //
 //        SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
@@ -97,20 +109,14 @@ public class MainActivity extends AppCompatActivity {
         mCamera = Camera.open(cameraId);
         mCamera.setDisplayOrientation(90);
         OverlayMod overlayMod = new OverlayMod(this);
-        Preview preview = new Preview(this, mCamera, overlayMod);
+        overlayMod.setZOrderOnTop(true);
+        Preview preview = new Preview(this, mCamera);
 
         preview.prepareForDisplay(mCamera);
 
         previewContainer.addView(preview);
-        previewContainer.addView(overlayMod);
-        previewContainer.bringChildToFront(overlayMod);
+        faceDetect.addView(overlayMod);
 
-
-//        Intent cameraIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
-//        intent.putExtra("android.intent.extras.USE_FRONT_CAMERA",true);
-//        intent.putExtra("android.intent.extras.LENS_FACING_FRONT",1);
-//        cameraIntent.putExtra("android.intent.extras.CAMERA_FACING",cameraId);
-//        startActivityForResult(cameraIntent, 5);
     }
 
 

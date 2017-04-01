@@ -20,11 +20,6 @@ public class MyFaceDetection implements Camera.FaceDetectionListener {
             Camera.Face face = faces[0];
             if(face!=null){
                 FaceTracker.getInstance().setFace(face);
-                Rect rect = face.rect;
-                int x = rect.centerX();
-                int y = rect.centerY();
-                Log.d(TAG, "onFaceDetection: "+ "score: " +face.score + x +","+ y);
-                mPreview.drawSomething(Math.abs(x),Math.abs(y));
             }
         }
     }

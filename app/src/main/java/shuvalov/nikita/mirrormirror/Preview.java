@@ -35,7 +35,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    public Preview(Context context, Camera camera, OverlayMod overlayMod) {
+    public Preview(Context context, Camera camera) {
         super(context);
 
         mCamera = camera;
@@ -54,10 +54,8 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-//        overlayMod.setSurfaceHolder(mSurfaceHolder);
         MyFaceDetection faceDetector = new MyFaceDetection();
         faceDetector.setPreview(this);
-//        faceDetector.attachOverlay(overlayMod);
         mCamera.setFaceDetectionListener(faceDetector);
 
     }
@@ -94,17 +92,4 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
     }
 
-//    public void drawSomething(int x, int y){
-//        onDraw(mSurfaceHolder.lockCanvas());
-//    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-//        Paint paint = new Paint();
-//        paint.setColor(Color.BLUE);
-//        paint.setStrokeWidth(30.0f);
-//        canvas.drawRect(50,50, 100, 100, paint);
-//        getHolder().unlockCanvasAndPost(canvas);
-    }
 }
