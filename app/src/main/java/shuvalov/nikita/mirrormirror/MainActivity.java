@@ -18,6 +18,7 @@ import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private Camera mCamera;
+    private OverlayMod mOverlayMod;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,14 +110,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("b", "onCreate: "+cameraId);
         mCamera = Camera.open(cameraId);
         mCamera.setDisplayOrientation(90);
-        OverlayMod overlayMod = new OverlayMod(this);
-        overlayMod.setZOrderOnTop(true);
+        mOverlayMod = new OverlayMod(this);
+        mOverlayMod.setZOrderOnTop(true);
         Preview preview = new Preview(this, mCamera);
 
         preview.prepareForDisplay(mCamera);
 
         previewContainer.addView(preview);
-        faceDetect.addView(overlayMod);
+        faceDetect.addView(mOverlayMod);
         previewContainer.setOnClickListener(this);
     }
 
@@ -151,7 +152,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         FilterManager.getInstance().moveToNextPosition();
-
+        mOverlayMod.notifyFilterChange();
     }
+
+
 
 }

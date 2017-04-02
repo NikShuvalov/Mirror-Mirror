@@ -23,7 +23,7 @@ import android.view.View;
  * Created by NikitaShuvalov on 3/24/17.
  */
 
-public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback {
+public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
     private GraphicThread mGraphicThread;
     private Paint mPaint;
     private Bitmap mBitmap;
@@ -36,6 +36,8 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback {
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         surfaceHolder.addCallback(this);
 
+        int resId = FilterManager.getInstance().getSelectedRes();
+        mBitmap = BitmapFactory.decodeResource(getResources(), resId);
 
 //        mPaint = new Paint();
 //        mPaint.setColor(Color.BLUE);
@@ -50,15 +52,10 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback {
         super.onDraw(canvas);
         RectF face = FaceTracker.getInstance().getFaceRect();
         if(face!=null){
-
-            //FixMe: Have the mBitmap change when the surface is clicked. Use an interface.
-            int resId = FilterManager.getInstance().getSelectedRes();
-            mBitmap = BitmapFactory.decodeResource(getResources(), resId);
-
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             Rect rect = new Rect();
             face.round(rect);
-            canvas.drawBitmap(mBitmap,null, rect,null);
+            canvas.drawBitmap(mBitmap, null, rect, null);
         }
     }
 
@@ -78,5 +75,10 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         mGraphicThread.stopThread();
+    }
+
+    public void notifyFilterChange() {
+        int resId = FilterManager.getInstance().getSelectedRes();
+        mBitmap = BitmapFactory.decodeResource(getResources(), resId);
     }
 }
