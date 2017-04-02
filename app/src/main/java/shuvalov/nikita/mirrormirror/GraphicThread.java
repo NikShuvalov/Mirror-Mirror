@@ -1,5 +1,6 @@
 package shuvalov.nikita.mirrormirror;
 
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.view.SurfaceHolder;
@@ -21,6 +22,7 @@ public class GraphicThread extends Thread {
         mStop.set(false);
     }
 
+    @SuppressLint("WrongCall")
     @Override
     public void run() {
         while(!mStop.get()){
