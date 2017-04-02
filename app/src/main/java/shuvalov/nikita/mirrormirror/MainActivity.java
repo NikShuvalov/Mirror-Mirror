@@ -12,10 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.widget.FrameLayout;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private Camera mCamera;
 
     @Override
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         previewContainer.addView(preview);
         faceDetect.addView(overlayMod);
-
+        previewContainer.setOnClickListener(this);
     }
 
 
@@ -146,4 +147,11 @@ public class MainActivity extends AppCompatActivity {
             mCamera.release();
         }
     }
+
+    @Override
+    public void onClick(View view) {
+        FilterManager.getInstance().moveToNextPosition();
+
+    }
+
 }

@@ -36,7 +36,6 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback {
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         surfaceHolder.addCallback(this);
 
-        mBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.beautify_mirror);
 
 //        mPaint = new Paint();
 //        mPaint.setColor(Color.BLUE);
@@ -51,7 +50,11 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback {
         super.onDraw(canvas);
         RectF face = FaceTracker.getInstance().getFaceRect();
         if(face!=null){
-            Log.d("OverlayMod", "onDraw: "+ face.centerY() + ","+ face.centerX());
+
+            //FixMe: Have the mBitmap change when the surface is clicked. Use an interface.
+            int resId = FilterManager.getInstance().getSelectedRes();
+            mBitmap = BitmapFactory.decodeResource(getResources(), resId);
+
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             Rect rect = new Rect();
             face.round(rect);
