@@ -30,7 +30,7 @@ public class GraphicThread extends Thread {
             try{
                 c = mSurfaceHolder.lockCanvas();
                 synchronized (mSurfaceHolder){
-                    mOverlayMod.onDraw(c);
+                    if(!mStop.get()) mOverlayMod.onDraw(c);
                 }
             }finally {
                 if(c != null)mSurfaceHolder.unlockCanvasAndPost(c);

@@ -24,7 +24,4 @@ public class MyFaceDetection implements Camera.FaceDetectionListener {
         }
     }
 
-    public void setPreview(Preview preview) {
-        mPreview = preview;
-    }
 }

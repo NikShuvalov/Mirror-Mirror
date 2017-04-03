@@ -19,23 +19,14 @@ import android.widget.FrameLayout;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private Camera mCamera;
     private OverlayMod mOverlayMod;
+    private FrameLayout mFaceDetect, mPreviewContainer;
+    private Preview mPreview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FrameLayout previewContainer = (FrameLayout) findViewById(R.id.preview);
-        FrameLayout faceDetect = (FrameLayout)findViewById(R.id.face_detect);
-
-        Display display = getWindow().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int x = size.x;
-        int y = size.y;
-
-
-        FaceTracker.getInstance().setScreenOffset(x/2, y/2);
 
 //
 //        SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
@@ -105,6 +96,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 ////        speechRecognizer.startListening(intent);
 
         //TODo: THis code will be better off in onResume
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mPreviewContainer = (FrameLayout) findViewById(R.id.preview);
+        mFaceDetect = (FrameLayout)findViewById(R.id.face_detect);
+
+        Display display = getWindow().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int x = size.x;
+        int y = size.y;
+
+
+        FaceTracker.getInstance().setScreenOffset(x/2, y/2);
+
         int cameraId = getIdForRequestedCamera(Camera.CameraInfo.CAMERA_FACING_FRONT);
 
         Log.d("b", "onCreate: "+cameraId);
@@ -112,15 +122,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mCamera.setDisplayOrientation(90);
         mOverlayMod = new OverlayMod(this);
         mOverlayMod.setZOrderOnTop(true);
-        Preview preview = new Preview(this, mCamera);
+        mPreview = new Preview(this, mCamera);
 
-        preview.prepareForDisplay(mCamera);
+        mPreview.prepareForDisplay(mCamera);
 
-        previewContainer.addView(preview);
-        faceDetect.addView(mOverlayMod);
-        previewContainer.setOnClickListener(this);
+        mPreviewContainer.addView(mPreview);
+        mFaceDetect.addView(mOverlayMod);
+        mPreviewContainer.setOnClickListener(this);
     }
-
 
     private static int getIdForRequestedCamera(int facing) {
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
@@ -134,19 +143,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        mCamera.stopPreview();
-        mCamera.release();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mCamera!=null){
-            mCamera.stopPreview();
-            mCamera.release();
-        }
+        mFaceDetect.removeAllViews();
+        mPreviewContainer.removeView(mPreview);
+        mCamera.stopPreview();
+        mCamera.release();
+        mCamera= null;
     }
 
     @Override
@@ -154,7 +157,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FilterManager.getInstance().moveToNextPosition();
         mOverlayMod.notifyFilterChange();
     }
-
-
-
 }

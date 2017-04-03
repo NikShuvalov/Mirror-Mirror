@@ -43,7 +43,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         MyFaceDetection faceDetector = new MyFaceDetection();
-        faceDetector.setPreview(this);
 //        faceDetector.attachOverlay(overlayMod);
         mCamera.setFaceDetectionListener(faceDetector);
     }
@@ -55,9 +54,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         MyFaceDetection faceDetector = new MyFaceDetection();
-        faceDetector.setPreview(this);
         mCamera.setFaceDetectionListener(faceDetector);
-
     }
 
 
