@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        });
 ////        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 ////        speechRecognizer.startListening(intent);
-        
+
     }
 
     @Override
