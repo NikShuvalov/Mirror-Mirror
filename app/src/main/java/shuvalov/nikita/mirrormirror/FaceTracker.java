@@ -50,5 +50,10 @@ public class FaceTracker {
         mYOffset = yOffSet;
     }
 
+    public void clearFace(){
+        mFace = null;
+        mFaceRect = null;
+    }
+
 
 }

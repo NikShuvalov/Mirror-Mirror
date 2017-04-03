@@ -12,15 +12,19 @@ import static android.content.ContentValues.TAG;
  */
 
 public class MyFaceDetection implements Camera.FaceDetectionListener {
-    private Preview mPreview;
 
     @Override
     public void onFaceDetection(Camera.Face[] faces, Camera camera) {
+        FaceTracker f = FaceTracker.getInstance();
         if (faces.length>0){
             Camera.Face face = faces[0];
             if(face!=null){
-                FaceTracker.getInstance().setFace(face);
+                f.setFace(face);
+            }else{
+                f.clearFace();
             }
+        }else{
+            f.clearFace();
         }
     }
 

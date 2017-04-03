@@ -51,8 +51,8 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         RectF face = FaceTracker.getInstance().getFaceRect();
+        canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
         if(face!=null){
-            canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             Rect rect = new Rect();
             face.round(rect);
             canvas.drawBitmap(mBitmap, null, rect, null);
