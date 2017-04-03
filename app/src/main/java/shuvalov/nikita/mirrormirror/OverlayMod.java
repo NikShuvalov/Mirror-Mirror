@@ -5,19 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Picture;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.hardware.Camera;
-import android.support.annotation.Nullable;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 /**
  * Created by NikitaShuvalov on 3/24/17.
@@ -25,7 +18,6 @@ import android.view.View;
 
 public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
     private GraphicThread mGraphicThread;
-    private Paint mPaint;
     private Bitmap mBitmap;
 
 
@@ -38,12 +30,6 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
 
         int resId = FilterManager.getInstance().getSelectedRes();
         mBitmap = BitmapFactory.decodeResource(getResources(), resId);
-
-//        mPaint = new Paint();
-//        mPaint.setColor(Color.BLUE);
-//        mPaint.setStyle(Paint.Style.STROKE);
-//        mPaint.setStrokeWidth(3.0f);
-
     }
 
     //FixMe: X and Y seem to be inverted.

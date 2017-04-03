@@ -1,9 +1,6 @@
 package shuvalov.nikita.mirrormirror;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
@@ -43,7 +40,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         MyFaceDetection faceDetector = new MyFaceDetection();
-//        faceDetector.attachOverlay(overlayMod);
         mCamera.setFaceDetectionListener(faceDetector);
     }
 

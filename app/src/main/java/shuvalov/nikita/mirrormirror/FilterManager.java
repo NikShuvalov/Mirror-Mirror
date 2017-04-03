@@ -19,6 +19,7 @@ public class FilterManager {
     private void prepareAllImages(){
         mResourceInts = new ArrayList<>();
         mResourceInts.add(R.drawable.beautify_mirror);
+//        mResourceInts.add(R.drawable.badman);
         mResourceInts.add(R.drawable.corgi);
     }
 

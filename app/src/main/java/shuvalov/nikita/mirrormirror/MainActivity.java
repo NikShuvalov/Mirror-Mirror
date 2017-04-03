@@ -1,13 +1,7 @@
 package shuvalov.nikita.mirrormirror;
 
-import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.hardware.Camera;
-import android.provider.MediaStore;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -94,9 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        });
 ////        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 ////        speechRecognizer.startListening(intent);
-
-        //TODo: THis code will be better off in onResume
-
+        
     }
 
     @Override

@@ -2,7 +2,6 @@ package shuvalov.nikita.mirrormirror;
 
 import android.annotation.SuppressLint;
 import android.graphics.Canvas;
-import android.hardware.Camera;
 import android.view.SurfaceHolder;
 
 import java.util.concurrent.atomic.AtomicBoolean;
