@@ -42,20 +42,6 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
                 face.round(mRect);
                 canvas.drawBitmap(mBitmap, null, mRect, null);
                 mRect.setEmpty();
-//                Point[] eyes = FaceTracker.getInstance().getEyes();
-//                for(Point eye: eyes){
-//                    if(eye!=null) {
-//                        float w = face.width();
-//                        float iris = w / 20;
-//                        int left = (int) (eye.x - iris);
-//                        int top = (int) (eye.y - iris);
-//                        int right = (int) (eye.x + iris);
-//                        int bottom = (int) (eye.y + iris);
-//                        mRect.set(left, top, right, bottom);
-//                        canvas.drawBitmap(mBitmap, null, mRect, null);
-//                    }
-//                }
-//                mRect.setEmpty();
             }
         }
 
