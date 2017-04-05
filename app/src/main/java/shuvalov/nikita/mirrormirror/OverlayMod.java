@@ -28,8 +28,8 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         surfaceHolder.addCallback(this);
 
-        int resId = FilterManager.getInstance().getSelectedRes();
-        mBitmap = BitmapFactory.decodeResource(getResources(), resId);
+        Filter f = FilterManager.getInstance().getSelectedFilter();
+        mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
         mRect = new Rect();
     }
 
@@ -78,8 +78,8 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
     }
 
     public void notifyFilterChange() {
-        int resId = FilterManager.getInstance().getSelectedRes();
-        mBitmap = BitmapFactory.decodeResource(getResources(), resId);
+        Filter f = FilterManager.getInstance().getSelectedFilter();
+        mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
     }
 
 }

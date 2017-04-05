@@ -30,24 +30,7 @@ public class FaceTracker {
         return sFaceTracker;
     }
 
-    public void setFace(Camera.Face face){
-        mFace = face;
-
-
-        mFaceRect = new RectF(mFace.rect);
-        Matrix matrix = new Matrix();
-        matrix.setScale(-1, 1);
-        // This is the value for android.hardware.Camera.setDisplayOrientation.
-        matrix.postRotate(90);
-        // Camera driver coordinates range from (-1000, -1000) to (1000, 1000).
-        // UI coordinates range from (0, 0) to (width, height).
-        matrix.postScale((mXOffset*2)/ 2000f, (mYOffset*2) / 2000f);
-        matrix.postTranslate(mXOffset, mYOffset);
-        matrix.mapRect(mFaceRect);
-        resizeFaceRect();
-    }
-
-    public void setOnTopOfHead(Camera.Face face){
+    public void setFace(Camera.Face face, Filter filter){
         mFace = face;
         mFaceRect = new RectF(mFace.rect);
         Matrix matrix = new Matrix();
@@ -57,44 +40,63 @@ public class FaceTracker {
         // Camera driver coordinates range from (-1000, -1000) to (1000, 1000).
         // UI coordinates range from (0, 0) to (width, height).
         matrix.postScale((mXOffset*2)/ 2000f, (mYOffset*2) / 2000f);
-        matrix.postTranslate(mXOffset, mYOffset-(int)(mFace.rect.height()*0.75));
+        matrix.postTranslate(mXOffset+(int)(mFace.rect.width()*filter.getOffsetXPercent()), mYOffset + (int)(mFace.rect.height()*filter.getOffsetYPercent()));
         matrix.mapRect(mFaceRect);
+
+        resizeFaceRect(filter);
     }
 
-    public void setOnHair(Camera.Face face){
-        mFace = face;
-        mFaceRect = new RectF(mFace.rect);
-        float centerY = mFaceRect.centerY();
-        float delta = Math.abs(centerY - mFaceRect.top);
-        float newTop = centerY-(delta*1.5f);
-        float newBottom = centerY+(delta*1.5f);
+//    public void setOnTopOfHead(Camera.Face face){
+//        mFace = face;
+//        mFaceRect = new RectF(mFace.rect);
+//        Matrix matrix = new Matrix();
+//        matrix.setScale(-1, 1);
+//        // This is the value for android.hardware.Camera.setDisplayOrientation.
+//        matrix.postRotate(90);
+//        // Camera driver coordinates range from (-1000, -1000) to (1000, 1000).
+//        // UI coordinates range from (0, 0) to (width, height).
+//        matrix.postScale((mXOffset*2)/ 2000f, (mYOffset*2) / 2000f);
+//        matrix.postTranslate(mXOffset, mYOffset-(int)(mFace.rect.height()*0.75));
+//        matrix.mapRect(mFaceRect);
+//    }
+//
+//    //FixMe: Move transformation logic to somewhere else.
+//    public void setOnHair(Camera.Face face){
+//        mFace = face;
+//        mFaceRect = new RectF(mFace.rect);
+//        float centerY = mFaceRect.centerY();
+//        float delta = Math.abs(centerY - mFaceRect.top);
+//        float newTop = centerY-(delta*1.5f);
+//        float newBottom = centerY+(delta*1.5f);
+//
+//        mFaceRect.top = newTop;
+//        mFaceRect.bottom = newBottom;
+//
+//        Matrix matrix = new Matrix();
+//        matrix.setScale(-1, 1);
+//        // This is the value for android.hardware.Camera.setDisplayOrientation.
+//        matrix.postRotate(90);
+//        // Camera driver coordinates range from (-1000, -1000) to (1000, 1000).
+//        // UI coordinates range from (0, 0) to (width, height).
+//        matrix.postScale((mXOffset*2)/ 2000f, (mYOffset*2) / 2000f);
+//        matrix.postTranslate(mXOffset, mYOffset-(int)(mFace.rect.height()*0.50));
+//        matrix.mapRect(mFaceRect);
+//    }
 
-        mFaceRect.top = newTop;
-        mFaceRect.bottom = newBottom;
-
-        Matrix matrix = new Matrix();
-        matrix.setScale(-1, 1);
-        // This is the value for android.hardware.Camera.setDisplayOrientation.
-        matrix.postRotate(90);
-        // Camera driver coordinates range from (-1000, -1000) to (1000, 1000).
-        // UI coordinates range from (0, 0) to (width, height).
-        matrix.postScale((mXOffset*2)/ 2000f, (mYOffset*2) / 2000f);
-        matrix.postTranslate(mXOffset, mYOffset-(int)(mFace.rect.height()*0.50));
-        matrix.mapRect(mFaceRect);
-    }
-
-    public void resizeFaceRect(){
+    public void resizeFaceRect(Filter filter){
         float centerY = mFaceRect.centerY();
         float yDelta = Math.abs(centerY - mFaceRect.top);
-        float newTop = centerY - (yDelta * 1.5f);
-        float newBottom = centerY + (yDelta * 1.5f);
+        float yScale = filter.getScaleY();
+        float newTop = centerY - (yDelta * yScale);
+        float newBottom = centerY + (yDelta * yScale);
         mFaceRect.top = newTop;
         mFaceRect.bottom = newBottom;
 
         float centerX = mFaceRect.centerX();
         float xDelta = Math.abs(centerX - mFaceRect.left);
-        float newRight = centerX + (xDelta * 1.25f);
-        float newLeft = centerX - (xDelta * 1.25f);
+        float xScale = filter.getScaleX();
+        float newRight = centerX + (xDelta * xScale);
+        float newLeft = centerX - (xDelta * xScale);
         mFaceRect.right = newRight;
         mFaceRect.left = newLeft;
     }
@@ -109,14 +111,14 @@ public class FaceTracker {
         mYOffset = yOffSet;
     }
 
-    public Point[] getEyes(){
-        Point rEye = mFace.mouth;
-        if(rEye== null){
-            Log.d("FaceTracker", "getEyes: Not Supported"+ mFace.id);
-        }
-        Point lEye = mFace.leftEye;
-        return new Point[]{lEye, rEye};
-    }
+//    public Point[] getEyes(){
+//        Point rEye = mFace.mouth;
+//        if(rEye== null){
+//            Log.d("FaceTracker", "getEyes: Not Supported"+ mFace.id);
+//        }
+//        Point lEye = mFace.leftEye;
+//        return new Point[]{lEye, rEye};
+//    }
 
     public void clearFace(){
         mFace = null;

@@ -39,4 +39,12 @@ public class Filter {
     public float getScaleY() {
         return mScaleY;
     }
+
+    public float getOffsetXPercent() {
+        return mOffsetXPercent;
+    }
+
+    public float getOffsetYPercent() {
+        return mOffsetYPercent;
+    }
 }

@@ -7,25 +7,25 @@ import java.util.ArrayList;
  */
 
 public class FilterManager {
-    private ArrayList<Integer> mResourceInts;
+    private ArrayList<Filter> mFilters;
     private int mCurrentPosition;
-    private Filter.ImagePosition mImagePosition;
+//    private Filter.ImagePosition mImagePosition;
 
     private FilterManager() {
         mCurrentPosition=0;
-        mImagePosition = Filter.ImagePosition.FACE;
+//        mImagePosition = Filter.ImagePosition.FACE;
         prepareAllImages();
     }
 
     private void prepareAllImages(){
-        mResourceInts = new ArrayList<>();
-        mResourceInts.add(R.drawable.beautify_mirror);
+        mFilters = new ArrayList<>();
+        mFilters.add(new Filter(R.drawable.beautify_mirror, Filter.ImagePosition.FACE,1.25f, 1.5f, 0, 0));
 //        mResourceInts.add(R.drawable.badman);
-        mResourceInts.add(R.drawable.corgi);
+        mFilters.add(new Filter(R.drawable.corgi, Filter.ImagePosition.FACE,1.25f, 1.5f, 0, 0));
 //        mResourceInts.add(R.drawable.eye_of_sauron);
-        mResourceInts.add(R.drawable.top_hat);
-        mResourceInts.add(R.drawable.trump_toupee);
-        mResourceInts.add(R.drawable.super_saiyan);
+        mFilters.add(new Filter(R.drawable.top_hat, Filter.ImagePosition.TOP_OF_HEAD, 1.5f, 1.5f, 0, -0.75f));
+        mFilters.add(new Filter(R.drawable.trump_toupee, Filter.ImagePosition.HAIRLINE, 1.25f, 0.65f, 0, -0.5f));
+        mFilters.add(new Filter(R.drawable.super_saiyan, Filter.ImagePosition.HAIRLINE, 2.25f, 1.75f, 0, -0.6f));
     }
 
     private static FilterManager sFilterManager;
@@ -40,21 +40,19 @@ public class FilterManager {
 
     public void moveToNextPosition(){
         mCurrentPosition++;
-        mImagePosition = Filter.ImagePosition.FACE;
-        if(mCurrentPosition>=mResourceInts.size()){
+//        mImagePosition = Filter.ImagePosition.FACE;
+        if(mCurrentPosition>=mFilters.size()){
             mCurrentPosition=0;
         }
-
-        if(mCurrentPosition==2) mImagePosition = Filter.ImagePosition.TOP_OF_HEAD;
-        else if(mCurrentPosition >=3) mImagePosition = Filter.ImagePosition.HAIRLINE;
+//        mImagePosition = mFilters.get(mCurrentPosition).getImagePosition();
     }
 
-    public Integer getSelectedRes(){
-        return mResourceInts.get(mCurrentPosition);
+    public Filter getSelectedFilter(){
+        return mFilters.get(mCurrentPosition);
     }
-
-    public Filter.ImagePosition getImagePosition() {
-        return mImagePosition;
-    }
+//
+//    public Filter.ImagePosition getImagePosition() {
+//        return mImagePosition;
+//    }
 
 }
