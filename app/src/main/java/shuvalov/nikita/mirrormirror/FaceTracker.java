@@ -32,6 +32,8 @@ public class FaceTracker {
 
     public void setFace(Camera.Face face){
         mFace = face;
+
+
         mFaceRect = new RectF(mFace.rect);
         Matrix matrix = new Matrix();
         matrix.setScale(-1, 1);
@@ -42,6 +44,7 @@ public class FaceTracker {
         matrix.postScale((mXOffset*2)/ 2000f, (mYOffset*2) / 2000f);
         matrix.postTranslate(mXOffset, mYOffset);
         matrix.mapRect(mFaceRect);
+        resizeFaceRect();
     }
 
     public void setOnTopOfHead(Camera.Face face){
@@ -80,13 +83,23 @@ public class FaceTracker {
         matrix.mapRect(mFaceRect);
     }
 
-    public RectF getFaceRect() {
-//        float x = mFaceRect.centerX();
-//        float y = mFaceRect.centerY();
-//        float width = mFaceRect.width();
-//        float height = mFaceRect.height();
+    public void resizeFaceRect(){
+        float centerY = mFaceRect.centerY();
+        float yDelta = Math.abs(centerY - mFaceRect.top);
+        float newTop = centerY - (yDelta * 1.5f);
+        float newBottom = centerY + (yDelta * 1.5f);
+        mFaceRect.top = newTop;
+        mFaceRect.bottom = newBottom;
 
-//        mFaceRect.set
+        float centerX = mFaceRect.centerX();
+        float xDelta = Math.abs(centerX - mFaceRect.left);
+        float newRight = centerX + (xDelta * 1.25f);
+        float newLeft = centerX - (xDelta * 1.25f);
+        mFaceRect.right = newRight;
+        mFaceRect.left = newLeft;
+    }
+
+    public RectF getFaceRect() {
         return mFaceRect;
     }
 
