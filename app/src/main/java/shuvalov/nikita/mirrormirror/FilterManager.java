@@ -9,11 +9,12 @@ import java.util.ArrayList;
 public class FilterManager {
     private ArrayList<Integer> mResourceInts;
     private int mCurrentPosition;
+    private ImagePosition mImagePosition;
 
     private FilterManager() {
         mCurrentPosition=0;
+        mImagePosition = ImagePosition.FACE;
         prepareAllImages();
-
     }
 
     private void prepareAllImages(){
@@ -21,6 +22,10 @@ public class FilterManager {
         mResourceInts.add(R.drawable.beautify_mirror);
 //        mResourceInts.add(R.drawable.badman);
         mResourceInts.add(R.drawable.corgi);
+//        mResourceInts.add(R.drawable.eye_of_sauron);
+        mResourceInts.add(R.drawable.top_hat);
+        mResourceInts.add(R.drawable.trump_toupee);
+        mResourceInts.add(R.drawable.super_saiyan);
     }
 
     private static FilterManager sFilterManager;
@@ -35,12 +40,24 @@ public class FilterManager {
 
     public void moveToNextPosition(){
         mCurrentPosition++;
+        mImagePosition = ImagePosition.FACE;
         if(mCurrentPosition>=mResourceInts.size()){
             mCurrentPosition=0;
         }
+
+        if(mCurrentPosition==2) mImagePosition = ImagePosition.TOP_OF_HEAD;
+        else if(mCurrentPosition >=3) mImagePosition = ImagePosition.HAIRLINE;
     }
 
     public Integer getSelectedRes(){
         return mResourceInts.get(mCurrentPosition);
+    }
+
+    public ImagePosition getImagePosition() {
+        return mImagePosition;
+    }
+
+    public enum ImagePosition{
+        TOP_OF_HEAD, FACE, BELOW_FACE, HAIRLINE
     }
 }

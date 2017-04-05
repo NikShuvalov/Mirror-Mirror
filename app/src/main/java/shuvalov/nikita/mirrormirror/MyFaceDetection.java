@@ -19,7 +19,10 @@ public class MyFaceDetection implements Camera.FaceDetectionListener {
         if (faces.length>0){
             Camera.Face face = faces[0];
             if(face!=null){
-                f.setFace(face);
+                FilterManager.ImagePosition pos = FilterManager.getInstance().getImagePosition();
+                if(pos.equals(FilterManager.ImagePosition.FACE)) f.setFace(face);
+                else if (pos.equals(FilterManager.ImagePosition.HAIRLINE)) f.setOnHair(face);
+                else f.setOnTopOfHead(face);
             }else{
                 f.clearFace();
             }
