@@ -39,11 +39,11 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
         RectF face = FaceTracker.getInstance().getFaceRect();
         canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
         if(face!=null){
-                face.round(mRect);
-                canvas.drawBitmap(mBitmap, null, mRect, null);
-                mRect.setEmpty();
-            }
+            face.round(mRect);
+            canvas.drawBitmap(mBitmap, null, mRect, null);
+            mRect.setEmpty();
         }
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
@@ -67,5 +67,4 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
         Filter f = FilterManager.getInstance().getSelectedFilter();
         mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
     }
-
 }
