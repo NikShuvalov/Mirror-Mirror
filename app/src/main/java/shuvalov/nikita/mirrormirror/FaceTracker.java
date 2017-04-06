@@ -1,10 +1,8 @@
 package shuvalov.nikita.mirrormirror;
 
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.RectF;
 import android.hardware.Camera;
-import android.util.Log;
 
 /**
  * Created by NikitaShuvalov on 3/31/17.
@@ -73,6 +71,7 @@ public class FaceTracker {
         mXOffset = xOffSet;
         mYOffset = yOffSet;
     }
+
 
     public void clearFace(){
         mFace = null;

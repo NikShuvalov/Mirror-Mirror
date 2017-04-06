@@ -19,111 +19,44 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.security.Permission;
 import java.util.Date;
-import java.util.jar.Manifest;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener, Camera.PictureCallback{
+//FixMe: Make it that the FilterImage flips the same way as the picture image is flipped. (Photo is flipped, filterImage isn't)
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Camera.PictureCallback, Camera.ShutterCallback{
     private Camera mCamera;
     private OverlayMod mOverlayMod;
     private FrameLayout mFaceDetect, mPreviewContainer;
     private Preview mPreview;
+    private int mCenterX, mCenterY;
+    private ImageButton mCameraButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-//
-//        SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-//        speechRecognizer.setRecognitionListener(new RecognitionListener() {
-//            String text;
-//            @Override
-//            public void onReadyForSpeech(Bundle bundle) {
-//
-//            }
-//
-//            @Override
-//            public void onBeginningOfSpeech() {
-//
-//            }
-//
-//            @Override
-//            public void onRmsChanged(float v) {
-//
-//            }
-//
-//            @Override
-//            public void onBufferReceived(byte[] bytes) {
-//
-//            }
-//
-//            @Override
-//            public void onEndOfSpeech() {
-//                mTextView.setText("Finished: "+ text);
-//            }
-//
-//            @Override
-//            public void onError(int i) {
-//
-//            }
-//
-//            @Override
-//            public void onResults(Bundle bundle) {
-//                ArrayList<String> recognizedSpeech = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-//                text = "";
-//                if(recognizedSpeech!=null && !recognizedSpeech.isEmpty()){
-//                    for(String word: recognizedSpeech){
-//                        text+=word+" ";
-//                    }
-//                    mTextView.setText(text);
-//                }
-//            }
-//
-//            @Override
-//            public void onPartialResults(Bundle bundle) {
-//                ArrayList<String> recognizedSpeech = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-//                String text = "";
-//                if(recognizedSpeech!=null && !recognizedSpeech.isEmpty()){
-//                    for(String word: recognizedSpeech){
-//                        text+=word+" ";
-//                    }
-//                    mTextView.setText(text);
-//                }
-//            }
-//
-//            @Override
-//            public void onEvent(int i, Bundle bundle) {
-//
-//
-//            }
-//        });
-////        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-////        speechRecognizer.startListening(intent);
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        mPreviewContainer = (FrameLayout) findViewById(R.id.preview);
-        mFaceDetect = (FrameLayout)findViewById(R.id.face_detect);
+        findViews();
+
 
         Display display = getWindow().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        int x = size.x;
-        int y = size.y;
+        mCenterX = size.x/2;
+        mCenterY = size.y/2;
 
 
-        FaceTracker.getInstance().setScreenOffset(x/2, y/2);
+        FaceTracker.getInstance().setScreenOffset(mCenterX, mCenterY);
 
         int cameraId = getIdForRequestedCamera(Camera.CameraInfo.CAMERA_FACING_FRONT);
 
@@ -139,7 +72,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPreviewContainer.addView(mPreview);
         mFaceDetect.addView(mOverlayMod);
         mPreviewContainer.setOnClickListener(this);
-        mPreviewContainer.setOnLongClickListener(this);
+        mCameraButton.setOnClickListener(this);
+    }
+
+    public void findViews(){
+        mPreviewContainer = (FrameLayout) findViewById(R.id.preview);
+        mFaceDetect = (FrameLayout)findViewById(R.id.face_detect);
+        mCameraButton = (ImageButton)findViewById(R.id.camera_button);
     }
 
     private static int getIdForRequestedCamera(int facing) {
@@ -165,53 +104,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        FilterManager.getInstance().moveToNextPosition();
-        mOverlayMod.notifyFilterChange();
+        switch (view.getId()){
+            case R.id.camera_button:
+                captureImage();
+                break;
+            default:
+                FilterManager.getInstance().moveToNextPosition();
+                mOverlayMod.notifyFilterChange();
+        }
     }
 
-    @Override
-    public boolean onLongClick(View view) {
+    public void captureImage() {
         int checkPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if(checkPermission== PackageManager.PERMISSION_DENIED){
             Toast.makeText(this, "Permission required for screenshots", Toast.LENGTH_SHORT).show();
+            //ToDo: Ask for permissions
         }else{
             Camera.Parameters param = mCamera.getParameters();
             param.setRotation(0);
             mCamera.setParameters(param);
-            mCamera.takePicture(null, this, this);
-//            takeScreenShot();
+            mCamera.takePicture(this, this, this);
         }
-        return true;
     }
-
-//    public void takeScreenShot(){
-//        Date now = new Date();
-//        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
-//
-//        try {
-//            // image naming and path  to include sd card  appending name you choose for file
-//            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
-//
-//            // create bitmap screen capture
-//            View v1 = getWindow().getDecorView().getRootView();
-//            v1.setDrawingCacheEnabled(true);
-//            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
-//            v1.setDrawingCacheEnabled(false);
-//
-//            File imageFile = new File(mPath);
-//
-//            FileOutputStream outputStream = new FileOutputStream(imageFile);
-//            int quality = 100;
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
-//            outputStream.flush();
-//            outputStream.close();
-//
-//            openScreenshot(imageFile);
-//        } catch (Throwable e) {
-//            // Several error may come out with file handling or OOM
-//            e.printStackTrace();
-//        }
-//    }
 
     public void openScreenshot(File imageFile){
         Intent intent = new Intent();
@@ -257,11 +171,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Bitmap filterBmp = BitmapFactory.decodeResource(getResources(), filter.getResourceInt());
 
         RectF faceRect = FaceTracker.getInstance().getFaceRect();
+        Matrix mirrorFilter = new Matrix();
+        mirrorFilter.postScale(-1, 1, mCenterX, mCenterY);
+        mirrorFilter.mapRect(faceRect);
+
         Rect r = new Rect();
         faceRect.round(r);
+
         canvas.drawBitmap(cameraPreview,0,0,null);
         canvas.drawBitmap(filterBmp, null, r, null);
         return drawnTogether;
     }
 
+    @Override
+    public void onShutter() {
+        //ToDo: Add sound or something.
+    }
 }
