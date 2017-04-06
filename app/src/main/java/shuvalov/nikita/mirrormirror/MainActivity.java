@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton mCameraButton;
     public static final int CAMERA_PERMISSION_REQUEST = 9999;
     public static final int STORAGE_PERMISSION_REQUEST = 2;
+    int debugCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mCenterX = size.x/2;
         mCenterY = size.y/2;
 
+        debugCount = 0;
 
         FaceTracker.getInstance().setScreenOffset(mCenterX, mCenterY);
 
@@ -159,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Camera.Parameters param = mCamera.getParameters();
             param.setRotation(0);
             mCamera.setParameters(param);
-            mCamera.takePicture(this, this, this);
+            mCamera.takePicture(this, null, this);
         }
     }
 
@@ -173,6 +175,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onPictureTaken(byte[] bytes, Camera camera) {
+        Log.d("Main", "onPictureTaken: "+debugCount);
+        debugCount++;
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
         try {
@@ -191,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             unfiltered = Bitmap.createBitmap(unfiltered, 0, 0, unfiltered.getWidth(),
                     unfiltered.getHeight(), matrix, true);
             Bitmap bitmap = getFilteredImage(unfiltered);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             outputStream.flush();
             outputStream.close();
             openScreenshot(imageFile);
@@ -221,6 +225,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onShutter() {
-        //ToDo: Add sound or something.
+        //ToDo: Add some kind of UX element to notify user of capture
     }
 }
