@@ -1,5 +1,6 @@
 package shuvalov.nikita.mirrormirror;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,7 +12,9 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Preview mPreview;
     private int mCenterX, mCenterY;
     private ImageButton mCameraButton;
+    public static final int CAMERA_PERMISSION_REQUEST = 9999;
+    public static final int STORAGE_PERMISSION_REQUEST = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +63,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         FaceTracker.getInstance().setScreenOffset(mCenterX, mCenterY);
 
+        int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if(checkPermission== PackageManager.PERMISSION_DENIED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+            }
+        }else{
+            setUp();
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode){
+            case CAMERA_PERMISSION_REQUEST:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    setUp();
+                }else{
+                    Toast.makeText(this, "This App requires Camera access", Toast.LENGTH_LONG).show();
+                }
+                break;
+//            case STORAGE_PERMISSION_REQUEST:
+//                if(grantResults.length>0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED);
+        }
+    }
+
+    public void setUp(){
         int cameraId = getIdForRequestedCamera(Camera.CameraInfo.CAMERA_FACING_FRONT);
 
         Log.d("b", "onCreate: "+cameraId);
@@ -115,10 +149,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void captureImage() {
-        int checkPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if(checkPermission== PackageManager.PERMISSION_DENIED){
             Toast.makeText(this, "Permission required for screenshots", Toast.LENGTH_SHORT).show();
-            //ToDo: Ask for permissions
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_REQUEST);
+            }
         }else{
             Camera.Parameters param = mCamera.getParameters();
             param.setRotation(0);
