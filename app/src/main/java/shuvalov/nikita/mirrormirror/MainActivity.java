@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton mCameraButton;
     public static final int CAMERA_PERMISSION_REQUEST = 9999;
     public static final int STORAGE_PERMISSION_REQUEST = 2;
-    int debugCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +59,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         display.getSize(size);
         mCenterX = size.x/2;
         mCenterY = size.y/2;
-
-        debugCount = 0;
 
         FaceTracker.getInstance().setScreenOffset(mCenterX, mCenterY);
 
@@ -175,8 +172,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onPictureTaken(byte[] bytes, Camera camera) {
-        Log.d("Main", "onPictureTaken: "+debugCount);
-        debugCount++;
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
         try {
@@ -214,6 +209,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Matrix mirrorFilter = new Matrix();
         mirrorFilter.postScale(-1, 1, mCenterX, mCenterY);
         mirrorFilter.mapRect(faceRect);
+        filterBmp = Bitmap.createBitmap(filterBmp, 0, 0,filterBmp.getWidth(),filterBmp.getHeight(),mirrorFilter,true);
+
 
         Rect r = new Rect();
         faceRect.round(r);
