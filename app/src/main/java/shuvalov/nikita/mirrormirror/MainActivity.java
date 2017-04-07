@@ -15,9 +15,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -36,7 +40,6 @@ import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.OverlayMod;
 
 
-//FixMe: Make it that the FilterImage flips the same way as the picture image is flipped. (Photo is flipped, filterImage isn't)
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Camera.PictureCallback, Camera.ShutterCallback{
     private Camera mCamera;
     private OverlayMod mOverlayMod;
@@ -46,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton mCameraButton;
     public static final int CAMERA_PERMISSION_REQUEST = 9999;
     public static final int STORAGE_PERMISSION_REQUEST = 2;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavView;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,11 +108,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setUp(){
         int cameraId = getIdForRequestedCamera(Camera.CameraInfo.CAMERA_FACING_FRONT);
 
+        setUpNavigationDrawer();
         Log.d("b", "onCreate: "+cameraId);
         mCamera = Camera.open(cameraId);
         mCamera.setDisplayOrientation(90);
         mOverlayMod = new OverlayMod(this);
-        mOverlayMod.setZOrderOnTop(true);
+        mOverlayMod.setZOrderMediaOverlay(true);
         mPreview = new Preview(this, mCamera);
 
         mPreview.prepareForDisplay(mCamera);
@@ -116,11 +123,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPreviewContainer.setOnClickListener(this);
         mCameraButton.setOnClickListener(this);
     }
+    public void setUpNavigationDrawer(){
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle("");
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar, R.string.drawer_open,R.string.drawer_closed);
+        mDrawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+    }
 
     public void findViews(){
         mPreviewContainer = (FrameLayout) findViewById(R.id.preview);
         mFaceDetect = (FrameLayout)findViewById(R.id.face_detect);
         mCameraButton = (ImageButton)findViewById(R.id.camera_button);
+
+        mNavView = (NavigationView)findViewById(R.id.navigation_view);
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+
+        mToolbar = (Toolbar)findViewById(R.id.toolbar);
     }
 
     private static int getIdForRequestedCamera(int facing) {
