@@ -84,9 +84,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, "This App requires Camera access", Toast.LENGTH_LONG).show();
                 }
                 break;
-//            case STORAGE_PERMISSION_REQUEST:
-//                if(grantResults.length>0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED);
+            case STORAGE_PERMISSION_REQUEST:
+                if(grantResults.length>0
+                        && grantResults[0] == PackageManager.PERMISSION_DENIED){
+                    Toast.makeText(this, "Permission required for screenshots", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 
@@ -150,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void captureImage() {
         int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if(checkPermission== PackageManager.PERMISSION_DENIED){
-            Toast.makeText(this, "Permission required for screenshots", Toast.LENGTH_SHORT).show();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_REQUEST);
             }
