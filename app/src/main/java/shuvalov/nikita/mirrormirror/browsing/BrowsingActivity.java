@@ -25,15 +25,15 @@ import shuvalov.nikita.mirrormirror.R;
 public class BrowsingActivity extends AppCompatActivity implements View.OnClickListener{
     private ImageView mImageView;
     private static final int READ_STORAGE_REQUEST = 42;
-    private ArrayList<File> mImageFiles;
-    public int mCurrentImage;
+    private BrowsingTracker mBrowsingTracker;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browsing);
 
-        mCurrentImage = 0;
+        mBrowsingTracker= BrowsingTracker.getInstance();
 
         findViews();
         permissionValidate();
@@ -59,7 +59,6 @@ public class BrowsingActivity extends AppCompatActivity implements View.OnClickL
     public void debugLoadImage(){
         File mirrorFolder = new File(AppConstants.getImageDirectoryPath());
         if(mirrorFolder.exists() && mirrorFolder.isDirectory()){
-            mImageFiles = new ArrayList<>();
             File[] files = mirrorFolder.listFiles();
             compileImageFiles(files);
         }
@@ -67,19 +66,21 @@ public class BrowsingActivity extends AppCompatActivity implements View.OnClickL
 
     public void compileImageFiles(File[] files) {
         if(files.length>0) {
+            ArrayList<File> imageFiles = new ArrayList<>();
             for (File f : files) {
                 if (!f.isDirectory() && f.getName().endsWith(".jpg")) {
-                    mImageFiles.add(f);
+                    imageFiles.add(f);
                 }
             }
+            mBrowsingTracker.setImageFiles(imageFiles);
         }else{
             Toast.makeText(this, "No files were found", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void loadImage(){
-        if(!mImageFiles.isEmpty()){
-            File firstFile = mImageFiles.get(mCurrentImage);
+        if(!mBrowsingTracker.isAlbumEmpty()){
+            File firstFile = mBrowsingTracker.getCurrentImageFile();
             try {
                 Bitmap bitmap = BitmapFactory.decodeFile(firstFile.getAbsolutePath());
                 mImageView.setImageBitmap(bitmap);
@@ -102,10 +103,7 @@ public class BrowsingActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View view) {
-        mCurrentImage++;
-        if(mCurrentImage>=mImageFiles.size()){
-            mCurrentImage=0;
-        }
+        mBrowsingTracker.moveToNextPicture();
         loadImage();
     }
 }
