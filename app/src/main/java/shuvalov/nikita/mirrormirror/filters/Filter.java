@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror;
+package shuvalov.nikita.mirrormirror.filters;
 
 /**
  * Created by NikitaShuvalov on 4/5/17.

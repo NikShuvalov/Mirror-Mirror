@@ -29,6 +29,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Date;
 
+import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
+import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
+import shuvalov.nikita.mirrormirror.filters.Filter;
+import shuvalov.nikita.mirrormirror.filters.FilterManager;
+import shuvalov.nikita.mirrormirror.filters.OverlayMod;
+
 
 //FixMe: Make it that the FilterImage flips the same way as the picture image is flipped. (Photo is flipped, filterImage isn't)
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Camera.PictureCallback, Camera.ShutterCallback{

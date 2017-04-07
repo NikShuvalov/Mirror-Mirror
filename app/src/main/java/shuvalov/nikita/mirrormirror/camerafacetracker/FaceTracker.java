@@ -1,8 +1,10 @@
-package shuvalov.nikita.mirrormirror;
+package shuvalov.nikita.mirrormirror.camerafacetracker;
 
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.hardware.Camera;
+
+import shuvalov.nikita.mirrormirror.filters.Filter;
 
 /**
  * Created by NikitaShuvalov on 3/31/17.

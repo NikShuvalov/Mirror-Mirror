@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror;
+package shuvalov.nikita.mirrormirror.filters;
 
 import android.annotation.SuppressLint;
 import android.graphics.Canvas;

@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror;
+package shuvalov.nikita.mirrormirror.filters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,12 +6,16 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
+import shuvalov.nikita.mirrormirror.filters.Filter;
+import shuvalov.nikita.mirrormirror.filters.FilterManager;
+import shuvalov.nikita.mirrormirror.filters.GraphicThread;
 
 /**
  * Created by NikitaShuvalov on 3/24/17.

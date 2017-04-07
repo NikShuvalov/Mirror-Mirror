@@ -1,11 +1,9 @@
-package shuvalov.nikita.mirrormirror;
+package shuvalov.nikita.mirrormirror.camerafacetracker;
 
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.hardware.Camera;
-import android.util.Log;
 
-import static android.content.ContentValues.TAG;
+import shuvalov.nikita.mirrormirror.filters.Filter;
+import shuvalov.nikita.mirrormirror.filters.FilterManager;
 
 /**
  * Created by NikitaShuvalov on 3/24/17.

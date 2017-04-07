@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror;
+package shuvalov.nikita.mirrormirror.camerafacetracker;
 
 import android.content.Context;
 import android.hardware.Camera;
@@ -7,6 +7,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
+
+import shuvalov.nikita.mirrormirror.camerafacetracker.MyFaceDetection;
 
 /**
  * Created by NikitaShuvalov on 3/24/17.

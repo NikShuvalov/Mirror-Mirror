@@ -1,6 +1,8 @@
-package shuvalov.nikita.mirrormirror;
+package shuvalov.nikita.mirrormirror.filters;
 
 import java.util.ArrayList;
+
+import shuvalov.nikita.mirrormirror.R;
 
 /**
  * Created by NikitaShuvalov on 4/2/17.
