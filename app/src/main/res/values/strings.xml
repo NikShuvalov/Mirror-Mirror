@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Mirror Mirror</string>
-    <string name = "drawer_open">Drawer opened</string>
-    <string name ="drawer_closed">Drawer closed</string>
+    <string name="drawer_open">Drawer opened</string>
+    <string name="drawer_closed">Drawer closed</string>
 </resources>

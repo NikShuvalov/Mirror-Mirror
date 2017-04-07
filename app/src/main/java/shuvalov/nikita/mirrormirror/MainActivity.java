@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Date;
 
+import shuvalov.nikita.mirrormirror.browsing.BrowsingActivity;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
 import shuvalov.nikita.mirrormirror.filters.Filter;
@@ -40,7 +42,7 @@ import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.OverlayMod;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, Camera.PictureCallback, Camera.ShutterCallback{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Camera.PictureCallback, Camera.ShutterCallback, NavigationView.OnNavigationItemSelectedListener{
     private Camera mCamera;
     private OverlayMod mOverlayMod;
     private FrameLayout mFaceDetect, mPreviewContainer;
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mCameraButton.setOnClickListener(this);
     }
     public void setUpNavigationDrawer(){
+        mNavView.setNavigationItemSelectedListener(this);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("");
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar, R.string.drawer_open,R.string.drawer_closed);
@@ -199,16 +202,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onPictureTaken(byte[] bytes, Camera camera) {
-        Date now = new Date();
-        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
         try {
-            File mirrorFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString()+"/MirrorScreens/");
+            File mirrorFolder = new File(AppConstants.getImageDirectoryPath());
             if(!mirrorFolder.exists()){
                 mirrorFolder.mkdirs();
             }
 
-            String mPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/" +"MirrorScreens/"+ now + ".jpg";
-            File imageFile = new File(mPath);
+            String path = AppConstants.getImageSavePath();
+            File imageFile = new File(path);
             FileOutputStream outputStream = new FileOutputStream(imageFile);
             Bitmap unfiltered = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
@@ -250,5 +251,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onShutter() {
         //ToDo: Add some kind of UX element to notify user of capture
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.browse_option:
+                Intent intent = new Intent(this, BrowsingActivity.class);
+                startActivity(intent);
+                break;
+        }
+        mDrawerLayout.closeDrawers();
+        return false;
     }
 }
