@@ -36,9 +36,9 @@ public class BrowseSwipeListener implements View.OnTouchListener {
         //If positive Y swipe is downward, if positive X swipe is rightward
         float deltaX = mUpX- mDownX;
         float deltaY = mUpY - mDownY;
+        SWIPE_DIRECTION swipeDirection = SWIPE_DIRECTION.CLICK;
         if(Math.abs(deltaX) > MIN_SWIPE_DISTANCE || Math.abs(deltaY) > MIN_SWIPE_DISTANCE){
             Log.d("Swipe", "countsAsSwipe: True");
-            SWIPE_DIRECTION swipeDirection;
             if(deltaX>0){
                 swipeDirection= SWIPE_DIRECTION.RIGHT;
             }else{
@@ -47,12 +47,13 @@ public class BrowseSwipeListener implements View.OnTouchListener {
             mSwipeListener.onSwipe(swipeDirection);
             return true;
         }
+        mSwipeListener.onSwipe(swipeDirection);
         return false;
     }
 
 
     public enum SWIPE_DIRECTION{
-        RIGHT, LEFT, UP, DOWN;
+        RIGHT, LEFT, UP, DOWN, CLICK;
     }
 
     public interface OnSwipeListener{

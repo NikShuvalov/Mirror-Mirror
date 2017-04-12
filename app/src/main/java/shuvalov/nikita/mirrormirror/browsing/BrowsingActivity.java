@@ -1,9 +1,11 @@
 package shuvalov.nikita.mirrormirror.browsing;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.net.URI;
 import java.security.Permission;
 import java.util.ArrayList;
 
@@ -114,7 +117,19 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
                 mBrowsingTracker.moveToNextPicture();
                 loadImage();
                 break;
-
+            case CLICK:
+                shareImage();
+                break;
         }
     }
+
+    public void shareImage() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        Uri imageUri = Uri.fromFile(mBrowsingTracker.getCurrentImageFile());
+        intent.putExtra(Intent.EXTRA_STREAM, imageUri);
+        intent.setType("image/jpeg");
+        startActivity(Intent.createChooser(intent, "Share to: "));
+    }
+
 }
