@@ -48,4 +48,5 @@ public class Filter {
     public float getOffsetYPercent() {
         return mOffsetYPercent;
     }
+
 }
