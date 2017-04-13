@@ -13,7 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.File;
@@ -30,6 +34,9 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
     private ImageView mImageView;
     private static final int READ_STORAGE_REQUEST = 42;
     private BrowsingTracker mBrowsingTracker;
+    private RelativeLayout mBottomPanel;
+    private ImageButton mShareButton;
+    private boolean mPanelShowing;
 
 
     @Override
@@ -37,15 +44,72 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browsing);
 
+        mPanelShowing = true;
         mBrowsingTracker= BrowsingTracker.getInstance();
 
         findViews();
         permissionValidate();
+        if(mPanelShowing) hideBottomPanel();
         loadImage();
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                shareImage();
+            }
+        });
+    }
+
+
+    public void hideBottomPanel(){
+        mPanelShowing = false;
+        Animation panelHideAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_panel_hide);
+        panelHideAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mBottomPanel.clearAnimation();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mBottomPanel.setAnimation(panelHideAnim);
+        mBottomPanel.setVisibility(View.GONE);
+    }
+
+    public void showBottomPanel(){
+        mPanelShowing= true;
+        Animation panelShowAnim = AnimationUtils.loadAnimation(this,R.anim.bottom_panel_show);
+        panelShowAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mBottomPanel.clearAnimation();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mBottomPanel.setAnimation(panelShowAnim);
+        mBottomPanel.setVisibility(View.VISIBLE);
     }
 
     public void findViews(){
         mImageView = (ImageView)findViewById(R.id.image_view);
+        mBottomPanel = (RelativeLayout)findViewById(R.id.bottom_panel_holder);
+        mShareButton = (ImageButton)findViewById(R.id.share_button);
         mImageView.setOnTouchListener(new BrowseSwipeListener(this));
     }
 
@@ -118,10 +182,12 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
                 loadImage();
                 break;
             case CLICK:
-                shareImage();
+                if(!mPanelShowing) showBottomPanel();
+                else hideBottomPanel();
                 break;
         }
     }
+
 
     public void shareImage() {
         Intent intent = new Intent();
