@@ -14,6 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/filters_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"/>
+
     <RelativeLayout
         android:id="@+id/hud_overlay"
         android:layout_width="match_parent"

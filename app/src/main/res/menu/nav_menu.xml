@@ -4,13 +4,7 @@
         android:id="@+id/browse_option"
         android:title="Browse"/>
     <item
-        android:id="@+id/hair_option"
-        android:title="Hair Filters"/>
-    <item
-        android:id="@+id/share_option"
-        android:title="Share"
-        android:icon="@android:drawable/ic_menu_share"
-        />
-
+        android:id="@+id/filter_options"
+        android:title="Filters"/>
 
 </menu>

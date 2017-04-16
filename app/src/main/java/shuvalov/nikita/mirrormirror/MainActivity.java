@@ -21,11 +21,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -39,6 +43,7 @@ import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
+import shuvalov.nikita.mirrormirror.filters.FilterSelectorAdapter;
 import shuvalov.nikita.mirrormirror.filters.OverlayMod;
 
 
@@ -54,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavView;
     private Toolbar mToolbar;
+    private RecyclerView mFilterRecycler;
+    private boolean mFilterSelectorVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +72,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
 
+        mFilterSelectorVisible = false;
         findViews();
-
-
         Display display = getWindow().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -83,8 +89,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }else{
             setUp();
+            setUpFilterSelector();
         }
 
+    }
+
+    public void setUpFilterSelector() {
+        LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mFilterRecycler.setAdapter(new FilterSelectorAdapter(FilterManager.getInstance().getFilters(), mOverlayMod));
+        mFilterRecycler.setLayoutManager(horizontalLayoutManager);
     }
 
     @Override
@@ -138,11 +151,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPreviewContainer = (FrameLayout) findViewById(R.id.preview);
         mFaceDetect = (FrameLayout)findViewById(R.id.face_detect);
         mCameraButton = (ImageButton)findViewById(R.id.camera_button);
-
         mNavView = (NavigationView)findViewById(R.id.navigation_view);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
+        mFilterRecycler = (RecyclerView)findViewById(R.id.filters_recycler);
     }
 
     private static int getIdForRequestedCamera(int facing) {
@@ -173,9 +185,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 captureImage();
                 break;
             default:
-                FilterManager.getInstance().moveToNextPosition();
-                mOverlayMod.notifyFilterChange();
+                if(!mFilterSelectorVisible) {
+                    replaceBottomView(mCameraButton, mFilterRecycler);
+                    mFilterSelectorVisible=true;
+                }else{
+                    replaceBottomView(mFilterRecycler, mCameraButton);
+                    mFilterSelectorVisible = false;
+                }
         }
+    }
+
+    public void replaceBottomView(final View viewToHide, final View viewToShow){
+        Animation hideAnim = AnimationUtils.loadAnimation(this,R.anim.bottom_panel_hide);
+        hideAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                viewToHide.clearAnimation();
+                showView(viewToShow);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        viewToHide.setAnimation(hideAnim);
+        viewToHide.setVisibility(View.INVISIBLE);
+    }
+
+    public void showView(final View v){
+        Animation showAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_panel_show);
+        showAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                v.clearAnimation();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        v.setAnimation(showAnim);
+        v.setVisibility(View.VISIBLE);
+
     }
 
     public void captureImage() {

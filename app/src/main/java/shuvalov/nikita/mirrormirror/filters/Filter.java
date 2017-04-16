@@ -9,8 +9,10 @@ public class Filter {
     private ImagePosition mImagePosition;
     private float mScaleX, mScaleY;
     private float mOffsetXPercent, mOffsetYPercent;
+    private String mFilterName;
 
-    public Filter(int resourceInt, ImagePosition imagePosition, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
+    public Filter(String filterName, int resourceInt, ImagePosition imagePosition, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
+        mFilterName = filterName;
         mResourceInt = resourceInt;
         mImagePosition = imagePosition;
         mScaleX = scaleX;
@@ -49,4 +51,7 @@ public class Filter {
         return mOffsetYPercent;
     }
 
+    public String getFilterName() {
+        return mFilterName;
+    }
 }
