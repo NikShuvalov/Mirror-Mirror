@@ -1,10 +1,17 @@
 package shuvalov.nikita.mirrormirror.camerafacetracker;
 
 import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.hardware.Camera;
+import android.util.Log;
+
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.Tracker;
+import com.google.android.gms.vision.face.Face;
 
 import shuvalov.nikita.mirrormirror.filters.Filter;
+import shuvalov.nikita.mirrormirror.filters.FilterManager;
 
 /**
  * Created by NikitaShuvalov on 3/31/17.
@@ -12,9 +19,9 @@ import shuvalov.nikita.mirrormirror.filters.Filter;
 
 
 //ToDO: Add a variable to hold the position above the head?
-public class FaceTracker {
-    private Camera.Face mFace;
-    private int mXOffset, mYOffset;
+public class FaceTracker extends Tracker<Face>{
+//    private Face mFace;
+    private int mScreenWidth, mScreenHeight;
     private RectF mFaceRect;
 
 
@@ -31,16 +38,17 @@ public class FaceTracker {
     }
 
     public void setFace(Camera.Face face, Filter filter){
-        mFace = face;
-        mFaceRect = new RectF(mFace.rect);
+//        mFace = face;
+//        mFaceRect = new RectF(mFace.rect);
         Matrix matrix = new Matrix();
         matrix.setScale(-1, 1);
-        // This is the value for android.hardware.Camera.setDisplayOrientation.
-        matrix.postRotate(90);
-        // Camera driver coordinates range from (-1000, -1000) to (1000, 1000).
-        // UI coordinates range from (0, 0) to (width, height).
-        matrix.postScale((mXOffset*2)/ 2000f, (mYOffset*2) / 2000f);
-        matrix.postTranslate(mXOffset+(int)(mFace.rect.width()*filter.getOffsetXPercent()), mYOffset + (int)(mFace.rect.height()*filter.getOffsetYPercent()));
+
+//        // This is the value for android.hardware.Camera.setDisplayOrientation.
+//        matrix.postRotate(90);
+//        // Camera driver coordinates range from (-1000, -1000) to (1000, 1000).
+//        // UI coordinates range from (0, 0) to (width, height).
+//        matrix.postScale((mXOffset*2)/ 2000f, (mYOffset*2) / 2000f);
+//        matrix.postTranslate(mXOffset+(int)(mFace.rect.width()*filter.getOffsetXPercent()), mYOffset + (int)(mFace.rect.height()*filter.getOffsetYPercent()));
         matrix.mapRect(mFaceRect);
 
         resizeFaceRect(filter);
@@ -69,16 +77,55 @@ public class FaceTracker {
     }
 
     //Takes into account that the camera driver coordinates have 0,0 at center of screen.
-    public void setScreenOffset(int xOffSet, int yOffSet){
-        mXOffset = xOffSet;
-        mYOffset = yOffSet;
+    public void setScreenSize(int screenHeight, int screenWidth){
+        mScreenWidth = screenWidth;
+        mScreenHeight = screenHeight;
     }
+
 
 
     public void clearFace(){
-        mFace = null;
+//        mFace = null;
         mFaceRect = null;
     }
 
+    public void setNewFacePosition(Face face){
+//        mFace = face;
+        PointF pos = face.getPosition();
+        Float faceHeight = face.getHeight();
+        Float faceWidth = face.getWidth();
+        Log.d("Face", "setNewFacePosition: "+ pos.x + "," + pos.y);
 
+//        scale
+        mFaceRect = new RectF(pos.x, pos.y, pos.x+faceWidth, pos.y+faceHeight);
+
+        Matrix matrix = new Matrix();
+        matrix.setScale(-1, 1);
+//        matrix.postTranslate((Math.abs(pos.x-faceWidth)*2)+faceWidth,0);
+//        matrix.postTranslate(mScreenWidth/2+(int)(mFaceRect.width()), mScreenHeight/2 + (int)(mFaceRect.height()));
+
+        matrix.mapRect(mFaceRect);
+        Log.d("Face", "setScaledPosition: "+ mFaceRect.left+","+mFaceRect.top);
+//        resizeFaceRect(FilterManager.getInstance().getSelectedFilter());
+    }
+
+    @Override
+    public void onNewItem(int i, Face face) {
+        setNewFacePosition(face);
+    }
+
+    @Override
+    public void onUpdate(Detector.Detections<Face> detections, Face face) {
+        setNewFacePosition(face);
+    }
+
+    @Override
+    public void onMissing(Detector.Detections<Face> detections) {
+        clearFace();
+    }
+
+    @Override
+    public void onDone() {
+        clearFace();
+    }
 }
