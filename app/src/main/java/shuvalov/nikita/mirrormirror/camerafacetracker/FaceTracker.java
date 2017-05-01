@@ -92,17 +92,15 @@ public class FaceTracker extends Tracker<Face>{
     public void setNewFacePosition(Face face){
 //        mFace = face;
         PointF pos = face.getPosition();
-        Float faceHeight = face.getHeight();
-        Float faceWidth = face.getWidth();
+        float posX = pos.x;
+        float faceHeight = face.getHeight();
+        float faceWidth = face.getWidth();
         Log.d("Face", "setNewFacePosition: "+ pos.x + "," + pos.y);
 
-//        scale
         mFaceRect = new RectF(pos.x, pos.y, pos.x+faceWidth, pos.y+faceHeight);
 
         Matrix matrix = new Matrix();
-        matrix.setScale(-1, 1);
-//        matrix.postTranslate((Math.abs(pos.x-faceWidth)*2)+faceWidth,0);
-//        matrix.postTranslate(mScreenWidth/2+(int)(mFaceRect.width()), mScreenHeight/2 + (int)(mFaceRect.height()));
+        matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2);
 
         matrix.mapRect(mFaceRect);
         Log.d("Face", "setScaledPosition: "+ mFaceRect.left+","+mFaceRect.top);
