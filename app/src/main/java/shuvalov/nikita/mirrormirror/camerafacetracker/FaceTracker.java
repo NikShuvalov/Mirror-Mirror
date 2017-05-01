@@ -20,7 +20,6 @@ import shuvalov.nikita.mirrormirror.filters.FilterManager;
 
 //ToDO: Add a variable to hold the position above the head?
 public class FaceTracker extends Tracker<Face>{
-//    private Face mFace;
     private int mScreenWidth, mScreenHeight;
     private RectF mFaceRect;
 
@@ -35,23 +34,6 @@ public class FaceTracker extends Tracker<Face>{
             sFaceTracker = new FaceTracker();
         }
         return sFaceTracker;
-    }
-
-    public void setFace(Camera.Face face, Filter filter){
-//        mFace = face;
-//        mFaceRect = new RectF(mFace.rect);
-        Matrix matrix = new Matrix();
-        matrix.setScale(-1, 1);
-
-//        // This is the value for android.hardware.Camera.setDisplayOrientation.
-//        matrix.postRotate(90);
-//        // Camera driver coordinates range from (-1000, -1000) to (1000, 1000).
-//        // UI coordinates range from (0, 0) to (width, height).
-//        matrix.postScale((mXOffset*2)/ 2000f, (mYOffset*2) / 2000f);
-//        matrix.postTranslate(mXOffset+(int)(mFace.rect.width()*filter.getOffsetXPercent()), mYOffset + (int)(mFace.rect.height()*filter.getOffsetYPercent()));
-        matrix.mapRect(mFaceRect);
-
-        resizeFaceRect(filter);
     }
 
     public void resizeFaceRect(Filter filter){
@@ -85,14 +67,11 @@ public class FaceTracker extends Tracker<Face>{
 
 
     public void clearFace(){
-//        mFace = null;
         mFaceRect = null;
     }
 
     public void setNewFacePosition(Face face){
-//        mFace = face;
         PointF pos = face.getPosition();
-        float posX = pos.x;
         float faceHeight = face.getHeight();
         float faceWidth = face.getWidth();
         Log.d("Face", "setNewFacePosition: "+ pos.x + "," + pos.y);
@@ -100,11 +79,17 @@ public class FaceTracker extends Tracker<Face>{
         mFaceRect = new RectF(pos.x, pos.y, pos.x+faceWidth, pos.y+faceHeight);
 
         Matrix matrix = new Matrix();
+        //Rotates the face detection across center of screen, since Front facing camera has a mirrored display
         matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2);
+
+        Filter filter = FilterManager.getInstance().getSelectedFilter();
+
+        //Moves the filter to the appropriate location depending on what kind of filter it is, face, hair, hat, etc.
+        matrix.postTranslate(0, (int)(mFaceRect.height()*filter.getOffsetYPercent()));
 
         matrix.mapRect(mFaceRect);
         Log.d("Face", "setScaledPosition: "+ mFaceRect.left+","+mFaceRect.top);
-//        resizeFaceRect(FilterManager.getInstance().getSelectedFilter());
+        resizeFaceRect(FilterManager.getInstance().getSelectedFilter());
     }
 
     @Override

@@ -18,7 +18,6 @@ public class MyFaceDetection implements Camera.FaceDetectionListener {
             Camera.Face face = faces[0];
             if(face!=null){
                 Filter filter = FilterManager.getInstance().getSelectedFilter();
-                f.setFace(face,filter);
             }else{
                 f.clearFace();
             }
