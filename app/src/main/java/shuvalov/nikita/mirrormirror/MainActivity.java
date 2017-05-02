@@ -1,7 +1,6 @@
 package shuvalov.nikita.mirrormirror;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RecyclerView mFilterRecycler;
     private boolean mFilterSelectorVisible;
     public CameraSource mCameraSource;
+    private FaceDetector mFaceDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +92,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
             }
         } else {
-            FaceDetector faceDetector = createFaceDetector();
-            createCameraSource(faceDetector, CameraSource.CAMERA_FACING_FRONT);
+            createFaceDetector();
+            createCameraSource(mFaceDetector, CameraSource.CAMERA_FACING_FRONT);
             setUp();
             setUpFilterSelector();
         }
@@ -108,8 +108,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
     }
 
-    public FaceDetector createFaceDetector(){
-        FaceDetector faceDetector = new FaceDetector.Builder(this).setLandmarkType(FaceDetector.ALL_LANDMARKS)
+    public void createFaceDetector(){
+        mFaceDetector = new FaceDetector.Builder(this).setLandmarkType(FaceDetector.ALL_LANDMARKS)
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .setTrackingEnabled(true)
                 .setMode(FaceDetector.FAST_MODE)
@@ -119,9 +119,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Detector.Processor<Face> processor;
         Tracker<Face> tracker = FaceTracker.getInstance();
-        processor = new LargestFaceFocusingProcessor.Builder(faceDetector,tracker).build();
-        faceDetector.setProcessor(processor);
-        return faceDetector;
+        processor = new LargestFaceFocusingProcessor.Builder(mFaceDetector,tracker).build();
+        mFaceDetector.setProcessor(processor);
     }
 
     public void setUpFilterSelector() {
@@ -154,11 +153,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setUpNavigationDrawer();
         mOverlayMod = new OverlayMod(this);
         mOverlayMod.setZOrderMediaOverlay(true);
-        mPreview = new Preview(this);
 
+        mPreview = new Preview(this);
         mPreview.setCameraSource(mCameraSource);
+
         mPreviewContainer.addView(mPreview);
         mFaceDetect.addView(mOverlayMod);
+
         mPreviewContainer.setOnClickListener(this);
         mCameraButton.setOnClickListener(this);
     }
@@ -185,15 +186,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         super.onPause();
-        mCameraSource.stop();
+        mFaceDetect.removeAllViews();
+        mPreviewContainer.removeView(mPreview);
+        if(mCameraSource!=null){
+            mCameraSource.stop();
+        }
+        if(mFaceDetector!=null && mFaceDetector.isOperational()){
+            mFaceDetector.release();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mFaceDetect.removeAllViews();
-        mPreviewContainer.removeView(mPreview);
-        mCameraSource.release();
+        if(mCameraSource!=null){
+            mCameraSource.release();
+        }
     }
 
     @Override
@@ -260,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void captureImage() {
-        Toast.makeText(this, "And this is where the picture would be captured, If I could", Toast.LENGTH_SHORT).show();
         int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (checkPermission == PackageManager.PERMISSION_DENIED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -269,14 +276,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             mCameraSource.takePicture(this, this);
         }
-    }
-
-    public void openScreenshot(File imageFile) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        Uri uri = Uri.fromFile(imageFile);
-        intent.setDataAndType(uri, "image/*");
-        startActivity(intent);
     }
 
     @Override
@@ -294,8 +293,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             Matrix matrix = new Matrix();
             matrix.postRotate(270);
+
+
             unfiltered = Bitmap.createBitmap(unfiltered, 0, 0, unfiltered.getWidth(),
                     unfiltered.getHeight(), matrix, true);
+
             Bitmap bitmap = getFilteredImage(unfiltered);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             outputStream.flush();
@@ -307,24 +309,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public Bitmap getFilteredImage(Bitmap cameraPreview) {
-        Bitmap drawnTogether = Bitmap.createBitmap(cameraPreview.getWidth(), cameraPreview.getHeight(), cameraPreview.getConfig());
+        Bitmap drawnTogether = Bitmap.createBitmap(mViewWidth, mViewHeight, cameraPreview.getConfig());
         Canvas canvas = new Canvas(drawnTogether);
         Filter filter = FilterManager.getInstance().getSelectedFilter();
         Bitmap filterBmp = BitmapFactory.decodeResource(getResources(), filter.getResourceInt());
 
-        RectF faceRect = FaceTracker.getInstance().getFaceRect();
-//        Matrix mirrorFilter = new Matrix();
-//        mirrorFilter.postScale(-1, 1, mCenterX, mCenterY);
-//        mirrorFilter.mapRect(faceRect);
-        filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth(), filterBmp.getHeight()); //ToDo: If it turns I need matrix, don't forget to add in the matrix parameters here.
+        FaceTracker faceTracker = FaceTracker.getInstance();
+        RectF faceRect = faceTracker.getFaceRect(); //ToDo: Lock faceRect so that it isn't pulled until after it's done being resized/moved?
 
+        Matrix mirrorFilter = new Matrix();
+        float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();
+        float scaleY = drawnTogether.getHeight()/faceTracker.getScreenHeight();
+        mirrorFilter.postScale(-1, 1, mViewWidth/2, mViewHeight/2);
+        mirrorFilter.mapRect(faceRect);
+        filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth()*(int)scaleX, filterBmp.getHeight()*(int)scaleY, mirrorFilter, true); //ToDo: If it turns I need matrix, don't forget to add in the matrix parameters here.
 
-        Rect r = new Rect();
-        faceRect.round(r);
+        Rect fr = new Rect();
+        faceRect.round(fr);
 
-        canvas.drawBitmap(cameraPreview, 0, 0, null);
-        canvas.drawBitmap(filterBmp, null, r, null);
+        Rect previewRect = new Rect(0,0,mViewWidth,mViewHeight);
+
+        canvas.drawBitmap(cameraPreview, null, previewRect, null);
+        canvas.drawBitmap(filterBmp, null, fr, null);
         return drawnTogether;
+    }
+
+    public void openScreenshot(File imageFile) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(imageFile);
+        intent.setDataAndType(uri, "image/*");
+        startActivity(intent);        //FixMe: APK 24+ doesn't allow this to work
     }
 
     @Override

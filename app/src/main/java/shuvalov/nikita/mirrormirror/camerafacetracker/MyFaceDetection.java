@@ -25,5 +25,4 @@ public class MyFaceDetection implements Camera.FaceDetectionListener {
             f.clearFace();
         }
     }
-
 }

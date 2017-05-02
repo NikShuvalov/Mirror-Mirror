@@ -36,7 +36,8 @@ public class FaceTracker extends Tracker<Face>{
         return sFaceTracker;
     }
 
-    public void resizeFaceRect(Filter filter){
+
+    private void resizeFaceRect(Filter filter){
         float centerY = mFaceRect.centerY();
         float yDelta = Math.abs(centerY - mFaceRect.top);
         float yScale = filter.getScaleY();
@@ -58,13 +59,18 @@ public class FaceTracker extends Tracker<Face>{
         return mFaceRect;
     }
 
-    //Takes into account that the camera driver coordinates have 0,0 at center of screen.
     public void setScreenSize(int screenHeight, int screenWidth){
         mScreenWidth = screenWidth;
         mScreenHeight = screenHeight;
     }
 
+    public int getScreenWidth() {
+        return mScreenWidth;
+    }
 
+    public int getScreenHeight() {
+        return mScreenHeight;
+    }
 
     public void clearFace(){
         mFaceRect = null;
@@ -74,11 +80,11 @@ public class FaceTracker extends Tracker<Face>{
         PointF pos = face.getPosition();
         float faceHeight = face.getHeight();
         float faceWidth = face.getWidth();
-        Log.d("Face", "setNewFacePosition: "+ pos.x + "," + pos.y);
 
         mFaceRect = new RectF(pos.x, pos.y, pos.x+faceWidth, pos.y+faceHeight);
 
         Matrix matrix = new Matrix();
+
         //Rotates the face detection across center of screen, since Front facing camera has a mirrored display
         matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2);
 
@@ -88,7 +94,6 @@ public class FaceTracker extends Tracker<Face>{
         matrix.postTranslate(0, (int)(mFaceRect.height()*filter.getOffsetYPercent()));
 
         matrix.mapRect(mFaceRect);
-        Log.d("Face", "setScaledPosition: "+ mFaceRect.left+","+mFaceRect.top);
         resizeFaceRect(FilterManager.getInstance().getSelectedFilter());
     }
 
