@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list
+    android:oneshot="false"
+    android:id= "@+id/debug_animate"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/eye_of_sauron" android:duration="300"/>
+    <item android:drawable="@drawable/corgi" android:duration="300"/>
+    <item android:drawable="@drawable/beautify_mirror" android:duration="300"/>
+    <item android:drawable="@drawable/super_saiyan" android:duration="300"/>
+
+</animation-list>

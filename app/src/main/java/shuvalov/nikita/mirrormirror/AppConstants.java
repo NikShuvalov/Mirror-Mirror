@@ -17,7 +17,7 @@ public class AppConstants {
     public static String getImageSavePath(){
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
-        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/" +"MirrorScreens/"+ now + ".jpg";
+        return getImageDirectoryPath()+ now + ".jpg";
     }
 
     /**

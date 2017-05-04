@@ -10,7 +10,6 @@ import com.google.android.gms.vision.CameraSource;
 
 import java.io.IOException;
 
-import shuvalov.nikita.mirrormirror.camerafacetracker.MyFaceDetection;
 
 /**
  * Created by NikitaShuvalov on 3/24/17.
@@ -45,9 +44,6 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
         mCameraSource = cameraSource;
         mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
-        mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-//        MyFaceDetection faceDetector = new MyFaceDetection();
-//        mCamera.setFaceDetectionListener(faceDetector);
     }
 
 
@@ -55,22 +51,10 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         try {
             mCameraSource.start(getHolder());
-//            startFaceDetection();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-//    public void startFaceDetection(){
-//        // Try starting Face Detection
-//        Camera.Parameters params = mCamera.getParameters();
-//
-//        // start face detection only *after* preview has started
-//        if (params.getMaxNumDetectedFaces() > 0){
-//            // camera supports face detection, so can start it:
-//            mCamera.startFaceDetection();
-//        }
-//    }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {

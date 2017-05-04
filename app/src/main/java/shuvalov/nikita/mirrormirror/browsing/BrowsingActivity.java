@@ -140,7 +140,12 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
                     imageFiles.add(f);
                 }
             }
-            mBrowsingTracker.setImageFiles(imageFiles);
+            //Since the user can't delete images from the app itself, if the amount of files in external storage == amount of files in the tracker, then every image is already loaded and there's no need to reload them.
+            //FixMe: Once user can delete images more readily might want to just clear cache and reload images every time. Or better yet look at timestamp of most recent image in both cache and external storage to determine if images need to be recached.
+            if(mBrowsingTracker.albumSize() != imageFiles.size()){
+                mBrowsingTracker.clearCache();
+                mBrowsingTracker.setImageFiles(imageFiles);
+            }
         }else{
             Toast.makeText(this, "No files were found", Toast.LENGTH_SHORT).show();
         }
@@ -171,7 +176,6 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
 
     @Override
     public void onSwipe(BrowseSwipeListener.SWIPE_DIRECTION d) {
-        Log.d("MainActivity", "onSwipe: "+ d);
         switch(d){
             case RIGHT:
                 mBrowsingTracker.moveToPreviousPicture();

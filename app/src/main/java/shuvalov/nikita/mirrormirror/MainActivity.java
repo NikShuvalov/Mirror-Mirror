@@ -3,6 +3,7 @@ package shuvalov.nikita.mirrormirror;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -22,6 +23,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,10 +42,13 @@ import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import shuvalov.nikita.mirrormirror.browsing.BrowsingActivity;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
+import shuvalov.nikita.mirrormirror.filters.AnimatedFilter;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.FilterSelectorAdapter;
@@ -70,6 +75,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //toDo: Should put a static image for animated filters to put in the recycler.
+        AnimatedFilter f = new AnimatedFilter("Test", R.drawable.debug_animated, Filter.ImagePosition.FACE, 1f, 1f, 0, 0,getBitmapList());
+        FilterManager.getInstance().addAnimatedFilters(f);
+    }
+
+    private List<Bitmap> getBitmapList(){
+        List<Bitmap> bitmapList = new ArrayList<>();
+        TypedArray tarray = getResources().obtainTypedArray(R.array.test_animation_list);
+        for(int i = 0; i<tarray.length();i++){
+            bitmapList.add(BitmapFactory.decodeResource(getResources(),tarray.getResourceId(i,-1)));
+        }
+        tarray.recycle();
+        Log.d("Bitmap", "getBitmapList: "+bitmapList.size());
+        return bitmapList;
     }
 
     @Override
@@ -288,6 +308,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             String path = AppConstants.getImageSavePath();
             File imageFile = new File(path);
+
+            //ToDo: Allow user instead to choose whether they want to keep or discard an image.
             FileOutputStream outputStream = new FileOutputStream(imageFile);
             Bitmap unfiltered = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 

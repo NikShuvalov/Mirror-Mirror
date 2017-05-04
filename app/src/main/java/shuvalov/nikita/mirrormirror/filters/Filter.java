@@ -1,10 +1,12 @@
 package shuvalov.nikita.mirrormirror.filters;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by NikitaShuvalov on 4/5/17.
  */
 
-public class Filter {
+public abstract class Filter {
     private int mResourceInt;
     private ImagePosition mImagePosition;
     private float mScaleX, mScaleY;
@@ -21,6 +23,14 @@ public class Filter {
         mOffsetYPercent = offsetYPercent;
     }
 
+    /**
+     *Use this method on animated filters to get the current frames bitmap. Doesn't work on static filters.
+     *
+     * @returns a bitmap if the filter is animated, returns null if static.
+     */
+    public abstract Bitmap getBitmap(long currentMillis);
+
+    public abstract boolean isAnimated();
 
     //FixME: This is effectively useless, unless if I decide to use different filters at once. Like a mix-and-match type deal.
     public enum ImagePosition{

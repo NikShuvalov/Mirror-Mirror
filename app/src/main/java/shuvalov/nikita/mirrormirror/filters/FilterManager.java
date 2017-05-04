@@ -1,6 +1,9 @@
 package shuvalov.nikita.mirrormirror.filters;
 
+import android.content.Context;
+
 import java.util.ArrayList;
+import java.util.Collection;
 
 import shuvalov.nikita.mirrormirror.R;
 
@@ -19,11 +22,11 @@ public class FilterManager {
 
     private void prepareAllImages(){
         mFilters = new ArrayList<>();
-        mFilters.add(new Filter("Instant Beauty", R.drawable.beautify_mirror, Filter.ImagePosition.FACE,1.1f, 1.2f, 0, 0));
-        mFilters.add(new Filter("Corgi", R.drawable.corgi, Filter.ImagePosition.FACE,1.1f, 1.2f, 0, 0));
-        mFilters.add(new Filter("Top Hat", R.drawable.top_hat, Filter.ImagePosition.TOP_OF_HEAD, 1f, 1f, 0, -0.5f));
-        mFilters.add(new Filter("Truompee", R.drawable.trump_toupee, Filter.ImagePosition.HAIRLINE, 0.85f, 0.4f, 0, -0.35f));
-        mFilters.add(new Filter("Saiyan", R.drawable.super_saiyan, Filter.ImagePosition.HAIRLINE, 1.75f, 1.5f, 0, -0.5f));
+        mFilters.add(new StaticFilter("Instant Beauty", R.drawable.beautify_mirror, Filter.ImagePosition.FACE,1.1f, 1.2f, 0, 0));
+        mFilters.add(new StaticFilter("Corgi", R.drawable.corgi, Filter.ImagePosition.FACE,1.1f, 1.2f, 0, 0));
+        mFilters.add(new StaticFilter("Top Hat", R.drawable.top_hat, Filter.ImagePosition.TOP_OF_HEAD, 1f, 1f, 0, -0.5f));
+        mFilters.add(new StaticFilter("Truompee", R.drawable.trump_toupee, Filter.ImagePosition.HAIRLINE, 0.85f, 0.4f, 0, -0.35f));
+        mFilters.add(new StaticFilter("Saiyan", R.drawable.super_saiyan, Filter.ImagePosition.HAIRLINE, 1.75f, 1.5f, 0, -0.5f));
     }
 
     private static FilterManager sFilterManager;
@@ -57,5 +60,11 @@ public class FilterManager {
 
     public int getCurrentPosition() {
         return mCurrentPosition;
+    }
+
+    public void addAnimatedFilters(AnimatedFilter... animatedFilters){
+        for(Filter f: animatedFilters){
+            mFilters.add(f);
+        }
     }
 }

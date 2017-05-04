@@ -12,6 +12,7 @@ import android.graphics.RectF;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
@@ -25,6 +26,7 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
     private GraphicThread mGraphicThread;
     private Bitmap mBitmap;
     private Rect mRect;
+    private boolean mUsingAnimated;
 
     public OverlayMod(Context context) {
         super(context);
@@ -33,7 +35,11 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
         surfaceHolder.addCallback(this);
 
         Filter f = FilterManager.getInstance().getSelectedFilter();
-        mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
+        if(mUsingAnimated = f.isAnimated()){
+            mBitmap = f.getBitmap(System.currentTimeMillis());
+        }else{
+            mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
+        }
         mRect = new Rect();
     }
 
@@ -44,6 +50,10 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
         canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
         if(face!=null){
             face.round(mRect);
+            //ToDo: Consider just checking if we're using an animated filter here if issues arise. But for now it seems it would be more optimal if we update the boolean on filter change.
+            if(mUsingAnimated){
+                mBitmap = FilterManager.getInstance().getSelectedFilter().getBitmap(System.currentTimeMillis());
+            }
             canvas.drawBitmap(mBitmap, null, mRect, null);
             mRect.setEmpty();
         }
@@ -69,6 +79,10 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
 
     public void notifyFilterChange() {
         Filter f = FilterManager.getInstance().getSelectedFilter();
-        mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
+        if(mUsingAnimated = f.isAnimated()){
+            mBitmap = f.getBitmap(System.currentTimeMillis());
+        }else{
+            mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
+        }
     }
 }

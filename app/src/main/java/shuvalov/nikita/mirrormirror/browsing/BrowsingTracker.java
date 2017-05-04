@@ -2,6 +2,7 @@ package shuvalov.nikita.mirrormirror.browsing;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by NikitaShuvalov on 4/7/17.
@@ -27,6 +28,8 @@ public class BrowsingTracker {
 
     public void setImageFiles(ArrayList<File> imageFiles) {
         mImageFiles = imageFiles;
+        Collections.reverse(mImageFiles);
+        mCurrentIndex = 0;
     }
 
     public File getCurrentImageFile(){
@@ -49,5 +52,14 @@ public class BrowsingTracker {
 
     public boolean isAlbumEmpty(){
         return mImageFiles.isEmpty();
+    }
+
+    public void clearCache(){
+        mImageFiles.clear();
+        mCurrentIndex = 0;
+    }
+
+    public int albumSize(){
+        return mImageFiles.size();
     }
 }
