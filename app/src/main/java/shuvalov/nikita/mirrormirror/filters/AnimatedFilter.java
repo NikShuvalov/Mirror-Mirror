@@ -20,7 +20,7 @@ public class AnimatedFilter extends Filter {
         super(filterName, resourceInt, imagePosition, scaleX, scaleY, offsetXPercent, offsetYPercent);
         mAnimationList = animationList;
         mIndex = 0;
-        mMillisPerFrame = 400; //ToDo: Change from hard-coded value.
+        mMillisPerFrame = 200; //ToDo: Change from hard-coded value.
         mLastFrameMillis = 0;
     }
 

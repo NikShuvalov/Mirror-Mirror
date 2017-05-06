@@ -77,13 +77,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         //toDo: Should put a static image for animated filters to put in the recycler.
-        AnimatedFilter f = new AnimatedFilter("Test", R.drawable.debug_animated, Filter.ImagePosition.FACE, 1f, 1f, 0, 0,getBitmapList());
+        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.ImagePosition.FACE, 1.25f, 1.5f, 0, -0.65f,getBitmapList());
         FilterManager.getInstance().addAnimatedFilters(f);
     }
 
     private List<Bitmap> getBitmapList(){
         List<Bitmap> bitmapList = new ArrayList<>();
-        TypedArray tarray = getResources().obtainTypedArray(R.array.test_animation_list);
+        TypedArray tarray = getResources().obtainTypedArray(R.array.flame_animation_list);
         for(int i = 0; i<tarray.length();i++){
             bitmapList.add(BitmapFactory.decodeResource(getResources(),tarray.getResourceId(i,-1)));
         }

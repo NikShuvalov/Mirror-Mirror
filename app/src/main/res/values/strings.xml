@@ -3,10 +3,13 @@
     <string name="drawer_open">Drawer opened</string>
     <string name="drawer_closed">Drawer closed</string>
 
-    <integer-array name="test_animation_list">
-        <item>@drawable/beautify_mirror</item>
-        <item>@drawable/eye_of_sauron</item>
-        <item>@drawable/corgi</item>
-        <item>@drawable/super_saiyan</item>
+    <integer-array name="flame_animation_list">
+        <item>@drawable/flamekey0</item>
+        <item>@drawable/flamekey1</item>
+        <item>@drawable/flamekey2</item>
+        <item>@drawable/flamekey3</item>
+        <item>@drawable/flamekey4</item>
+        <item>@drawable/flamekey5</item>
+        <item>@drawable/flamekey6</item>
     </integer-array>
 </resources>
