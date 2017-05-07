@@ -32,6 +32,8 @@ public abstract class Filter {
 
     public abstract boolean isAnimated();
 
+    public boolean isParticle(){return false;}
+
     //FixME: This is effectively useless, unless if I decide to use different filters at once. Like a mix-and-match type deal.
     public enum ImagePosition{
         TOP_OF_HEAD, FACE, BELOW_FACE, HAIRLINE

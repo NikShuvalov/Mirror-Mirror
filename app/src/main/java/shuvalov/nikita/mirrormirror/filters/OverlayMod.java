@@ -9,6 +9,7 @@ import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.SystemClock;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -36,7 +37,7 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
 
         Filter f = FilterManager.getInstance().getSelectedFilter();
         if(mUsingAnimated = f.isAnimated()){
-            mBitmap = f.getBitmap(System.currentTimeMillis());
+            mBitmap = f.getBitmap(SystemClock.uptimeMillis());
         }else{
             mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
         }
@@ -52,7 +53,7 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
             face.round(mRect);
             //ToDo: Consider just checking if we're using an animated filter here if issues arise. But for now it seems it would be more optimal if we update the boolean on filter change.
             if(mUsingAnimated){
-                mBitmap = FilterManager.getInstance().getSelectedFilter().getBitmap(System.currentTimeMillis());
+                mBitmap = FilterManager.getInstance().getSelectedFilter().getBitmap(SystemClock.uptimeMillis());
             }
             canvas.drawBitmap(mBitmap, null, mRect, null);
             mRect.setEmpty();
@@ -80,7 +81,7 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
     public void notifyFilterChange() {
         Filter f = FilterManager.getInstance().getSelectedFilter();
         if(mUsingAnimated = f.isAnimated()){
-            mBitmap = f.getBitmap(System.currentTimeMillis());
+            mBitmap = f.getBitmap(SystemClock.uptimeMillis());
         }else{
             mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
         }
