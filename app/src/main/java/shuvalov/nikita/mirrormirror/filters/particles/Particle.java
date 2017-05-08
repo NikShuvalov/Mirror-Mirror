@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.filters.Particles;
+package shuvalov.nikita.mirrormirror.filters.particles;
 
 import android.graphics.Rect;
 
@@ -39,6 +39,7 @@ public class Particle {
 
         mScale = scale;
     }
+
 
 
     public int getResourceInt() {
@@ -88,8 +89,21 @@ public class Particle {
         return mScale;
     }
 
+    public float getStartX() {
+        return mStartX;
+    }
+
+    public float getStartY() {
+        return mStartY;
+    }
+
+    //ToDo: Add a buffer of space to allow the particle to go off screen cause it might be able to come back on screen.
     public boolean isOutOfBounds(Rect screenBounds){
         return screenBounds.contains((int)mXLoc, (int)mYLoc);
+    }
+
+    public Particle makeCarbonCopy(){
+        return new Particle(mResourceInt, mStartX, mStartY, mXVel, mYVel, mScale);
     }
 
 }

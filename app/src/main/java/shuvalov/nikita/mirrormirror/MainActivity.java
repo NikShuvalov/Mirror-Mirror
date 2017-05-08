@@ -46,6 +46,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import shuvalov.nikita.mirrormirror.browsing.BrowsingActivity;
+import shuvalov.nikita.mirrormirror.camera.CameraSourceGenerator;
+import shuvalov.nikita.mirrormirror.camera.FaceDetectorGenerator;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
 import shuvalov.nikita.mirrormirror.filters.AnimatedFilter;
@@ -53,6 +55,7 @@ import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.FilterSelectorAdapter;
 import shuvalov.nikita.mirrormirror.filters.OverlayMod;
+import shuvalov.nikita.mirrormirror.filters.particles.ParticleActivity;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, CameraSource.PictureCallback, CameraSource.ShutterCallback, NavigationView.OnNavigationItemSelectedListener {
@@ -112,8 +115,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
             }
         } else {
-            createFaceDetector();
-            createCameraSource(mFaceDetector, CameraSource.CAMERA_FACING_FRONT);
+            mFaceDetector = new FaceDetectorGenerator(this).getFaceDetector();
+
+            //Note: Width and height are reversed here because we are using portrait mode instead of landscape mode.
+            mCameraSource = new CameraSourceGenerator(this, mFaceDetector, CameraSource.CAMERA_FACING_FRONT,mViewHeight,mViewWidth).getCameraSource();
+//            createFaceDetector();
+//            createCameraSource(mFaceDetector, CameraSource.CAMERA_FACING_FRONT);
             setUp();
             setUpFilterSelector();
         }
@@ -373,11 +380,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.browse_option:
-                Intent intent = new Intent(this, BrowsingActivity.class);
-                startActivity(intent);
+                Intent browseIntent = new Intent(this, BrowsingActivity.class);
+                startActivity(browseIntent);
                 break;
             case R.id.particle_option:
-                
+                Intent particleIntent = new Intent(this, ParticleActivity.class);
+                startActivity(particleIntent);
                 break;
         }
         mDrawerLayout.closeDrawers();

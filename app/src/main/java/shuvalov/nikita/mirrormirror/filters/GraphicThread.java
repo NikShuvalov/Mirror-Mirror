@@ -6,6 +6,8 @@ import android.view.SurfaceHolder;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import shuvalov.nikita.mirrormirror.BaseOverlay;
+
 /**
  * Created by NikitaShuvalov on 3/31/17.
  */

@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.filters.Particles;
+package shuvalov.nikita.mirrormirror.filters.particles;
 
 import android.graphics.Bitmap;
 

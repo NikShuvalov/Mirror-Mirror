@@ -1,10 +1,11 @@
-package shuvalov.nikita.mirrormirror.filters.Particles;
+package shuvalov.nikita.mirrormirror.filters.particles;
 
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -15,7 +16,8 @@ public class ParticleEngine {
     private ArrayList<Particle> mParticles;
     private PhysicsType mPhysicsType;
     private int MAX_PARTICLES = 25;
-    private Rect mScreenBounds, mFaceBounds;
+    private Rect mScreenBounds;
+    private RectF mFaceBounds;
     private long mLastUpdate = SystemClock.elapsedRealtime();
 
     //ToDO: Make an enum for vertical direction of particles?
@@ -31,11 +33,25 @@ public class ParticleEngine {
 
     //ToDo: Have particles that are below a certain size(aka distance) not appear when within the bounds of the face
     // to give an effect of the particles traveling behind the face. Then have them come back into existance once they leave the bounds of the face?
-    public ParticleEngine(ArrayList<Particle> particles, PhysicsType physicsType, Rect screenBounds, Rect faceBounds) {
-        mParticles = particles;
+    public ParticleEngine(PhysicsType physicsType, Rect screenBounds,@Nullable RectF faceBounds) {
+        mParticles = new ArrayList<>();
         mPhysicsType = physicsType;
         mScreenBounds = screenBounds;
         mFaceBounds = faceBounds;
+    }
+
+    public void setFaceBounds(RectF faceBounds){
+        mFaceBounds = faceBounds;
+    }
+
+    public void populateParticles(Particle sampleParticle){
+        while(mParticles.size()<=MAX_PARTICLES){
+            Particle p = sampleParticle.makeCarbonCopy();
+            resetParticle(p);
+            if(addParticle(p)) { //Just in case.
+                break;
+            }
+        }
     }
 
     //Returns false if list is or becomes maxed, returns true if room for more.
@@ -81,7 +97,7 @@ public class ParticleEngine {
             p.translatePosition(xDisplacement, yDisplacement);
 
             if(p.isOutOfBounds(mScreenBounds)){
-                recycleParticle(p);
+                resetParticle(p);
             }
         }
         mLastUpdate = currentTime;
@@ -95,8 +111,8 @@ public class ParticleEngine {
 
     }
 
-    //This currently only makes the particle fall/rise infinitely at the same location, only changing in size.
-    private void recycleParticle(Particle p){
+    //This currently only makes the particle fall/rise infinitely at the same x location, only changing in size.
+    private void resetParticle(Particle p){
         Random rng = new Random();
         p.setXLoc(rng.nextInt(mScreenBounds.right));
         float scale = rng.nextFloat()*2;
@@ -104,5 +120,6 @@ public class ParticleEngine {
             scale= 0.5f;
         }
         p.setScale(scale);
+        p.setYLoc(p.getStartY());
     }
 }

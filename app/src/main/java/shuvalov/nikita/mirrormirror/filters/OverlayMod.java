@@ -18,6 +18,7 @@ import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.GraphicThread;
+import shuvalov.nikita.mirrormirror.filters.particles.ParticleEngine;
 
 /**
  * Created by NikitaShuvalov on 3/24/17.
@@ -62,8 +63,7 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        if(mGraphicThread!=null) return;
-
+        if(mGraphicThread!=null) {return;}
         mGraphicThread= new GraphicThread(surfaceHolder, this);
         mGraphicThread.start();
     }
