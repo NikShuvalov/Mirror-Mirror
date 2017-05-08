@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.filters;
+package shuvalov.nikita.mirrormirror.overlay;
 
 import android.annotation.SuppressLint;
 import android.graphics.Canvas;
@@ -6,18 +6,16 @@ import android.view.SurfaceHolder;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import shuvalov.nikita.mirrormirror.BaseOverlay;
-
 /**
  * Created by NikitaShuvalov on 3/31/17.
  */
 
 public class GraphicThread extends Thread {
     private final SurfaceHolder mSurfaceHolder;
-    private OverlayMod mOverlayMod;
+    private BaseOverlay mOverlayMod;
     private AtomicBoolean mStop = new AtomicBoolean();
 
-    public GraphicThread(SurfaceHolder surfaceHolder, OverlayMod overlayMod) {
+    public GraphicThread(SurfaceHolder surfaceHolder, BaseOverlay overlayMod) {
         mSurfaceHolder = surfaceHolder;
         mOverlayMod = overlayMod;
         mStop.set(false);

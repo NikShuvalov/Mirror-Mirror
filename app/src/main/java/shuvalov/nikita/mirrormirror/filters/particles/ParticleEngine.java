@@ -4,6 +4,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,12 +16,11 @@ import java.util.Random;
 public class ParticleEngine {
     private ArrayList<Particle> mParticles;
     private PhysicsType mPhysicsType;
-    private int MAX_PARTICLES = 25;
+    private int MAX_PARTICLES = 50;
     private Rect mScreenBounds;
     private RectF mFaceBounds;
     private long mLastUpdate = SystemClock.elapsedRealtime();
-
-    //ToDO: Make an enum for vertical direction of particles?
+    private Random mRng;
 
     /**
      * SnowGlobe just shakes the particles when the face moves.
@@ -38,6 +38,7 @@ public class ParticleEngine {
         mPhysicsType = physicsType;
         mScreenBounds = screenBounds;
         mFaceBounds = faceBounds;
+        mRng = new Random();
     }
 
     public void setFaceBounds(RectF faceBounds){
@@ -48,7 +49,7 @@ public class ParticleEngine {
         while(mParticles.size()<=MAX_PARTICLES){
             Particle p = sampleParticle.makeCarbonCopy();
             resetParticle(p);
-            if(addParticle(p)) { //Just in case.
+            if(!addParticle(p)) { //Just in case.
                 break;
             }
         }
@@ -60,7 +61,7 @@ public class ParticleEngine {
             return false;
         }
         mParticles.add(p);
-        return mParticles.size() != MAX_PARTICLES;
+        return true;
     }
 
     public ArrayList<Particle> getParticles() {
@@ -68,16 +69,19 @@ public class ParticleEngine {
     }
 
     public void moveParticles(){
-        switch(mPhysicsType){
-            case SNOWGLOBE:
-                processSnowglobeMovement();
-                break;
-            case SIMPLE:
-                processSimpleMovement();
-                break;
-            case OSCILLATING:
-                processOscillatingMovement();
-                break;
+        long val = SystemClock.elapsedRealtime() - mLastUpdate;
+        if(val >= Particle.REFRESH_RATE) {
+            switch (mPhysicsType) {
+                case SNOWGLOBE:
+                    processSnowglobeMovement();
+                    break;
+                case SIMPLE:
+                    processSimpleMovement();
+                    break;
+                case OSCILLATING:
+                    processOscillatingMovement();
+                    break;
+            }
         }
     }
 
@@ -88,10 +92,10 @@ public class ParticleEngine {
         for(int i =0; i< mParticles.size(); i++){
             Particle p = mParticles.get(i);
             float scaledYSpeed = p.getYVel()*p.getScale();//The speed at which the particle will move up based on it's "distance" from the lens. Speed is per 30ms
-            float yDisplacement = scaledYSpeed * (Particle.REFRESH_RATE/elapsedTime);
+            float yDisplacement = scaledYSpeed * (elapsedTime/Particle.REFRESH_RATE);
 
             float scaledXSpeed = p.getXVel() * p.getScale();
-            float xDisplacement = scaledXSpeed * (Particle.REFRESH_RATE/elapsedTime);
+            float xDisplacement = scaledXSpeed * (elapsedTime/Particle.REFRESH_RATE);
 
             //ToDo: Add faceShifts to displacement?
             p.translatePosition(xDisplacement, yDisplacement);
@@ -113,9 +117,8 @@ public class ParticleEngine {
 
     //This currently only makes the particle fall/rise infinitely at the same x location, only changing in size.
     private void resetParticle(Particle p){
-        Random rng = new Random();
-        p.setXLoc(rng.nextInt(mScreenBounds.right));
-        float scale = rng.nextFloat()*2;
+        p.setXLoc(mRng.nextInt(mScreenBounds.width()));
+        float scale = mRng.nextFloat()*4;
         if(scale<0.5){
             scale= 0.5f;
         }

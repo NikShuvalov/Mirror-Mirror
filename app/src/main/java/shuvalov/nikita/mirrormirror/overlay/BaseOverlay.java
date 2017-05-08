@@ -1,13 +1,12 @@
-package shuvalov.nikita.mirrormirror;
+package shuvalov.nikita.mirrormirror.overlay;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
-import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import shuvalov.nikita.mirrormirror.filters.GraphicThread;
+import shuvalov.nikita.mirrormirror.overlay.GraphicThread;
 
 /**
  * Created by NikitaShuvalov on 5/8/17.
@@ -27,8 +26,8 @@ public abstract class BaseOverlay extends SurfaceView implements SurfaceHolder.C
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if(mGraphicThread!=null) {return;}
-//        mGraphicThread= new GraphicThread(surfaceHolder, this);
-//        mGraphicThread.start();
+        mGraphicThread= new GraphicThread(surfaceHolder, this);
+        mGraphicThread.start();
     }
 
     @Override
@@ -40,5 +39,8 @@ public abstract class BaseOverlay extends SurfaceView implements SurfaceHolder.C
         mGraphicThread.stopThread();
     }
 
-    public abstract void onDraw(Canvas canvas);
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+    }
 }

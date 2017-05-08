@@ -34,8 +34,9 @@ public class Particle {
         mXLoc = startX;
         mYLoc = startY;
 
-        mXVel = XVel;
-        mYVel = YVel;
+        //Because portrait mode and camera makes things confusing.
+        mXVel = YVel;
+        mYVel = XVel;
 
         mScale = scale;
     }
@@ -53,8 +54,9 @@ public class Particle {
      * @param y
      */
     public void translatePosition(float x, float y){
-        mXLoc+=x;
-        mYLoc+=y;
+        //Portrait mode makes things confusing with this api.
+        mXLoc+=y;
+        mYLoc+=x;
     }
 
     public float getXLoc() {
@@ -99,7 +101,7 @@ public class Particle {
 
     //ToDo: Add a buffer of space to allow the particle to go off screen cause it might be able to come back on screen.
     public boolean isOutOfBounds(Rect screenBounds){
-        return screenBounds.contains((int)mXLoc, (int)mYLoc);
+        return !screenBounds.contains((int)mXLoc, (int)mYLoc);
     }
 
     public Particle makeCarbonCopy(){

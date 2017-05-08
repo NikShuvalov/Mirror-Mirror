@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.filters;
+package shuvalov.nikita.mirrormirror.overlay;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,28 +13,23 @@ import android.os.SystemClock;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
-import shuvalov.nikita.mirrormirror.filters.GraphicThread;
-import shuvalov.nikita.mirrormirror.filters.particles.ParticleEngine;
+import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
+import shuvalov.nikita.mirrormirror.overlay.GraphicThread;
 
 /**
  * Created by NikitaShuvalov on 3/24/17.
  */
 
-public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
-    private GraphicThread mGraphicThread;
+public class FilterOverlay extends BaseOverlay{
     private Bitmap mBitmap;
     private Rect mRect;
     private boolean mUsingAnimated;
 
-    public OverlayMod(Context context) {
+    public FilterOverlay(Context context) {
         super(context);
-        SurfaceHolder surfaceHolder = getHolder();
-        surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        surfaceHolder.addCallback(this);
 
         Filter f = FilterManager.getInstance().getSelectedFilter();
         if(mUsingAnimated = f.isAnimated()){
@@ -61,22 +56,6 @@ public class OverlayMod extends SurfaceView implements SurfaceHolder.Callback{
         }
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        if(mGraphicThread!=null) {return;}
-        mGraphicThread= new GraphicThread(surfaceHolder, this);
-        mGraphicThread.start();
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        mGraphicThread.stopThread();
-    }
 
     public void notifyFilterChange() {
         Filter f = FilterManager.getInstance().getSelectedFilter();

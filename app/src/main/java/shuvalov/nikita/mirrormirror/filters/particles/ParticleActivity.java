@@ -24,13 +24,16 @@ import android.widget.Toast;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.util.Random;
+
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.browsing.BrowsingActivity;
 import shuvalov.nikita.mirrormirror.camera.CameraSourceGenerator;
 import shuvalov.nikita.mirrormirror.camera.FaceDetectorGenerator;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
-import shuvalov.nikita.mirrormirror.filters.OverlayMod;
+import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
+import shuvalov.nikita.mirrormirror.overlay.ParticleOverlay;
 
 public class ParticleActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener{
     private FrameLayout mFaceDetect, mPreviewContainer;
@@ -47,6 +50,7 @@ public class ParticleActivity extends AppCompatActivity implements View.OnClickL
     private FaceDetector mFaceDetector;
     private ParticleEngine mParticleEngine;
     private int mViewWidth, mViewHeight;
+    private ParticleOverlay mParticleOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,9 +85,12 @@ public class ParticleActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void getParticlesReady(){
-        Rect screenBounds = new Rect(0,0,mViewHeight, mViewWidth);//This might need to be reversed, the whole landscape/portrait shifting has got me confused.
+        Rect screenBounds = new Rect(0,0,mViewWidth, mViewHeight);//This might need to be reversed, the whole landscape/portrait shifting has got me confused.
         mParticleEngine = new ParticleEngine(ParticleEngine.PhysicsType.SIMPLE, screenBounds, null);
-        mParticleEngine.populateParticles(new Particle(R.drawable.flamekey0, 200,mViewWidth,0,0,1));
+        Random rng = new Random();
+
+        mParticleEngine.populateParticles(new Particle(R.drawable.flamekey0, rng.nextInt(mViewWidth), 0, 10, 0, 2));
+        mParticleOverlay.setParticleEngine(mParticleEngine);
     }
 
     @Override
@@ -108,14 +115,14 @@ public class ParticleActivity extends AppCompatActivity implements View.OnClickL
 
     public void setUp() {
         setUpNavigationDrawer();
-        OverlayMod overlayMod = new OverlayMod(this);
-        overlayMod.setZOrderMediaOverlay(true);
+        mParticleOverlay = new ParticleOverlay(this);
+        mParticleOverlay.setZOrderMediaOverlay(true);
 
         mPreview = new Preview(this);
         mPreview.setCameraSource(mCameraSource);
 
         mPreviewContainer.addView(mPreview);
-        mFaceDetect.addView(overlayMod);
+        mFaceDetect.addView(mParticleOverlay);
 
         mPreviewContainer.setOnClickListener(this);
         mCameraButton.setOnClickListener(this);

@@ -54,12 +54,12 @@ import shuvalov.nikita.mirrormirror.filters.AnimatedFilter;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.FilterSelectorAdapter;
-import shuvalov.nikita.mirrormirror.filters.OverlayMod;
+import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 import shuvalov.nikita.mirrormirror.filters.particles.ParticleActivity;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, CameraSource.PictureCallback, CameraSource.ShutterCallback, NavigationView.OnNavigationItemSelectedListener {
-    private OverlayMod mOverlayMod;
+    private FilterOverlay mFilterOverlay;
     private FrameLayout mFaceDetect, mPreviewContainer;
     private Preview mPreview;
     private int mViewWidth, mViewHeight;
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setUpFilterSelector() {
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mFilterRecycler.setAdapter(new FilterSelectorAdapter(FilterManager.getInstance().getFilters(), mOverlayMod));
+        mFilterRecycler.setAdapter(new FilterSelectorAdapter(FilterManager.getInstance().getFilters(), mFilterOverlay));
         mFilterRecycler.setLayoutManager(horizontalLayoutManager);
     }
 
@@ -178,14 +178,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setUp() {
         setUpNavigationDrawer();
-        mOverlayMod = new OverlayMod(this);
-        mOverlayMod.setZOrderMediaOverlay(true);
+        mFilterOverlay = new FilterOverlay(this);
+        mFilterOverlay.setZOrderMediaOverlay(true);
 
         mPreview = new Preview(this);
         mPreview.setCameraSource(mCameraSource);
 
         mPreviewContainer.addView(mPreview);
-        mFaceDetect.addView(mOverlayMod);
+        mFaceDetect.addView(mFilterOverlay);
 
         mPreviewContainer.setOnClickListener(this);
         mCameraButton.setOnClickListener(this);

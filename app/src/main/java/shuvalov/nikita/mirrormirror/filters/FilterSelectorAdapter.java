@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import shuvalov.nikita.mirrormirror.R;
+import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 
 /**
  * Created by NikitaShuvalov on 4/15/17.
@@ -15,11 +16,11 @@ import shuvalov.nikita.mirrormirror.R;
 
 public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorViewHolder> {
     private ArrayList<Filter> mFilters;
-    private OverlayMod mOverlayMod;
+    private FilterOverlay mFilterOverlay;
 
-    public FilterSelectorAdapter(ArrayList<Filter> filters, OverlayMod overlayMod) {
+    public FilterSelectorAdapter(ArrayList<Filter> filters, FilterOverlay filterOverlay) {
         mFilters = filters;
-        mOverlayMod = overlayMod;
+        mFilterOverlay = filterOverlay;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorVi
             @Override
             public void onClick(View view) {
                 FilterManager.getInstance().setCurrentPosition(holder.getAdapterPosition());
-                mOverlayMod.notifyFilterChange();
+                mFilterOverlay.notifyFilterChange();
                 notifyDataSetChanged(); //FixMe: Optimize
             }
         });
