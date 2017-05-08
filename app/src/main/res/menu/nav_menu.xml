@@ -6,5 +6,7 @@
     <item
         android:id="@+id/filter_options"
         android:title="Filters"/>
-
+    <item
+        android:id="@+id/particle_option"
+        android:title="Particle Debug"/>
 </menu>

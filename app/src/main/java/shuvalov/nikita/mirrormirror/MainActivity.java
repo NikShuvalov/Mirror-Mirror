@@ -376,6 +376,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent = new Intent(this, BrowsingActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.particle_option:
+                
+                break;
         }
         mDrawerLayout.closeDrawers();
         return false;
