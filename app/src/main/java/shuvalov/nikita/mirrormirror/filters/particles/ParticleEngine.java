@@ -16,7 +16,7 @@ import java.util.Random;
 public class ParticleEngine {
     private ArrayList<Particle> mParticles;
     private PhysicsType mPhysicsType;
-    private int MAX_PARTICLES = 50;
+    private int MAX_PARTICLES = 25;
     private Rect mScreenBounds;
     private RectF mFaceBounds;
     private long mLastUpdate = SystemClock.elapsedRealtime();
@@ -91,15 +91,14 @@ public class ParticleEngine {
         long elapsedTime = currentTime-mLastUpdate;
         for(int i =0; i< mParticles.size(); i++){
             Particle p = mParticles.get(i);
-            float scaledYSpeed = p.getYVel()*p.getScale();//The speed at which the particle will move up based on it's "distance" from the lens. Speed is per 30ms
-            float yDisplacement = scaledYSpeed * (elapsedTime/Particle.REFRESH_RATE);
+            double scaledYSpeed = p.getYVel()*p.getScale();//The speed at which the particle will move up based on it's "distance" from the lens. Speed is per 30ms
+            double yDisplacement = scaledYSpeed * (elapsedTime/Particle.REFRESH_RATE);
 
-            float scaledXSpeed = p.getXVel() * p.getScale();
-            float xDisplacement = scaledXSpeed * (elapsedTime/Particle.REFRESH_RATE);
+            double scaledXSpeed = p.getXVel() * p.getScale();
+            double xDisplacement = scaledXSpeed * (elapsedTime/Particle.REFRESH_RATE);
 
             //ToDo: Add faceShifts to displacement?
             p.translatePosition(xDisplacement, yDisplacement);
-
             if(p.isOutOfBounds(mScreenBounds)){
                 resetParticle(p);
             }
@@ -112,16 +111,33 @@ public class ParticleEngine {
     }
 
     private void processOscillatingMovement(){
+        long currentTime = SystemClock.elapsedRealtime();
+        long elapsedTime = currentTime-mLastUpdate;
+        double xAxis;
+        Particle p;
+        for(int i =0; i< mParticles.size(); i++){
+            p = mParticles.get(i);
+            double scaledYSpeed = p.getYVel()*p.getScale();//The speed at which the particle will move up based on it's "distance" from the lens. Speed is per 30ms
+            double yDisplacement = scaledYSpeed * (elapsedTime/Particle.REFRESH_RATE);
 
+            xAxis = p.getStartX();
+            p.translatePosition(0,yDisplacement);
+            double newXPosition = (100 * Math.sin(p.getYLoc()/100)) +  xAxis;
+
+            p.setXLoc(newXPosition);
+
+            if(p.getYLoc()>mScreenBounds.height()){
+                resetParticle(p);
+            }
+        }
+        mLastUpdate = currentTime;
     }
 
     //This currently only makes the particle fall/rise infinitely at the same x location, only changing in size.
     private void resetParticle(Particle p){
-        p.setXLoc(mRng.nextInt(mScreenBounds.width()));
-        float scale = mRng.nextFloat()*4;
-        if(scale<0.5){
-            scale= 0.5f;
-        }
+        p.setStartX(mRng.nextInt(mScreenBounds.height())); //Using portrait in a landscape world.
+        p.resetXToStart();
+        double scale = (mRng.nextDouble()+.25)*4;
         p.setScale(scale);
         p.setYLoc(p.getStartY());
     }

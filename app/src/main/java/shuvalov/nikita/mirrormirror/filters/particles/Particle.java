@@ -8,7 +8,7 @@ import android.graphics.Rect;
 
 public class Particle {
     private int mResourceInt;
-    private float mXLoc, mYLoc, mXVel, mYVel, mScale, mStartX, mStartY;
+    private double mXLoc, mYLoc, mXVel, mYVel, mScale, mStartX, mStartY;
     public static final long REFRESH_RATE = 30; //Target FPS
 
 
@@ -25,7 +25,7 @@ public class Particle {
      *              for a parallaxing effect.
      *
      */
-    public Particle(int resourceInt, float startX, float startY, float XVel, float YVel, float scale) {
+    public Particle(int resourceInt, double startX, double startY, double XVel, double YVel, double scale) {
         mResourceInt = resourceInt;
 
         mStartX= startX;
@@ -34,9 +34,8 @@ public class Particle {
         mXLoc = startX;
         mYLoc = startY;
 
-        //Because portrait mode and camera makes things confusing.
-        mXVel = YVel;
-        mYVel = XVel;
+        mXVel = XVel;
+        mYVel = YVel;
 
         mScale = scale;
     }
@@ -53,49 +52,49 @@ public class Particle {
      * @param x
      * @param y
      */
-    public void translatePosition(float x, float y){
+    public void translatePosition(double x, double y){
         //Portrait mode makes things confusing with this api.
-        mXLoc+=y;
-        mYLoc+=x;
+        mXLoc+=x;
+        mYLoc+=y;
     }
 
-    public float getXLoc() {
+    public double getXLoc() {
         return mXLoc;
     }
 
-    public float getYLoc() {
+    public double getYLoc() {
         return mYLoc;
     }
 
-    public float getXVel() {
+    public double getXVel() {
         return mXVel;
     }
 
-    public float getYVel() {
+    public double getYVel() {
         return mYVel;
     }
 
-    public void setXLoc(float XLoc) {
+    public void setXLoc(double XLoc) {
         mXLoc = XLoc;
     }
 
-    public void setYLoc(float YLoc) {
+    public void setYLoc(double YLoc) {
         mYLoc = YLoc;
     }
 
-    public void setScale(float scale) {
+    public void setScale(double scale) {
         mScale = scale;
     }
 
-    public float getScale() {
+    public double getScale() {
         return mScale;
     }
 
-    public float getStartX() {
+    public double getStartX() {
         return mStartX;
     }
 
-    public float getStartY() {
+    public double getStartY() {
         return mStartY;
     }
 
@@ -104,8 +103,23 @@ public class Particle {
         return !screenBounds.contains((int)mXLoc, (int)mYLoc);
     }
 
+    public boolean isVerticallyOutOfFrame(Rect screenBounds){
+        return mYLoc > screenBounds.bottom;
+    }
+
     public Particle makeCarbonCopy(){
         return new Particle(mResourceInt, mStartX, mStartY, mXVel, mYVel, mScale);
     }
 
+    public void setStartX(double startX) {
+        mStartX = startX;
+    }
+
+    public void setStartY(double startY) {
+        mStartY = startY;
+    }
+
+    public void resetXToStart(){
+        mXLoc = mStartX;
+    }
 }

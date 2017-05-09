@@ -119,35 +119,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //Note: Width and height are reversed here because we are using portrait mode instead of landscape mode.
             mCameraSource = new CameraSourceGenerator(this, mFaceDetector, CameraSource.CAMERA_FACING_FRONT,mViewHeight,mViewWidth).getCameraSource();
-//            createFaceDetector();
-//            createCameraSource(mFaceDetector, CameraSource.CAMERA_FACING_FRONT);
             setUp();
             setUpFilterSelector();
         }
-    }
-
-    public void createCameraSource(Detector detector, int cameraFacing){
-        mCameraSource = new CameraSource.Builder(this, detector)
-                .setFacing(cameraFacing)
-                .setRequestedPreviewSize(mViewHeight, mViewWidth)
-                .setRequestedFps(60.0f)
-                .setAutoFocusEnabled(true)
-                .build();
-    }
-
-    public void createFaceDetector(){
-        mFaceDetector = new FaceDetector.Builder(this).setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
-                .setTrackingEnabled(true)
-                .setMode(FaceDetector.FAST_MODE)
-                .setProminentFaceOnly(true)
-                .setMinFaceSize(0.35f)
-                .build();
-
-        Detector.Processor<Face> processor;
-        Tracker<Face> tracker = FaceTracker.getInstance();
-        processor = new LargestFaceFocusingProcessor.Builder(mFaceDetector,tracker).build();
-        mFaceDetector.setProcessor(processor);
     }
 
     public void setUpFilterSelector() {
@@ -224,8 +198,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
         if(mCameraSource!=null){
             mCameraSource.release();
         }
@@ -386,6 +360,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.particle_option:
                 Intent particleIntent = new Intent(this, ParticleActivity.class);
                 startActivity(particleIntent);
+                break;
+            case R.id.filter_options:
+                Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
                 break;
         }
         mDrawerLayout.closeDrawers();

@@ -12,7 +12,7 @@ import com.google.android.gms.vision.Detector;
 public class CameraSourceGenerator {
     public CameraSource mCameraSource;
 
-    public CameraSourceGenerator(Context context, Detector detector, int cameraFacing,int previewHeight, int previewWidth){
+    public CameraSourceGenerator(Context context, Detector detector, int cameraFacing, int previewHeight, int previewWidth){
         mCameraSource = new CameraSource.Builder(context, detector)
                 .setFacing(cameraFacing)
                 .setRequestedPreviewSize(previewHeight, previewWidth)

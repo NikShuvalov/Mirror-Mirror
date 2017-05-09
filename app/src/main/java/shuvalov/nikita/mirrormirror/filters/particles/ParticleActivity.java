@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +49,6 @@ public class ParticleActivity extends AppCompatActivity implements View.OnClickL
 //    private boolean mFilterSelectorVisible;
     public CameraSource mCameraSource;
     private FaceDetector mFaceDetector;
-    private ParticleEngine mParticleEngine;
     private int mViewWidth, mViewHeight;
     private ParticleOverlay mParticleOverlay;
 
@@ -78,6 +78,7 @@ public class ParticleActivity extends AppCompatActivity implements View.OnClickL
         } else {
             mFaceDetector = new FaceDetectorGenerator(this).getFaceDetector();
             //Note: Width and height are reversed here because we are using portrait mode instead of landscape mode.
+            Log.d("Size", "onResume: "+mViewWidth + ", "+mViewHeight);
             mCameraSource = new CameraSourceGenerator(this, mFaceDetector, CameraSource.CAMERA_FACING_FRONT,mViewHeight,mViewWidth).getCameraSource();
             setUp();
             getParticlesReady();
@@ -86,11 +87,12 @@ public class ParticleActivity extends AppCompatActivity implements View.OnClickL
 
     public void getParticlesReady(){
         Rect screenBounds = new Rect(0,0,mViewWidth, mViewHeight);//This might need to be reversed, the whole landscape/portrait shifting has got me confused.
-        mParticleEngine = new ParticleEngine(ParticleEngine.PhysicsType.SIMPLE, screenBounds, null);
+//        ParticleEngine particleEngine= new ParticleEngine(ParticleEngine.PhysicsType.SIMPLE, screenBounds, null);
+        ParticleEngine particleEngine= new ParticleEngine(ParticleEngine.PhysicsType.OSCILLATING, screenBounds, null);
         Random rng = new Random();
 
-        mParticleEngine.populateParticles(new Particle(R.drawable.flamekey0, rng.nextInt(mViewWidth), 0, 10, 0, 2));
-        mParticleOverlay.setParticleEngine(mParticleEngine);
+        particleEngine.populateParticles(new Particle(R.drawable.flamekey0, rng.nextInt(mViewWidth), 1, 0, 10, 2));
+        mParticleOverlay.setParticleEngine(particleEngine);
     }
 
     @Override
@@ -182,11 +184,16 @@ public class ParticleActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
         if(mCameraSource!=null){
             mCameraSource.release();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -197,6 +204,10 @@ public class ParticleActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.particle_option:
                 Toast.makeText(this, "Already in particle activity", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.filter_options:
+                mDrawerLayout.closeDrawers();
+                finish();
                 break;
         }
         mDrawerLayout.closeDrawers();
