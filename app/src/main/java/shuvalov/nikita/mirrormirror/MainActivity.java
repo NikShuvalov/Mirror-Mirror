@@ -20,16 +20,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Display;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
@@ -48,32 +42,30 @@ import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
 import shuvalov.nikita.mirrormirror.filters.AnimatedFilter;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
+import shuvalov.nikita.mirrormirror.filters.FilterOverlayFragment;
 import shuvalov.nikita.mirrormirror.filters.FilterSelectorAdapter;
-import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
-import shuvalov.nikita.mirrormirror.filters.particles.ParticleActivity;
+import shuvalov.nikita.mirrormirror.filters.particles.ParticleOverlayFragment;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, CameraSource.PictureCallback, CameraSource.ShutterCallback, NavigationView.OnNavigationItemSelectedListener {
-    private FilterOverlay mFilterOverlay;
-    private FrameLayout mFaceDetect, mPreviewContainer;
+public class MainActivity extends AppCompatActivity implements  CameraSource.PictureCallback, CameraSource.ShutterCallback, NavigationView.OnNavigationItemSelectedListener{
+    private FrameLayout mPreviewContainer;
     private Preview mPreview;
     private int mViewWidth, mViewHeight;
-    private ImageButton mCameraButton;
     public static final int CAMERA_PERMISSION_REQUEST = 9999;
     public static final int STORAGE_PERMISSION_REQUEST = 2;
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavView;
     private Toolbar mToolbar;
-    private RecyclerView mFilterRecycler;
-    private boolean mFilterSelectorVisible;
     public CameraSource mCameraSource;
     private FaceDetector mFaceDetector;
+    public GraphicType mCurrentOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mCurrentOverlay = GraphicType.FILTER;
         //toDo: Should put a static image for animated filters to put in the recycler.
         AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.ImagePosition.FACE, 1.25f, 1.5f, 0, -0.65f,getBitmapList(R.array.flame_animation_list));
         FilterManager.getInstance().addAnimatedFilters(f);
@@ -92,15 +84,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-
-        mFilterSelectorVisible = false;
         findViews();
-        Display display = getWindow().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        mViewWidth = size.x;
-        mViewHeight = size.y;
-
+        Rect screenBounds = getScreenBounds();
+        mViewWidth = screenBounds.width();
+        mViewHeight = screenBounds.height();
         FaceTracker.getInstance().setScreenSize(mViewHeight, mViewWidth);
 
         int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
@@ -114,14 +101,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Note: Width and height are reversed here because we are using portrait mode instead of landscape mode.
             mCameraSource = new CameraSourceGenerator(this, mFaceDetector, CameraSource.CAMERA_FACING_FRONT,mViewHeight,mViewWidth).getCameraSource();
             setUp();
-            setUpFilterSelector();
         }
-    }
-
-    public void setUpFilterSelector() {
-        LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mFilterRecycler.setAdapter(new FilterSelectorAdapter(FilterManager.getInstance().getFilters(), mFilterOverlay));
-        mFilterRecycler.setLayoutManager(horizontalLayoutManager);
+        notifyOverlayChanged();
     }
 
     @Override
@@ -146,17 +127,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setUp() {
         setUpNavigationDrawer();
-        mFilterOverlay = new FilterOverlay(this);
-        mFilterOverlay.setZOrderMediaOverlay(true);
-
         mPreview = new Preview(this);
         mPreview.setCameraSource(mCameraSource);
-
         mPreviewContainer.addView(mPreview);
-        mFaceDetect.addView(mFilterOverlay);
-
-        mPreviewContainer.setOnClickListener(this);
-        mCameraButton.setOnClickListener(this);
     }
 
     public void setUpNavigationDrawer() {
@@ -170,18 +143,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void findViews() {
         mPreviewContainer = (FrameLayout) findViewById(R.id.preview);
-        mFaceDetect = (FrameLayout) findViewById(R.id.face_detect);
-        mCameraButton = (ImageButton) findViewById(R.id.camera_button);
         mNavView = (NavigationView) findViewById(R.id.navigation_view);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mFilterRecycler = (RecyclerView) findViewById(R.id.filters_recycler);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mFaceDetect.removeAllViews();
         mPreviewContainer.removeView(mPreview);
         if(mCameraSource!=null){
             mCameraSource.stop();
@@ -197,69 +166,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(mCameraSource!=null){
             mCameraSource.release();
         }
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.camera_button:
-                captureImage();
-                break;
-            default:
-                if (!mFilterSelectorVisible) {
-                    replaceBottomView(mCameraButton, mFilterRecycler);
-                    mFilterSelectorVisible = true;
-                } else {
-                    replaceBottomView(mFilterRecycler, mCameraButton);
-                    mFilterSelectorVisible = false;
-                }
-        }
-    }
-
-    public void replaceBottomView(final View viewToHide, final View viewToShow) {
-        Animation hideAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_panel_hide);
-        hideAnim.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                viewToHide.clearAnimation();
-                showView(viewToShow);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        viewToHide.setAnimation(hideAnim);
-        viewToHide.setVisibility(View.INVISIBLE);
-    }
-
-    public void showView(final View v) {
-        Animation showAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_panel_show);
-        showAnim.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                v.clearAnimation();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        v.setAnimation(showAnim);
-        v.setVisibility(View.VISIBLE);
-
     }
 
     public void captureImage() {
@@ -340,26 +246,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onShutter() {
-        //ToDo: Add some kind of UX element to notify user of capture
-    }
-
-    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.browse_option:
+                //ToDo: Fix this up if necessary cause things might get weird with the fragments being added
+                mDrawerLayout.closeDrawers();
                 Intent browseIntent = new Intent(this, BrowsingActivity.class);
                 startActivity(browseIntent);
                 break;
             case R.id.particle_option:
-                Intent particleIntent = new Intent(this, ParticleActivity.class);
-                startActivity(particleIntent);
+                mDrawerLayout.closeDrawers();
+                if(mCurrentOverlay==GraphicType.PARTICLE){
+                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+                }else{
+                    mCurrentOverlay = GraphicType.PARTICLE;
+                    notifyOverlayChanged();
+                }
                 break;
             case R.id.filter_options:
-                Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+                mDrawerLayout.closeDrawers();
+                if(mCurrentOverlay == GraphicType.FILTER){
+                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+                }else{
+                    mCurrentOverlay = GraphicType.FILTER;
+                    notifyOverlayChanged();
+                }
                 break;
         }
-        mDrawerLayout.closeDrawers();
         return false;
+    }
+
+    public void notifyOverlayChanged(){
+        switch(mCurrentOverlay){
+            case PARTICLE:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ParticleOverlayFragment.newInstance()).commit();
+                break;
+            case FILTER:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, FilterOverlayFragment.newInstance()).commit();
+                break;
+        }
+    }
+
+    public Rect getScreenBounds(){
+        Display display = getWindow().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return new Rect(0, 0, size.x, size.y);
+    }
+
+    @Override
+    public void onShutter() {}
+
+    public enum GraphicType{
+        PARTICLE, FILTER
     }
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import shuvalov.nikita.mirrormirror.R;
+import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 
 /**
@@ -16,9 +17,9 @@ import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 
 public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorViewHolder> {
     private ArrayList<Filter> mFilters;
-    private FilterOverlay mFilterOverlay;
+    private BaseOverlay mFilterOverlay;
 
-    public FilterSelectorAdapter(ArrayList<Filter> filters, FilterOverlay filterOverlay) {
+    public FilterSelectorAdapter(ArrayList<Filter> filters, BaseOverlay filterOverlay) {
         mFilters = filters;
         mFilterOverlay = filterOverlay;
     }
@@ -37,7 +38,7 @@ public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorVi
             @Override
             public void onClick(View view) {
                 FilterManager.getInstance().setCurrentPosition(holder.getAdapterPosition());
-                mFilterOverlay.notifyFilterChange();
+                ((FilterOverlay)mFilterOverlay).notifyFilterChange();//FixMe: Use the BaseOverlay if I want to reuse the graphic selector for other overlays.
                 notifyDataSetChanged(); //FixMe: Optimize
             }
         });

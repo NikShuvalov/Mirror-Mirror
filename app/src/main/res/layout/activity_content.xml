@@ -9,36 +9,16 @@
         android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
     <FrameLayout
-        android:id="@+id/face_detect"
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/filters_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:visibility="invisible"/>
+    <include
+        layout="@layout/toolbar"/>
 
-    <RelativeLayout
-        android:id="@+id/hud_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <include
-            layout="@layout/toolbar"/>
 
-        <ImageButton
-            android:id="@+id/camera_button"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:clickable="true"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/camera_button_selector"
-            />
-    </RelativeLayout>
 </RelativeLayout>
 
 

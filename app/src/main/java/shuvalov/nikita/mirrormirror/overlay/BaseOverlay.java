@@ -3,6 +3,7 @@ package shuvalov.nikita.mirrormirror.overlay;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -36,11 +37,14 @@ public abstract class BaseOverlay extends SurfaceView implements SurfaceHolder.C
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        mGraphicThread.stopThread();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+    }
+
+    public void stopGraphicThread(){
+        mGraphicThread.stopThread();
     }
 }

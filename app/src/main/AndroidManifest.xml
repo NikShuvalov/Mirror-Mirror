@@ -32,9 +32,6 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="face"/>
 
-        <activity android:name=".filters.particles.ParticleActivity"
-                  android:screenOrientation="portrait">
-        </activity>
     </application>
 
 </manifest>
