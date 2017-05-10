@@ -43,8 +43,8 @@ import shuvalov.nikita.mirrormirror.filters.AnimatedFilter;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.FilterOverlayFragment;
-import shuvalov.nikita.mirrormirror.filters.FilterSelectorAdapter;
 import shuvalov.nikita.mirrormirror.filters.particles.ParticleOverlayFragment;
+import shuvalov.nikita.mirrormirror.gamification.GameOverlayFragment;
 
 
 public class MainActivity extends AppCompatActivity implements  CameraSource.PictureCallback, CameraSource.ShutterCallback, NavigationView.OnNavigationItemSelectedListener{
@@ -272,6 +272,15 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                     notifyOverlayChanged();
                 }
                 break;
+            case R.id. game_option:
+                mDrawerLayout.closeDrawers();
+                if(mCurrentOverlay== GraphicType.GAME){
+                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+                }else{
+                    mCurrentOverlay = GraphicType.GAME;
+                    notifyOverlayChanged();
+                }
+                break;
         }
         return false;
     }
@@ -283,6 +292,9 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 break;
             case FILTER:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, FilterOverlayFragment.newInstance()).commit();
+                break;
+            case GAME:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, GameOverlayFragment.newInstance()).commit();
                 break;
         }
     }
@@ -298,6 +310,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     public void onShutter() {}
 
     public enum GraphicType{
-        PARTICLE, FILTER
+        PARTICLE, FILTER, GAME
     }
 }

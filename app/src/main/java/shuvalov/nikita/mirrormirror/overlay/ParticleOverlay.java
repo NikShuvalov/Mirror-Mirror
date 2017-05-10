@@ -40,9 +40,7 @@ public class ParticleOverlay extends BaseOverlay {
         ArrayList<Particle> particles = mParticleEngine.getParticles();
         RectF faceRect =FaceTracker.getInstance().getFaceRect();
 
-        int i=0;
         for(Particle p: particles){
-
             double scale = p.getScale();
             int sideLen = (int)scale*100;
             int top = (int)p.getYLoc()-sideLen/2;

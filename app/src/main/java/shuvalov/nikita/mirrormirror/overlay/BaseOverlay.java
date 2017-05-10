@@ -45,6 +45,8 @@ public abstract class BaseOverlay extends SurfaceView implements SurfaceHolder.C
     }
 
     public void stopGraphicThread(){
-        mGraphicThread.stopThread();
+        if(mGraphicThread!=null && mGraphicThread.isAlive()){
+            mGraphicThread.stopThread();
+        }
     }
 }
