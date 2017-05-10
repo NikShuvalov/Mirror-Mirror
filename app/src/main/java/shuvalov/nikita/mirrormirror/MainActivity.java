@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,11 +33,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
-import com.google.android.gms.vision.Detector;
-import com.google.android.gms.vision.Tracker;
-import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
-import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -80,18 +75,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         //toDo: Should put a static image for animated filters to put in the recycler.
-        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.ImagePosition.FACE, 1.25f, 1.5f, 0, -0.65f,getBitmapList());
+        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.ImagePosition.FACE, 1.25f, 1.5f, 0, -0.65f,getBitmapList(R.array.flame_animation_list));
         FilterManager.getInstance().addAnimatedFilters(f);
     }
 
-    private List<Bitmap> getBitmapList(){
+    private List<Bitmap> getBitmapList(int resourceArray){
         List<Bitmap> bitmapList = new ArrayList<>();
-        TypedArray tarray = getResources().obtainTypedArray(R.array.flame_animation_list);
+        TypedArray tarray = getResources().obtainTypedArray(resourceArray);
         for(int i = 0; i<tarray.length();i++){
             bitmapList.add(BitmapFactory.decodeResource(getResources(),tarray.getResourceId(i,-1)));
         }
         tarray.recycle();
-        Log.d("Bitmap", "getBitmapList: "+bitmapList.size());
         return bitmapList;
     }
 

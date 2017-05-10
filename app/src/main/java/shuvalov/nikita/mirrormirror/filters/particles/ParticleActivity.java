@@ -192,10 +192,6 @@ public class ParticleActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.browse_option:

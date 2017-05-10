@@ -107,7 +107,12 @@ public class ParticleEngine {
     }
 
     private void processSnowglobeMovement(){
-
+        long currentTime = SystemClock.elapsedRealtime();
+        long elapsedTime = currentTime-mLastUpdate;
+        for(int i =0; i< mParticles.size(); i++){
+            //Do the thing?
+        }
+        mLastUpdate = currentTime;
     }
 
     private void processOscillatingMovement(){
