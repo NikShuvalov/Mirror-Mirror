@@ -20,6 +20,8 @@ public class GameOverlay extends BaseOverlay {
     private Paint mRedPaint;
     private Paint mBlackPaint;
 
+    private SoccerEngine mSoccerEngine;
+
     public GameOverlay(Context context) {
         super(context);
         mBluePaint= new Paint();
@@ -43,16 +45,25 @@ public class GameOverlay extends BaseOverlay {
                 canvas.drawRect(face, mBluePaint);
             }
             //ToDo: Draw rounded Rect for API 21+
-            canvas.drawCircle(300, 300, 225, mBluePaint);
+
+            Ball soccerBall = mSoccerEngine.getSoccerBall();
+
+            canvas.drawCircle((float)soccerBall.getCenterX(), (float)soccerBall.getCenterY(), (float)soccerBall.getRadius(), soccerBall.getPaint());
+
             canvas.drawRect(700f, 50f, 1050f, 400f, mGreyPaint);
             canvas.drawRect(720f, 70f, 1030f, 380f, mBlackPaint);
             canvas.drawRect(720, 70, 900, 380, mRedPaint);
         }
+        mSoccerEngine.moveSoccerBall();
     }
 
     public void adjustHitBox(RectF hitBox){
         float centerX = hitBox.centerX();
         float centerY = hitBox.centerY();
         hitBox.set(centerX-250, centerY-250, centerX+250, centerY+250);
+    }
+
+    public void setSoccerEngine(SoccerEngine soccerEngine){
+        mSoccerEngine = soccerEngine;
     }
 }
