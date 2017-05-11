@@ -16,11 +16,13 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.hardware.display.DisplayManagerCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -85,9 +87,11 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     protected void onResume() {
         super.onResume();
         findViews();
-        Rect screenBounds = getScreenBounds();
-        mViewWidth = screenBounds.width();
-        mViewHeight = screenBounds.height();
+        Display display = getWindow().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        mViewWidth = size.x;
+        mViewHeight = size.y;
         FaceTracker.getInstance().setScreenSize(mViewHeight, mViewWidth);
 
         int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
@@ -300,10 +304,15 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     }
 
     public Rect getScreenBounds(){
-        Display display = getWindow().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        return new Rect(0, 0, size.x, size.y);
+//        Display display = getWindow().getWindowManager().getDefaultDisplay();
+        Rect displayRect = new Rect();
+        mPreviewContainer.getHitRect(displayRect);
+//        Log.d("frame", "getScreenBounds: "+ mPreviewContainer.getHeight());
+//        Point size = new Point();
+//        display.getSize(size);
+//        Log.d("frame", "defaultDisplay: " + size.y);
+//        return new Rect(0, 0, size.x, size.y);
+        return displayRect;
     }
 
     @Override
