@@ -42,9 +42,9 @@ public class GameOverlay extends BaseOverlay {
             RectF face = FaceTracker.getInstance().getFaceRect();
             if (face != null) {
                 adjustHitBox(face);
-                mSoccerEngine.updateFacePosition(face);
                 canvas.drawRect(face, mBluePaint);
             }
+            mSoccerEngine.updateFacePosition(face);
             //ToDo: Draw rounded Rect for API 21+
 
             Ball soccerBall = mSoccerEngine.getSoccerBall();
