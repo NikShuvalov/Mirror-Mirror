@@ -42,6 +42,7 @@ public class GameOverlay extends BaseOverlay {
             RectF face = FaceTracker.getInstance().getFaceRect();
             if (face != null) {
                 adjustHitBox(face);
+                mSoccerEngine.updateFacePosition(face);
                 canvas.drawRect(face, mBluePaint);
             }
             //ToDo: Draw rounded Rect for API 21+
@@ -49,10 +50,9 @@ public class GameOverlay extends BaseOverlay {
             Ball soccerBall = mSoccerEngine.getSoccerBall();
 
             canvas.drawCircle((float)soccerBall.getCenterX(), (float)soccerBall.getCenterY(), (float)soccerBall.getRadius(), soccerBall.getPaint());
-
-            canvas.drawRect(700f, 50f, 1050f, 400f, mGreyPaint);
-            canvas.drawRect(720f, 70f, 1030f, 380f, mBlackPaint);
-            canvas.drawRect(720, 70, 900, 380, mRedPaint);
+//            canvas.drawRect(700f, 50f, 1050f, 400f, mGreyPaint);
+//            canvas.drawRect(720f, 70f, 1030f, 380f, mBlackPaint);
+//            canvas.drawRect(720, 70, 900, 380, mRedPaint);
         }
         mSoccerEngine.moveSoccerBall();
     }
@@ -60,7 +60,8 @@ public class GameOverlay extends BaseOverlay {
     public void adjustHitBox(RectF hitBox){
         float centerX = hitBox.centerX();
         float centerY = hitBox.centerY();
-        hitBox.set(centerX-250, centerY-250, centerX+250, centerY+250);
+        float faceRadius = SoccerEngine.FACE_LENGTH/2; //It's not really a radius because it's a rectangle, but it's easier to name it this way.
+        hitBox.set(centerX-faceRadius, centerY-faceRadius, centerX+faceRadius, centerY+faceRadius);
     }
 
     public void setSoccerEngine(SoccerEngine soccerEngine){

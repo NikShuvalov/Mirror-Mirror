@@ -2,7 +2,9 @@ package shuvalov.nikita.mirrormirror.gamification;
 
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
@@ -21,6 +23,9 @@ import android.util.Log;
 public class SoccerEngine {
     private Rect mScreenBounds, mGoalBounds;
     private Ball mSoccerBall;
+    private RectF mFaceRect;
+
+    public static final int FACE_LENGTH = 400;
 
     private long mLastUpdateTime;
 
@@ -36,6 +41,9 @@ public class SoccerEngine {
         mGoalBounds = new Rect(mScreenBounds.centerX()-goalWidth/2, 0, mScreenBounds.centerX()+goalWidth/2,50);
         mSoccerBall = new Ball(mScreenBounds.centerX(), mScreenBounds.centerY(), goalWidth, 0, -10, Color.YELLOW);
         mLastUpdateTime = SystemClock.elapsedRealtime();
+        float centerX = mScreenBounds.exactCenterX();
+        float centerY = mScreenBounds.exactCenterY();
+        mFaceRect = new RectF(centerX-FACE_LENGTH/2, centerY-FACE_LENGTH/2, centerX+FACE_LENGTH/2, centerY+FACE_LENGTH/2);
     }
 
     public Rect getScreenBounds() {
@@ -59,11 +67,14 @@ public class SoccerEngine {
             mSoccerBall.moveSoccerBall(xDisplacement, yDisplacement);
             int floor = mScreenBounds.bottom;
             double bottomOfBall = mSoccerBall.getCenterY() + mSoccerBall.getRadius();
-
-            if(bottomOfBall>floor){//Check if the ball went through the floor, if so we need to adjust the position and adjust it's vertical velocity
+            if(mSoccerBall.intersectRect(mFaceRect)){
+                if(mSoccerBall.getYSpeed()>0){
+                    bounceBall((int)mFaceRect.top, bottomOfBall);
+                    Log.d("ball", "moveSoccerBall: BOUNCED OFF YO FACE");
+                }
+            }
+            else if(bottomOfBall>floor){//Check if the ball went through the floor, if so we need to adjust the position and adjust it's vertical velocity
                 bounceBall(floor, bottomOfBall); //Adjusted the speed at which the ball will travel after bouncing.
-                Log.d("ball", "floor: "+ floor);
-                Log.d("ball", "bottomOfBall: "+ bottomOfBall);
             }
             mLastUpdateTime = currentTime;
         }
@@ -101,10 +112,10 @@ public class SoccerEngine {
         return (ySpeed * elapsedTime/10) + (GRAVITY_ACCELERATION * (elapsedTime/10*elapsedTime/10))/2;
     }
 
-    private void bounceBall(int floor, double bottomOfBall){
+    private void bounceBall(int bouncedSurface, double bottomOfBall){
         //If the ball goes through the floor this should adjust it to the correct position as if it had bounced.
-        double overBounce = bottomOfBall - floor;
-        double adjustedCenter = (floor - mSoccerBall.getRadius()) - overBounce;
+        double overBounce = bottomOfBall - bouncedSurface;
+        double adjustedCenter = (bouncedSurface - mSoccerBall.getRadius()) - overBounce;
         mSoccerBall.setCenterY(adjustedCenter);
 
         //This reverses the speed of the ball as well as applying the ball's rigidity to dampen the speed after a bounce. Less Rigid balls keep more of their bounce.
@@ -117,6 +128,17 @@ public class SoccerEngine {
             yPostBounceSpeed = bounceFrictionApplied*-1;
         }
         mSoccerBall.setYSpeed(yPostBounceSpeed);
+    }
+
+    /**
+     * Updates the position of the FaceRect as seen by the soccerEngine. If a face isn't detected we keep the rectangle where the face was at last update.
+     *
+     * @param faceRect The updated faceRect
+     */
+    public void updateFacePosition(@Nullable RectF faceRect){
+        if(faceRect!=null){
+            mFaceRect = faceRect;
+        }
     }
 
 }

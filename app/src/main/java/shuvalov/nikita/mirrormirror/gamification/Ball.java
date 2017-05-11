@@ -1,6 +1,7 @@
 package shuvalov.nikita.mirrormirror.gamification;
 
 import android.graphics.Paint;
+import android.graphics.RectF;
 
 /**
  * Created by NikitaShuvalov on 5/10/17.
@@ -65,5 +66,27 @@ public class Ball {
     public void moveSoccerBall(double x, double y){
         mCenterX+=x;
         mCenterY+=y;
+    }
+
+    /**
+     * The logic behind establishing whether the ball was hit by the face.
+     * If the top of the ball is below the top of the face, then it already doesn't count as contact, otherwise follow the below logic.
+     *
+     * If Ball(left) is right of Face(left) and Ball(Right) is left of Face(right) then contact was made
+     * If Ball(left) is left of Face(left), and Ball(right) is right of Face(Left), or vice versa, that means face made contact.
+     * If neither of those conditions are met the ball does not make contact.
+     * @param rectF Rectangle of face
+     * @return true if face made contact with ball
+     */
+    public boolean intersectRect(RectF rectF){
+        float topOfBall = (float) (mCenterY-mRadius);
+        float bottomOfBall = (float) (mCenterY+mRadius);
+        float topOfFace = rectF.top;
+        if(topOfBall>topOfFace || bottomOfBall< topOfFace){ //Since Y increases downwards.
+            return false;
+        }
+        double ballRight = mCenterX+mRadius;
+        double ballLeft = mCenterX-mRadius;
+        return !(ballRight < rectF.left || ballLeft > rectF.right);
     }
 }
