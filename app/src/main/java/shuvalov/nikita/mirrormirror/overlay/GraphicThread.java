@@ -41,5 +41,4 @@ public class GraphicThread extends Thread {
         mStop.set(true);
     }
 
-//    public interface
 }

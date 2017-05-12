@@ -54,7 +54,6 @@ public class ParticleOverlayFragment extends Fragment {
     public ParticleEngine getFunctionalParticleEngine(){
         Random rng = new Random();
         Rect screenBounds = ((MainActivity)getActivity()).getScreenBounds();
-
         ParticleEngine pEngine = new ParticleEngine(ParticleEngine.PhysicsType.OSCILLATING, screenBounds,null);
         pEngine.populateParticles(new Particle(R.drawable.flamekey0, rng.nextInt(screenBounds.width()),1,0,10,2));
         return pEngine;

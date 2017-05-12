@@ -59,9 +59,6 @@ public class GameOverlay extends BaseOverlay {
             canvas.drawText("Score: "+ mSoccerEngine.getPlayerScore(), mGoalBounds.centerX() - mTextSize , mGoalBounds.top + mTextSize, mScorePaint);
 
             canvas.drawCircle((float)soccerBall.getCenterX(), (float)soccerBall.getCenterY(), (float)soccerBall.getRadius(), soccerBall.getPaint());
-//            canvas.drawRect(700f, 50f, 1050f, 400f, mGreyPaint);
-//            canvas.drawRect(720f, 70f, 1030f, 380f, mBlackPaint);
-//            canvas.drawRect(720, 70, 900, 380, mRedPaint);
         }
         mSoccerEngine.moveSoccerBall();
     }

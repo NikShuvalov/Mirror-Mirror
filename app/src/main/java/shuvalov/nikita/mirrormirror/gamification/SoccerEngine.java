@@ -27,29 +27,35 @@ so that people can't just balance it on their head and score a whole bunch of po
 Or, have the ball need to travel some distance up after a hit to count towards a point.
 
  */
+
+
 public class SoccerEngine {
+
+    // ============================================= Variables===============================================
     private Rect mScreenBounds, mGoalBounds;
     private Ball mSoccerBall;
     private RectF mFaceRect;
     private RectF[] mPreviousRectPositions;
     private int mPlayerScore;
     private boolean mPointRegistered;
-    public static final int FACE_LENGTH = 400;
-    public static final int SECOND = 1000;
+    private boolean mIsSurvivalMode;
     private long mLastUpdateTime;
 
-    private boolean mIsSurvivalMode;
-
+    public static final int FACE_LENGTH = 400;
+    public static final int SECOND = 1000;
     private static final double MAX_DEFLECTION_VALUE = 15.0;
     private static final double GRAVITY_ACCELERATION = 10.0/SECOND;
     private static final double AIR_FRICTION_ACCELERATION = 5.0/SECOND;
     private static final int REFRESH_DELAY = 30;
     private static final double ZERO_TOLERANCE = 0.05f;
-    public static final double  BALL_RIGIDITY = 3; //Reduces the acceleration after a bounce to keep ball from bouncing indefinitely without any force being applied to it.
+    private static final double  BALL_RIGIDITY = 3; //Reduces the acceleration after a bounce to keep ball from bouncing indefinitely without any force being applied to it.
 
     public enum Wall {
         LEFT_SIDE, RIGHT_SIDE
     }
+
+    // ======================================== Constructor/Set-Up ==================================================
+
     public SoccerEngine(Rect screenBounds) {
         mScreenBounds = screenBounds;
         int goalWidth = mScreenBounds.width()/3;
@@ -73,6 +79,8 @@ public class SoccerEngine {
         mPlayerScore = 0;
     }
 
+    // ======================================== Getter Methods ==================================================
+
     public Rect getScreenBounds() {
         return mScreenBounds;
     }
@@ -85,13 +93,21 @@ public class SoccerEngine {
         return mSoccerBall;
     }
 
+    public int getPlayerScore(){
+        return mPlayerScore;
+    }
+
+    // ======================================== Main Move Method==================================================
+
     public void moveSoccerBall(){
         long currentTime = SystemClock.elapsedRealtime();
         long elapsedTime = currentTime- mLastUpdateTime;
         if(elapsedTime> REFRESH_DELAY){
-            double yDisplacement = applyGravity(currentTime); //ToDo: Split the method into two parts, one that applies gravity, another that gets displacement distance.
-            double xDisplacement = applyAirFriction(currentTime);
+            double yDisplacement = getYDisplacement(elapsedTime);
+            double xDisplacement = getXDisplacement(elapsedTime);
             mSoccerBall.moveSoccerBall(xDisplacement, yDisplacement);
+            applyGravity(elapsedTime);
+
             int floor = mScreenBounds.bottom;
             double bottomOfBall = mSoccerBall.getCenterY() + mSoccerBall.getRadius();
             if(mSoccerBall.intersectRect(mFaceRect)){ //Logic if ball hits face
@@ -123,10 +139,7 @@ public class SoccerEngine {
         }
     }
 
-    /*
-    Skews the ball if it's hit off-center. If the ball is hit in the mid 1/3 of the face, then xSpeed is unaffected.
-    Otherwise, if the ball is hit on the right 3rd of the face, the ball will fly towards the right, and vice versa.
-     */
+    // ======================================== Bouncy Methods ==================================================
 
     private void skewForAngledBounce(){
         double ballCenter = mSoccerBall.getCenterX();
@@ -139,14 +152,14 @@ public class SoccerEngine {
 
         double adjustmentSpeed =0;
         double distanceFromEdge;
-        if(ballCenter<sweetSpotStart){ //The ball has hit the left Side of the face.
+        if(ballCenter<sweetSpotStart){
             distanceFromEdge = ballCenter - faceStart;
-            if(distanceFromEdge<=0){ //The balls center is either on the exact edge of the face or off of the face, so it should be deflected
+            if(distanceFromEdge<=0){
                 adjustmentSpeed = MAX_DEFLECTION_VALUE * -1;
             }else{
                 adjustmentSpeed = (distanceFromEdge/(sweetSpotStart-faceStart))* MAX_DEFLECTION_VALUE * -1;
             }
-        }else if (ballCenter>sweetSpotEnd){ //The ball has hit the right side of the face.
+        }else if (ballCenter>sweetSpotEnd){
             distanceFromEdge = faceEnd - ballCenter;
             if(distanceFromEdge<=0){
                 adjustmentSpeed = MAX_DEFLECTION_VALUE;
@@ -155,56 +168,6 @@ public class SoccerEngine {
             }
         }
         mSoccerBall.setXSpeed(mSoccerBall.getXSpeed()+adjustmentSpeed);
-        //If neither above conditions are met, that means the ball hit the sweet spot and its xSpeed will not be affected.
-    }
-
-
-    private void checkIfScored(){
-        if(!mPointRegistered && mSoccerBall.getYSpeed()<0){
-            if(mGoalBounds.contains((int)mSoccerBall.getCenterX(), (int)mSoccerBall.getCenterY())){
-                mPlayerScore++;
-                mPointRegistered=true;
-            }
-        }
-    }
-
-    private double calculateOpposingForce(long elapsedTime, float previousYPos, float currentYPos){
-        float distanceTraveledHorizontally = (previousYPos - currentYPos)/10;
-        return distanceTraveledHorizontally * SECOND/elapsedTime;
-    }
-
-    private double applyAirFriction(long currentTime){
-        long elapsedTime = currentTime - mLastUpdateTime;
-        double xSpeed = mSoccerBall.getXSpeed();
-//        double newSpeed = xSpeed;
-//        if(xSpeed>0){ //We are looking to move the value towards 0 with air Friction. So if value is neg, add air friction to speed, otherwise minus it.
-//            newSpeed = xSpeed+(AIR_FRICTION_ACCELERATION*elapsedTime/REFRESH_DELAY);
-//            if(Math.abs(newSpeed)<ZERO_TOLERANCE) {//Taking a page out of Google's book/sample code, reduce the xSpeed to 0 if it's a trivially close to 0 already.
-//                newSpeed =0;
-//            }
-//            mSoccerBall.setXSpeed(newSpeed);
-//        }else if (xSpeed<0){
-//            newSpeed = xSpeed-(AIR_FRICTION_ACCELERATION*elapsedTime/REFRESH_DELAY);
-//            if(Math.abs(newSpeed)<ZERO_TOLERANCE){
-//                newSpeed =0;
-//            }
-//            mSoccerBall.setXSpeed(newSpeed);
-//        }
-        /*
-            Since horizontal deceleration isn't always affecting the xSpeed and it matters less compared to vertical movement,
-             I took a bit of a lazy approach and just found the average speed of before and after the acceleration is applied in order
-             to figure out the xDisplacement amount.
-         */
-        return (xSpeed * elapsedTime/REFRESH_DELAY);
-//        return ((xSpeed * elapsedTime/REFRESH_DELAY)+(newSpeed * elapsedTime/REFRESH_DELAY))/2;
-    }
-
-    private double applyGravity(long currentTime){
-        long elapsedTime = currentTime- mLastUpdateTime;
-        double ySpeed = mSoccerBall.getYSpeed();
-        mSoccerBall.setYSpeed(ySpeed+ GRAVITY_ACCELERATION*elapsedTime);
-        return (ySpeed * elapsedTime/10) + (GRAVITY_ACCELERATION * (elapsedTime/10*elapsedTime/10))/2;
-
     }
 
     private void wallBallBounce(Wall side){
@@ -226,45 +189,89 @@ public class SoccerEngine {
         mSoccerBall.setXSpeed(getSpeedAfterBounce(mSoccerBall.getXSpeed()));
     }
 
-
     private void verticalBallBounce(int bouncedSurface, double bottomOfBall, double opposingForce){
-        //If the ball goes through the floor this should adjust it to the correct position as if it had bounced.
         double overBounce = bottomOfBall - bouncedSurface;
         double adjustedCenter = (bouncedSurface - mSoccerBall.getRadius()) - overBounce;
         mSoccerBall.setCenterY(adjustedCenter);
         double yPostBounceSpeed = getSpeedAfterBounce(mSoccerBall.getYSpeed());
-
         double momentum = opposingForce/4;
         if(momentum<-5){
             momentum=-5;
         } else if (momentum > 5) {
             momentum = 5;
         }
-
         double adjustedSpeed = yPostBounceSpeed - momentum;
-
-        /*
-        If your head goes down at same or great rate as the ball coming down, then the momentum has a chance of moving the ball with a momentum
-        that will speed it up going downwards, which doesn't happen in real-life, so instead
-        if the momentum would direct the acceleration downwards then we would have the ball stall with a vertical speed of 0 just like in real-life.
-
-          */
-
         if(adjustedSpeed> 0 ){  //A positive speed would mean that the ball would would be heading towards bottom of screen.
             adjustedSpeed =0;
         }
         mSoccerBall.setYSpeed(adjustedSpeed);
     }
 
-    //This assumes that bounce should slow same amount regardless if it hits a vertical or horizontal surface.
+    // ======================================== Helper Methods ==================================================
+
+    /**
+     * Score only counts if the ball was heading upwards, and only if the user had hit the ball with their head prior to it entering the goal.
+     */
+    private void checkIfScored(){
+        if(!mPointRegistered && mSoccerBall.getYSpeed()<0){
+            if(mGoalBounds.contains((int)mSoccerBall.getCenterX(), (int)mSoccerBall.getCenterY())){
+                mPlayerScore++;
+                mPointRegistered=true;
+            }
+        }
+    }
+
     private double getSpeedAfterBounce(double previousSpeed){
         double postBounceSpeed = Math.abs(previousSpeed) - BALL_RIGIDITY;
         if(postBounceSpeed<0){
             return 0;
         }else{
-            return previousSpeed<0 ? postBounceSpeed : postBounceSpeed * -1;
+            return previousSpeed < 0 ? postBounceSpeed : postBounceSpeed * -1;
         }
     }
+
+    private double calculateOpposingForce(long elapsedTime, float previousYPos, float currentYPos){
+        float distanceTraveledHorizontally = (previousYPos - currentYPos)/10;
+        return distanceTraveledHorizontally * SECOND/elapsedTime;
+    }
+
+    private double getXDisplacement(long elapsedTime){
+        return (mSoccerBall.getXSpeed() * elapsedTime/REFRESH_DELAY);
+    }
+
+
+    private double getYDisplacement(long elapsedTime){
+        return (mSoccerBall.getYSpeed() * elapsedTime/10) + (GRAVITY_ACCELERATION * (elapsedTime/10*elapsedTime/10))/2;
+    }
+
+    private void applyGravity(long elapsedTime){
+        mSoccerBall.setYSpeed(mSoccerBall.getYSpeed()+ GRAVITY_ACCELERATION*elapsedTime);
+    }
+
+//    private void applyAirFriction(){
+//        double newSpeed = xSpeed;
+//        if(xSpeed>0){ //We are looking to move the value towards 0 with air Friction. So if value is neg, add air friction to speed, otherwise minus it.
+//            newSpeed = xSpeed+(AIR_FRICTION_ACCELERATION*elapsedTime/REFRESH_DELAY);
+//            if(Math.abs(newSpeed)<ZERO_TOLERANCE) {//Taking a page out of Google's book/sample code, reduce the xSpeed to 0 if it's a trivially close to 0 already.
+//                newSpeed =0;
+//            }
+//            mSoccerBall.setXSpeed(newSpeed);
+//        }else if (xSpeed<0){
+//            newSpeed = xSpeed-(AIR_FRICTION_ACCELERATION*elapsedTime/REFRESH_DELAY);
+//            if(Math.abs(newSpeed)<ZERO_TOLERANCE){
+//                newSpeed =0;
+//            }
+//            mSoccerBall.setXSpeed(newSpeed);
+//        }
+        /*
+            Since horizontal deceleration isn't always affecting the xSpeed and it matters less compared to vertical movement,
+             I took a bit of a lazy approach and just found the average speed of before and after the acceleration is applied in order
+             to figure out the xDisplacement amount.
+         */
+//        return ((xSpeed * elapsedTime/REFRESH_DELAY)+(newSpeed * elapsedTime/REFRESH_DELAY))/2;
+//    }
+
+    // ======================================== FaceStorage Methods ==================================================
 
     /**
      * Updates the position of the FaceRect as seen by the soccerEngine. If a face isn't detected we keep the rectangle where the face was at last update.
@@ -278,14 +285,11 @@ public class SoccerEngine {
         updateFaceRectCache();
     }
 
-    public void updateFaceRectCache(){
+    private void updateFaceRectCache(){
         for(int i =mPreviousRectPositions.length-1; i>0; i --){
             mPreviousRectPositions[i] = mPreviousRectPositions[i-1];
         }
         mPreviousRectPositions[0] = mFaceRect;
     }
 
-    public int getPlayerScore(){
-        return mPlayerScore;
-    }
 }
