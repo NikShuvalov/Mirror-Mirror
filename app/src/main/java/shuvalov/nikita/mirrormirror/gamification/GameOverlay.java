@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
@@ -17,8 +18,11 @@ import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 public class GameOverlay extends BaseOverlay {
     private Paint mBluePaint;
     private Paint mGreyPaint;
+    private Paint mScorePaint;
     private Paint mRedPaint;
     private Paint mBlackPaint;
+    private Rect mGoalBounds;
+    private static final float mTextSize = 40f;
 
     private SoccerEngine mSoccerEngine;
 
@@ -32,6 +36,9 @@ public class GameOverlay extends BaseOverlay {
         mRedPaint.setColor(Color.RED);
         mBlackPaint = new Paint();
         mBlackPaint.setColor(Color.BLACK);
+        mScorePaint = new Paint();
+        mScorePaint.setColor(Color.RED);
+        mScorePaint.setTextSize(mTextSize);
     }
 
     @Override
@@ -48,6 +55,8 @@ public class GameOverlay extends BaseOverlay {
             //ToDo: Draw rounded Rect for API 21+
 
             Ball soccerBall = mSoccerEngine.getSoccerBall();
+            canvas.drawRect(mGoalBounds, mGreyPaint);
+            canvas.drawText("Score: "+ mSoccerEngine.getPlayerScore(), mGoalBounds.centerX() - mTextSize , mGoalBounds.top + mTextSize, mScorePaint);
 
             canvas.drawCircle((float)soccerBall.getCenterX(), (float)soccerBall.getCenterY(), (float)soccerBall.getRadius(), soccerBall.getPaint());
 //            canvas.drawRect(700f, 50f, 1050f, 400f, mGreyPaint);
@@ -66,5 +75,6 @@ public class GameOverlay extends BaseOverlay {
 
     public void setSoccerEngine(SoccerEngine soccerEngine){
         mSoccerEngine = soccerEngine;
+        mGoalBounds = mSoccerEngine.getGoalBounds();
     }
 }
