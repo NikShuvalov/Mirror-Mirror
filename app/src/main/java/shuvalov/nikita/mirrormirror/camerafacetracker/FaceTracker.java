@@ -10,6 +10,7 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 
+import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 
@@ -22,9 +23,11 @@ import shuvalov.nikita.mirrormirror.filters.FilterManager;
 public class FaceTracker extends Tracker<Face>{
     private int mScreenWidth, mScreenHeight;
     private RectF mFaceRect;
+    private MainActivity.GraphicType mDetectionMode;
 
 
     private FaceTracker() {
+        mDetectionMode = null;
     }
 
     private static FaceTracker sFaceTracker;
@@ -37,22 +40,25 @@ public class FaceTracker extends Tracker<Face>{
     }
 
 
-    private void resizeFaceRect(Filter filter){
-        float centerY = mFaceRect.centerY();
-        float yDelta = Math.abs(centerY - mFaceRect.top);
-        float yScale = filter.getScaleY();
-        float newTop = centerY - (yDelta * yScale);
-        float newBottom = centerY + (yDelta * yScale);
-        mFaceRect.top = newTop;
-        mFaceRect.bottom = newBottom;
+    public RectF resizeFaceRect(Filter filter){
+        if(mFaceRect!=null) {
+            float centerY = mFaceRect.centerY();
+            float yDelta = Math.abs(centerY - mFaceRect.top);
+            float yScale = filter.getScaleY();
+            float newTop = centerY - (yDelta * yScale);
+            float newBottom = centerY + (yDelta * yScale);
+            mFaceRect.top = newTop;
+            mFaceRect.bottom = newBottom;
 
-        float centerX = mFaceRect.centerX();
-        float xDelta = Math.abs(centerX - mFaceRect.left);
-        float xScale = filter.getScaleX();
-        float newRight = centerX + (xDelta * xScale);
-        float newLeft = centerX - (xDelta * xScale);
-        mFaceRect.right = newRight;
-        mFaceRect.left = newLeft;
+            float centerX = mFaceRect.centerX();
+            float xDelta = Math.abs(centerX - mFaceRect.left);
+            float xScale = filter.getScaleX();
+            float newRight = centerX + (xDelta * xScale);
+            float newLeft = centerX - (xDelta * xScale);
+            mFaceRect.right = newRight;
+            mFaceRect.left = newLeft;
+        }
+        return mFaceRect;
     }
 
     public RectF getFaceRect() {
@@ -84,17 +90,23 @@ public class FaceTracker extends Tracker<Face>{
         mFaceRect = new RectF(pos.x, pos.y, pos.x+faceWidth, pos.y+faceHeight);
 
         Matrix matrix = new Matrix();
+        matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2); //Rotates the face detection across center of screen, since Front facing camera has a mirrored display
+        if(mDetectionMode!=null && mDetectionMode.equals(MainActivity.GraphicType.FILTER)){
+            applyFilterParameters(matrix);
+        }else{
+            matrix.mapRect(mFaceRect);
+        }
+    }
 
-        //Rotates the face detection across center of screen, since Front facing camera has a mirrored display
-        matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2);
-
+    private void applyFilterParameters(Matrix matrix){
         Filter filter = FilterManager.getInstance().getSelectedFilter();
-
-        //Moves the filter to the appropriate location depending on what kind of filter it is, face, hair, hat, etc.
         matrix.postTranslate(0, (int)(mFaceRect.height()*filter.getOffsetYPercent()));
-
+        resizeFaceRect(filter);
         matrix.mapRect(mFaceRect);
-        resizeFaceRect(FilterManager.getInstance().getSelectedFilter());
+
+    }
+    public void changeDetectionMode(MainActivity.GraphicType graphicType){
+        mDetectionMode = graphicType;
     }
 
     @Override

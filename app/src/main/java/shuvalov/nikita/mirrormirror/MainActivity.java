@@ -92,7 +92,9 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         display.getSize(size);
         mViewWidth = size.x;
         mViewHeight = size.y;
-        FaceTracker.getInstance().setScreenSize(mViewHeight, mViewWidth);
+        FaceTracker faceTracker = FaceTracker.getInstance();
+        faceTracker.setScreenSize(mViewHeight, mViewWidth);
+        faceTracker.changeDetectionMode(GraphicType.FILTER);
 
         int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (checkPermission == PackageManager.PERMISSION_DENIED) {
@@ -290,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     }
 
     public void notifyOverlayChanged(){
+        FaceTracker.getInstance().changeDetectionMode(mCurrentOverlay);
         switch(mCurrentOverlay){
             case PARTICLE:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ParticleOverlayFragment.newInstance()).commit();

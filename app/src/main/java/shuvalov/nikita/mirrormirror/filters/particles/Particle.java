@@ -115,6 +115,8 @@ public class Particle {
         mStartX = startX;
     }
 
+    public void moveStartX(double xShift){ mStartX+=xShift;}
+
     public void setStartY(double startY) {
         mStartY = startY;
     }

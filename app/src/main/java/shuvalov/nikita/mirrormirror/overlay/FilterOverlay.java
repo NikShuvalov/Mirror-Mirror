@@ -43,7 +43,8 @@ public class FilterOverlay extends BaseOverlay{
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        RectF face = FaceTracker.getInstance().getFaceRect();
+        RectF face =  FaceTracker.getInstance().getFaceRect();
+//        RectF face = faceTracker.resizeFaceRect(FilterManager.getInstance().getSelectedFilter());//ToDo: Might be better to return the tracker instead of the RectF to avoid confusion by having the method do more than it should.
         canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
         if(face!=null){
             face.round(mRect);
