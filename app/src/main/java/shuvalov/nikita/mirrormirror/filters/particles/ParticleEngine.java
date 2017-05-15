@@ -21,10 +21,10 @@ public class ParticleEngine {
     private Rect mScreenBounds;
     private long mLastUpdate = SystemClock.elapsedRealtime();
     private Random mRng;
-    private PointF mCurrentPosition;
-    private PointF[] mRecentPositions;
-    public static final int FACE_CACHE_SIZE = 5;
-    private double mFaceXShift, mFaceYShift;
+    private PointF mCurrentPosition, mPreviousPosition;
+//    private PointF[] mRecentPositions;
+    public static final int FACE_CACHE_SIZE = 10;
+    private double mFaceXShift, mFaceYShift, mCumulativeXShift, mCumulativeYShift;
 
 
     /**
@@ -47,13 +47,15 @@ public class ParticleEngine {
         if (faceRect != null) {
             mCurrentPosition = new PointF(faceRect.centerX(), faceRect.centerY());
         } else {
-            mCurrentPosition = new PointF(-50, mScreenBounds.exactCenterY());
+            mCurrentPosition = new PointF(mScreenBounds.exactCenterX(), mScreenBounds.exactCenterY());
         }
-//        mMostRecentPosition = mCurrentPosition;
-        mRecentPositions = new PointF[FACE_CACHE_SIZE];
-        for(int i = 0; i<FACE_CACHE_SIZE; i ++){
-            mRecentPositions[i] = mCurrentPosition;
-        }
+        mPreviousPosition = new PointF(mCurrentPosition.x, mCurrentPosition.y);
+        mFaceYShift = 0;
+        mFaceXShift = 0;
+//        mRecentPositions = new PointF[FACE_CACHE_SIZE];
+//        for(int i = 0; i<FACE_CACHE_SIZE; i ++){
+//            mRecentPositions[i] = mCurrentPosition;
+//        }
     }
 
     public void populateParticles(Particle sampleParticle) {
@@ -135,7 +137,7 @@ public class ParticleEngine {
             p = mParticles.get(i);
             double yDisplacement = getYDisplacementOscillating(elapsedTime, p);
 
-            xAxis = p.getStartX();
+            xAxis = p.getStartX() - (mCumulativeXShift * p.getScale()/3);
             p.translatePosition(0, yDisplacement);
             double newXPosition = (100 * Math.sin(p.getYLoc() / 100)) + xAxis;
 
@@ -150,7 +152,7 @@ public class ParticleEngine {
     }
 
     private double getYDisplacementOscillating(long elapsedTime, Particle p){
-        double scaledYSpeed = (p.getYVel()+mFaceYShift) * p.getScale();//The speed at which the particle will move up based on it's "distance" from the lens. Speed is per 30ms
+        double scaledYSpeed = (p.getYVel()-mFaceYShift) * p.getScale();//The speed at which the particle will move up based on it's "distance" from the lens. Speed is per 30ms
         return scaledYSpeed * (elapsedTime / Particle.REFRESH_RATE);
     }
 
@@ -165,21 +167,27 @@ public class ParticleEngine {
         p.setYLoc(p.getStartY());
     }
 
-    public void updateFacePosition(float cx, float cy) {
-        if (cx != Float.MIN_VALUE) {
-            Log.d("Hello", "Darkness");
-            mCurrentPosition.set(cx,cy);
+
+    public void updateFacePosition(float cx, float cy){
+        mPreviousPosition.set(mCurrentPosition.x, mCurrentPosition.y);
+        if(cx!= Float.MIN_VALUE){
+            mCurrentPosition.set(cx, cy);
         }
-        mFaceXShift = mRecentPositions[4].x - mCurrentPosition.x;
-        mFaceYShift = mRecentPositions[4].y - mCurrentPosition.y;
-        Log.d("Face", "updateFacePosition: " + mFaceXShift + "," + mFaceYShift);
-        updateFacePosCache();
+        calculateForFaceShift();
     }
 
-    private void updateFacePosCache(){
-        for(int i =FACE_CACHE_SIZE-1; i>0; i --){
-            mRecentPositions[i] = mRecentPositions[i-1];
+    private void calculateForFaceShift(){
+        //XShift needs to affect startX of particle for oscillating.
+        mFaceXShift = mPreviousPosition.x - mCurrentPosition.x;
+        mCumulativeXShift += mFaceXShift;
+        if(mCumulativeXShift > mScreenBounds.width()/2){
+            mCumulativeXShift = mScreenBounds.width()/2;
+        }else if ( mCumulativeXShift< mScreenBounds.width()/-2){
+            mCumulativeXShift = mScreenBounds.width()/-2;
         }
-        mRecentPositions[0] = mCurrentPosition;
+
+        //YShift need to shift vertically in a way that doesn't cause the particle to move upward in a sine-wave as well.
+        mFaceYShift = mPreviousPosition.y - mCurrentPosition.y;
+        mCumulativeYShift += mFaceYShift;
     }
 }

@@ -93,17 +93,14 @@ public class FaceTracker extends Tracker<Face>{
         matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2); //Rotates the face detection across center of screen, since Front facing camera has a mirrored display
         if(mDetectionMode!=null && mDetectionMode.equals(MainActivity.GraphicType.FILTER)){
             applyFilterParameters(matrix);
-        }else{
-            matrix.mapRect(mFaceRect);
         }
+        matrix.mapRect(mFaceRect);
     }
 
     private void applyFilterParameters(Matrix matrix){
         Filter filter = FilterManager.getInstance().getSelectedFilter();
         matrix.postTranslate(0, (int)(mFaceRect.height()*filter.getOffsetYPercent()));
         resizeFaceRect(filter);
-        matrix.mapRect(mFaceRect);
-
     }
     public void changeDetectionMode(MainActivity.GraphicType graphicType){
         mDetectionMode = graphicType;
