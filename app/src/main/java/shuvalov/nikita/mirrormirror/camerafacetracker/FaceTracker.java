@@ -9,6 +9,7 @@ import android.util.Log;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.Landmark;
 
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.filters.Filter;
@@ -24,10 +25,12 @@ public class FaceTracker extends Tracker<Face>{
     private int mScreenWidth, mScreenHeight;
     private RectF mFaceRect;
     private MainActivity.GraphicType mDetectionMode;
-
+    private boolean mRightEyeOpen, mLeftEyeOpen, mMouthOpen;
+    private double mEyelength;
 
     private FaceTracker() {
         mDetectionMode = null;
+        mMouthOpen = false;
     }
 
     private static FaceTracker sFaceTracker;
@@ -106,14 +109,74 @@ public class FaceTracker extends Tracker<Face>{
         mDetectionMode = graphicType;
     }
 
+    private void distinguishLandmarks(Face face){
+        if(face.getIsLeftEyeOpenProbability()<.30){
+            Log.d("Eye", "Left eye closed ");
+        }
+        if(face.getIsRightEyeOpenProbability()<.30){
+            Log.d("Eye", "Right eye closed ");
+        }
+        calculateEyeLength(face);
+        deduceIfMouthIsOpen(face);
+    }
+
+    private void deduceIfMouthIsOpen(Face face){
+        float noseBase = Float.MIN_VALUE;
+        float bottomLip = Float.MAX_VALUE;
+        for(Landmark mark: face.getLandmarks()){
+            if(mark.getType() == Landmark.NOSE_BASE){
+                noseBase = mark.getPosition().y;
+            }
+            if(mark.getType() == Landmark.BOTTOM_MOUTH){
+                bottomLip = mark.getPosition().y;
+            }
+        }
+        if(noseBase!= Float.MIN_VALUE && bottomLip!= Float.MIN_VALUE && mEyelength >0){
+            mMouthOpen = Math.abs(bottomLip-noseBase) >mEyelength;
+            return;
+            //Have there be a counter or something, if there's several detections of an open mouth within a time span, treat as Open Mouth, to reduce probability of a false positive.
+        }
+        mMouthOpen = false;
+    }
+
+    /**
+     * The distance between the edges of both eyes is typically a single eye's width.
+     * This calculates the distance of an eye by getting the distance between the center of both eyes divided by 2.
+     *
+     * @param face
+     */
+    private void calculateEyeLength(Face face){
+        float leftEyeCenter = Float.MIN_VALUE;
+        float rightEyeCenter = Float.MIN_VALUE;
+        for(Landmark mark :face.getLandmarks()){
+            if(mark.getType() == Landmark.LEFT_EYE){
+                leftEyeCenter = mark.getPosition().x;
+            }
+            if (mark.getType() == Landmark.RIGHT_EYE){
+                rightEyeCenter = mark.getPosition().x;
+            }
+        }
+        if(leftEyeCenter!= Float.MIN_VALUE && rightEyeCenter != Float.MIN_VALUE){
+            mEyelength = Math.abs(rightEyeCenter - leftEyeCenter);
+        }else{
+            mEyelength = -1;
+        }
+    }
+
+    private void updateData(Face face){
+        setNewFacePosition(face);
+        distinguishLandmarks(face);
+    }
+
+
     @Override
     public void onNewItem(int i, Face face) {
-        setNewFacePosition(face);
+        updateData(face);
     }
 
     @Override
     public void onUpdate(Detector.Detections<Face> detections, Face face) {
-        setNewFacePosition(face);
+        updateData(face);
     }
 
     @Override

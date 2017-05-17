@@ -30,6 +30,9 @@ public class GameOverlay extends BaseOverlay {
         super(context);
         mBluePaint= new Paint();
         mBluePaint.setColor(Color.BLUE);
+        mBluePaint.setStyle(Paint.Style.STROKE);
+        mBluePaint.setStrokeWidth(2f);
+
         mGreyPaint = new Paint();
         mGreyPaint.setColor(Color.LTGRAY);
         mRedPaint = new Paint();

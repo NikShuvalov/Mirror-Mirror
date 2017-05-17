@@ -28,7 +28,6 @@ public class ParticleOverlay extends BaseOverlay {
 
     public ParticleOverlay(Context context) {
         super(context);
-        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.flamekey0);
         mParticleRect = new RectF();
     }
 
@@ -60,5 +59,10 @@ public class ParticleOverlay extends BaseOverlay {
 
     public void setParticleEngine(ParticleEngine p){
         mParticleEngine = p;
+    }
+
+    public void notifyBitmapChange(Particle p){
+        mBitmap = BitmapFactory.decodeResource(getResources(), p.getResourceInt());
+
     }
 }

@@ -10,6 +10,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Random;
 
+import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
+
 /**
  * Created by NikitaShuvalov on 5/7/17.
  */
@@ -17,7 +19,7 @@ import java.util.Random;
 public class ParticleEngine {
     private ArrayList<Particle> mParticles;
     private PhysicsType mPhysicsType;
-    private int MAX_PARTICLES = 25;
+    private static final int MAX_PARTICLES = 25;
     private Rect mScreenBounds;
     private long mLastUpdate = SystemClock.elapsedRealtime();
     private Random mRng;
@@ -25,6 +27,7 @@ public class ParticleEngine {
 //    private PointF[] mRecentPositions;
     public static final int FACE_CACHE_SIZE = 10;
     private double mFaceXShift, mFaceYShift, mCumulativeXShift, mCumulativeYShift;
+    private static final double MAX_REPULSION_FORCE = 30; //ToDo: Adjust as necessary.
 
 
     /**
@@ -34,7 +37,7 @@ public class ParticleEngine {
      */
 
     public enum PhysicsType {
-        SNOWGLOBE, OSCILLATING, SIMPLE
+        SNOWGLOBE, OSCILLATING, SIMPLE, RADIATING
     }
 
     //ToDo: Have particles that are below a certain size(aka distance) not appear when within the bounds of the face
@@ -94,9 +97,13 @@ public class ParticleEngine {
                 case OSCILLATING:
                     processOscillatingMovement();
                     break;
+                case RADIATING:
+                    processRadiatingMovement();
+                    break;
             }
         }
     }
+
 
     //ToDo: Make asynchronous?
     private void processSimpleMovement() {
@@ -119,6 +126,8 @@ public class ParticleEngine {
         mLastUpdate = currentTime;
     }
 
+
+
     private void processSnowglobeMovement() {
         long currentTime = SystemClock.elapsedRealtime();
         long elapsedTime = currentTime - mLastUpdate;
@@ -128,6 +137,61 @@ public class ParticleEngine {
         mLastUpdate = currentTime;
     }
 
+    //===================================== Radiating movement ========================================================
+    //This movement will be outwards from the user's face.
+    // The user's face will repel the particles so that the closer the particle is the faster to moves away from the user.
+    // Slowing as it gets away. Velocity is logarithmic to distance from face center.
+    private void processRadiatingMovement(){
+        long currentTime = SystemClock.elapsedRealtime();
+        long elapsedTime = currentTime - mLastUpdate;
+        Particle p;
+        for(int i = 0; i<mParticles.size() ; i++){
+            p = mParticles.get(i);
+            RectF face = FaceTracker.getInstance().getFaceRect();
+            double yDisplacement = getYDisplacementRadiating(elapsedTime, p, face);
+            double xDisplacement = getXDisplacementRadiating(elapsedTime, p, face);
+            p.translatePosition(xDisplacement, yDisplacement);
+            if (p.getYLoc()<0 || p.getYLoc() > mScreenBounds.height() || p.getXLoc()< 0 || p.getXLoc() > mScreenBounds.width()){
+                resetParticle(p);
+            }
+        }
+        mLastUpdate = currentTime;
+    }
+
+    //Formula: displacement = force - (force * (distance/bounds));
+    private double getYDisplacementRadiating(long elapsedTime, Particle p, RectF face){
+        double yForceSource;
+        if(face!=null){
+            yForceSource = face.centerY() + (face.height()/4);
+        }else{
+            yForceSource = mScreenBounds.centerY();
+        }
+        double particleCenter = p.getYLoc();
+        double distance = particleCenter - yForceSource;
+        double yDisplacement = (MAX_REPULSION_FORCE - (MAX_REPULSION_FORCE* (distance/mScreenBounds.height())) * elapsedTime/Particle.REFRESH_RATE);
+        if(distance<0){
+            yDisplacement = yDisplacement * -1;
+        }
+        return yDisplacement;
+    }
+
+    private double getXDisplacementRadiating(long elapsedTime, Particle p, RectF face){
+        double xForceSource;
+        if(face!=null){
+            xForceSource = face.centerX();
+        }else{
+            xForceSource = mScreenBounds.centerX();
+        }
+        double particleCenter = p.getXLoc();
+        double distance = particleCenter - xForceSource;
+        double xDisplacement = (MAX_REPULSION_FORCE - (MAX_REPULSION_FORCE* (distance/mScreenBounds.width())) * elapsedTime/Particle.REFRESH_RATE);
+        if(distance<0){
+            xDisplacement= xDisplacement * -1;
+        }
+        return xDisplacement;
+    }
+
+    //======================================== Oscillating movement ======================================================
     private void processOscillatingMovement() {
         long currentTime = SystemClock.elapsedRealtime();
         long elapsedTime = currentTime - mLastUpdate;
@@ -156,15 +220,34 @@ public class ParticleEngine {
         return scaledYSpeed * (elapsedTime / Particle.REFRESH_RATE);
     }
 
-
-
     //This currently only makes the particle fall/rise infinitely at the same x location, only changing in size.
     private void resetParticle(Particle p) {
-        p.setStartX(mRng.nextInt(mScreenBounds.height())); //Using portrait in a landscape world.
-        p.resetXToStart();
-        double scale = (mRng.nextDouble() + .25) * 4;
-        p.setScale(scale);
-        p.setYLoc(p.getStartY());
+        switch(mPhysicsType){
+            case RADIATING:
+                RectF face = FaceTracker.getInstance().getFaceRect();
+                Random rng = new Random();
+                if(face!=null){
+                    double xCenter = face.centerX();
+                    p.setXLoc(xCenter + (rng.nextInt(100) - 50));
+                    double range = face.bottom - face.centerY();
+                    p.setYLoc(face.centerY() + rng.nextInt((int)range));
+                }else{//If no face available just spawn in middle of screen.
+                    double xCenter = mScreenBounds.centerX();
+                    p.setXLoc(xCenter + (rng.nextInt(100) - 50));
+                    double yCenter = mScreenBounds.centerY();
+                    p.setYLoc(yCenter + (rng.nextInt(100)-50));
+                }
+                break;
+            case SIMPLE:
+            case OSCILLATING:
+                p.setStartX(mRng.nextInt(mScreenBounds.height())); //Using portrait in a landscape world.
+                p.resetXToStart();
+                double scale = (mRng.nextDouble() + .25) * 4;
+                p.setScale(scale);
+                p.setYLoc(p.getStartY());
+                break;
+        }
+
     }
 
 
