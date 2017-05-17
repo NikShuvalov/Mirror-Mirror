@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ import shuvalov.nikita.mirrormirror.filters.particles.ParticleEngine;
  */
 
 public class ParticleOverlay extends BaseOverlay {
-    private Bitmap mBitmap;
     private RectF mParticleRect;
     private ParticleEngine mParticleEngine;
 
@@ -46,7 +46,7 @@ public class ParticleOverlay extends BaseOverlay {
             if((faceRect!=null && faceRect.contains(mParticleRect)) && scale<1.75){ //If the particle is located in the bounds of the face and has a large "distance" emulate it becoming hidden.
                 //If scale is less than 1 than the bitmap is never drawn in the first place, hence why checking for scale <1 made no difference.
             }else{
-                canvas.drawBitmap(mBitmap, null, mParticleRect, null);
+                canvas.drawBitmap(p.getCurrentBitMap(SystemClock.elapsedRealtime()), null, mParticleRect, null);
             }
         }
         if(faceRect!=null){
@@ -59,10 +59,5 @@ public class ParticleOverlay extends BaseOverlay {
 
     public void setParticleEngine(ParticleEngine p){
         mParticleEngine = p;
-    }
-
-    public void notifyBitmapChange(Particle p){
-        mBitmap = BitmapFactory.decodeResource(getResources(), p.getResourceInt());
-
     }
 }

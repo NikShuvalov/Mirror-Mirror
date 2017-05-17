@@ -19,7 +19,6 @@ import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 public class ParticleEngine {
     private ArrayList<Particle> mParticles;
     private PhysicsType mPhysicsType;
-    private static final int MAX_PARTICLES = 25;
     private Rect mScreenBounds;
     private long mLastUpdate = SystemClock.elapsedRealtime();
     private Random mRng;
@@ -28,6 +27,7 @@ public class ParticleEngine {
     public static final int FACE_CACHE_SIZE = 10;
     private double mFaceXShift, mFaceYShift, mCumulativeXShift, mCumulativeYShift;
     private static final double MAX_REPULSION_FORCE = 30; //ToDo: Adjust as necessary.
+    private int[] mParticleResourceImages;
 
 
     /**
@@ -62,7 +62,8 @@ public class ParticleEngine {
     }
 
     public void populateParticles(Particle sampleParticle) {
-        while (mParticles.size() <= MAX_PARTICLES) {
+        mParticles.clear();
+        while (mParticles.size() <= sampleParticle.getMaxParticles()) {
             Particle p = sampleParticle.makeCarbonCopy();
             resetParticle(p);
             if (!addParticle(p)) { //Just in case.
@@ -73,7 +74,7 @@ public class ParticleEngine {
 
     //Returns false if list is or becomes maxed, returns true if room for more.
     public boolean addParticle(Particle p) {
-        if (mParticles.size() >= MAX_PARTICLES) {
+        if (mParticles.size() >= p.getMaxParticles()) {
             return false;
         }
         mParticles.add(p);
@@ -138,7 +139,7 @@ public class ParticleEngine {
     }
 
     //===================================== Radiating movement ========================================================
-    //This movement will be outwards from the user's face.
+    //This movement moves outwards from a point of origin, for now just the face or mouth.
     // The user's face will repel the particles so that the closer the particle is the faster to moves away from the user.
     // Slowing as it gets away. Velocity is logarithmic to distance from face center.
     private void processRadiatingMovement(){
@@ -151,7 +152,7 @@ public class ParticleEngine {
             double yDisplacement = getYDisplacementRadiating(elapsedTime, p, face);
             double xDisplacement = getXDisplacementRadiating(elapsedTime, p, face);
             p.translatePosition(xDisplacement, yDisplacement);
-            if (p.getYLoc()<0 || p.getYLoc() > mScreenBounds.height() || p.getXLoc()< 0 || p.getXLoc() > mScreenBounds.width()){
+            if (p.isOutOfBounds(mScreenBounds)){
                 resetParticle(p);
             }
         }
@@ -247,6 +248,7 @@ public class ParticleEngine {
                 p.setYLoc(p.getStartY());
                 break;
         }
+        p.randomizeBitmap();
 
     }
 

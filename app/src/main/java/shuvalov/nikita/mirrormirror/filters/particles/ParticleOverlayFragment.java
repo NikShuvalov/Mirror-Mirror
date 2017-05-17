@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 
 import java.util.Random;
 
+import shuvalov.nikita.mirrormirror.AppConstants;
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.overlay.ParticleOverlay;
@@ -55,9 +56,9 @@ public class ParticleOverlayFragment extends Fragment {
         Random rng = new Random();
         Rect screenBounds = ((MainActivity)getActivity()).getScreenBounds();
         ParticleEngine pEngine = new ParticleEngine(ParticleEngine.PhysicsType.RADIATING, screenBounds, null);
-        Particle p = new Particle(R.drawable.flamekey0, rng.nextInt(screenBounds.width()),1,0,10,2);
+//        Particle p = new Particle(AppConstants.getBitmapList(getContext(),R.array.musical_notes_list),false, 0, 0, 2,7);
+        Particle p = new Particle(AppConstants.getBitmapList(getContext(), R.array.flame_animation_list),true, rng.nextInt(screenBounds.width()),10,2,30);
         pEngine.populateParticles(p);
-        mParticleOverlay.notifyBitmapChange(p);
         return pEngine;
     }
 

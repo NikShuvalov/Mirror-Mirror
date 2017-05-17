@@ -1,51 +1,76 @@
 package shuvalov.nikita.mirrormirror.filters.particles;
 
+import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.support.annotation.Nullable;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by NikitaShuvalov on 5/7/17.
  */
 
 public class Particle {
-    private int mResourceInt;
+    private List<Bitmap> mBitmapList;
     private double mXLoc, mYLoc, mXVel, mYVel, mScale, mStartX, mStartY;
     public static final long REFRESH_RATE = 30; //Target FPS
+    private long mLastUpdate;
+    private int mIndex;
+    private static final long mMillisPerFrame =200;
+    private boolean mAnimated;
+    private int mMaxParticles;
 
 
     /**
      * Creates a particle to be used by the particle engine for display.
      *
-     * @param resourceInt Image Resources
-     * @param startX At what horizontal position the particle starts.
-     * @param startY At what Vertical position the particle starts. Typically it'll be 0 if particle is falling, screenheight if particle is rising.
+     * @param bitmaps The different appearances of the particles
+     * @param animated If animated particle changes appearances as it moves, otherwise it changes appearance only on resetting.
      * @param XVel Number of pixels to move based on refresh rate, a positive value means moving to the right; negative to the left.
      * @param YVel Number of pixels to moved based on refresh rate, a positive value means falling on the screen, a negative value means rising
      * @param scale The scale emulates the distance of the particle from the lens
      *              and also used to determine the speed of which the particle moves
      *              for a parallaxing effect.
-     *
+     *@param maxParticles Max number of particles allowed to be populated for this particle.
      */
-    public Particle(int resourceInt, double startX, double startY, double XVel, double YVel, double scale) {
-        mResourceInt = resourceInt;
+    public Particle(List<Bitmap> bitmaps, boolean animated,  double XVel, double YVel, double scale, int maxParticles) {
+        mBitmapList = bitmaps;
 
-        mStartX= startX;
-        mStartY = startY;
-
-        mXLoc = startX;
-        mYLoc = startY;
+        mStartX= 0;
+        mStartY = 0;
+        mXLoc = mStartX;
+        mYLoc = mStartY;
 
         mXVel = XVel;
         mYVel = YVel;
 
         mScale = scale;
+
+        mAnimated = animated;
+        mLastUpdate = 0;
+        mIndex = 0;
+        mMaxParticles = maxParticles;
     }
 
-
-
-    public int getResourceInt() {
-        return mResourceInt;
+    public Bitmap getCurrentBitMap(long currentTime) {
+        if(mAnimated){
+            if(mLastUpdate == 0){
+                mLastUpdate = currentTime;
+            }else if (mLastUpdate + mMillisPerFrame < currentTime) {
+                mIndex++;
+                if(mIndex>= mBitmapList.size()){
+                    mIndex = 0;
+                }
+            }
+        }
+        return mBitmapList.get(mIndex);
     }
 
+    public void randomizeBitmap(){
+        Random rng = new Random();
+        mIndex = rng.nextInt(mBitmapList.size());
+    }
     /**
      * Adds the translation x and y amounts to the current x and y positions of the particle.
      *
@@ -108,7 +133,7 @@ public class Particle {
     }
 
     public Particle makeCarbonCopy(){
-        return new Particle(mResourceInt, mStartX, mStartY, mXVel, mYVel, mScale);
+        return new Particle(mBitmapList, mAnimated, mXVel, mYVel, mScale, mMaxParticles);
     }
 
     public void setStartX(double startX) {
@@ -123,5 +148,9 @@ public class Particle {
 
     public void resetXToStart(){
         mXLoc = mStartX;
+    }
+
+    public int getMaxParticles() {
+        return mMaxParticles;
     }
 }

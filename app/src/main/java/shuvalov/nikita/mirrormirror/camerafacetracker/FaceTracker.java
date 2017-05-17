@@ -110,12 +110,8 @@ public class FaceTracker extends Tracker<Face>{
     }
 
     private void distinguishLandmarks(Face face){
-        if(face.getIsLeftEyeOpenProbability()<.30){
-            Log.d("Eye", "Left eye closed ");
-        }
-        if(face.getIsRightEyeOpenProbability()<.30){
-            Log.d("Eye", "Right eye closed ");
-        }
+        mLeftEyeOpen = face.getIsLeftEyeOpenProbability()>.70;
+        mRightEyeOpen = face.getIsRightEyeOpenProbability()>.70;
         calculateEyeLength(face);
         deduceIfMouthIsOpen(face);
     }

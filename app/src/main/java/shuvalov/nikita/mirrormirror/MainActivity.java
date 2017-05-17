@@ -69,18 +69,8 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
         mCurrentOverlay = GraphicType.FILTER;
         //toDo: Should put a static image for animated filters to put in the recycler.
-        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.ImagePosition.FACE, 1.25f, 1.5f, 0, -0.65f,getBitmapList(R.array.flame_animation_list));
+        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.ImagePosition.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
         FilterManager.getInstance().addAnimatedFilters(f);
-    }
-
-    private List<Bitmap> getBitmapList(int resourceArray){
-        List<Bitmap> bitmapList = new ArrayList<>();
-        TypedArray tarray = getResources().obtainTypedArray(resourceArray);
-        for(int i = 0; i<tarray.length();i++){
-            bitmapList.add(BitmapFactory.decodeResource(getResources(),tarray.getResourceId(i,-1)));
-        }
-        tarray.recycle();
-        return bitmapList;
     }
 
     @Override

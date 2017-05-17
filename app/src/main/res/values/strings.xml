@@ -13,6 +13,19 @@
         <item>@drawable/flamekey6</item>
     </integer-array>
 
+    <integer-array name="musical_notes_list">
+        <item>@drawable/note_double_eighth_inverted</item>
+        <item>@drawable/note_double_quarter</item>
+        <item>@drawable/note_eighth</item>
+        <item>@drawable/note_eighth_double</item>
+        <item>@drawable/note_eighth_upside</item>
+        <item>@drawable/note_half</item>
+        <item>@drawable/note_inverted_double_quarter</item>
+        <item>@drawable/note_quarter</item>
+        <item>@drawable/note_quarter_fat</item>
+        <item>@drawable/note_quarter_upside</item>
+    </integer-array>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
