@@ -10,6 +10,7 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Build;
 import android.os.SystemClock;
 
 import java.util.ArrayList;
@@ -28,9 +29,10 @@ import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 public class ComponentOverlay extends BaseOverlay{
     private Rect mRect;
     private ArrayList<Filter> mFiltersUsed;
-    private Paint mLinePaint, mTextPaint;
+    private Paint mLinePaint, mTextPaint, mEyeBrowPaint;
 
     private static final float TEXT_SIZE = 200f;
+    private static final float EYEBROW_THICKNESS = 65f;
 
     private Bitmap mRickHair, mRickVomit; //FixMe: Get Rid of hard-coding
 
@@ -47,11 +49,17 @@ public class ComponentOverlay extends BaseOverlay{
         mLinePaint = new Paint();
         mLinePaint.setColor(Color.BLACK);
         mLinePaint.setStrokeWidth(5f);
+        mLinePaint.setStyle(Paint.Style.STROKE);
 
         mTextPaint = new Paint();
         mTextPaint.setColor(Color.WHITE);
         mTextPaint.setTextSize(TEXT_SIZE);
         mTextPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+
+        mEyeBrowPaint = new Paint();
+        mEyeBrowPaint.setColor(Color.argb(200, 156, 239, 243));
+        mEyeBrowPaint.setStyle(Paint.Style.FILL);
+        mEyeBrowPaint.setStrokeWidth(EYEBROW_THICKNESS);
 
         mRickHair = BitmapFactory.decodeResource(getResources(), R.drawable.rick_hair);
         mRickVomit = BitmapFactory.decodeResource(getResources(), R.drawable.rick_vomit);
@@ -72,19 +80,60 @@ public class ComponentOverlay extends BaseOverlay{
 //            if(mUsingAnimated){
 //                mBitmap = FilterManager.getInstance().getSelectedFilter().getBitmap(SystemClock.uptimeMillis());
 //            }
-            PointF leftMouth = FaceTracker.getInstance().getLeftMouth();
-            PointF rightMouth = FaceTracker.getInstance().getRightMouth();
-            if(leftMouth!=null && rightMouth!=null){
-                canvas.drawLine(leftMouth.x, leftMouth.y, rightMouth.x, rightMouth.y, mLinePaint); //Draw mouthline
-                float left = leftMouth.x;
-                canvas.drawBitmap(mRickVomit, left,Math.max(leftMouth.y, rightMouth.y),null);
-            }
-            FaceTracker faceTracker = FaceTracker.getInstance();
-            float line1Height = faceTracker.getScreenHeight()*.8f;
-            canvas.drawText("I stand", faceTracker.getScreenWidth()*.2f, line1Height, mTextPaint);
-            canvas.drawText("with Rick!",faceTracker.getScreenWidth()*.1f, line1Height+TEXT_SIZE + 16, mTextPaint);
-            canvas.drawBitmap(mRickHair, null, mRect, null);
-            mRect.setEmpty();
+            doItForRick(canvas);
         }
     }
+
+    private void doItForRick(Canvas canvas){
+        PointF leftMouth = FaceTracker.getInstance().getLeftMouth();
+        PointF rightMouth = FaceTracker.getInstance().getRightMouth();
+        if(leftMouth!=null && rightMouth!=null){
+            canvas.drawLine(leftMouth.x, leftMouth.y, rightMouth.x, rightMouth.y, mLinePaint); //Draw mouthline
+            float left = leftMouth.x;
+            canvas.drawBitmap(mRickVomit, left,Math.max(leftMouth.y, rightMouth.y),null);
+        }
+        FaceTracker faceTracker = FaceTracker.getInstance();
+        float line1Height = faceTracker.getScreenHeight()*.8f;
+        canvas.drawText("I stand", faceTracker.getScreenWidth()*.2f, line1Height, mTextPaint);
+        canvas.drawText("with Rick!",faceTracker.getScreenWidth()*.1f, line1Height+TEXT_SIZE + 16, mTextPaint);
+        double eyeLength = faceTracker.getEyelength();
+        PointF leftEye = faceTracker.getLeftEye();
+        PointF rightEye = faceTracker.getRightEye();
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            float leftInnerX = (float)(leftEye.x+(eyeLength/2f));
+            float leftTop = leftEye.y - (EYEBROW_THICKNESS*3f);
+            float leftBot = leftEye.y -EYEBROW_THICKNESS*2f;
+            float leftOutterX = (float)(leftEye.x-(eyeLength/2.5f));
+
+            float rightInnerX = (float)(rightEye.x-(eyeLength/2.5f));
+            float rightTop = rightEye.y - (EYEBROW_THICKNESS*3f);
+            float rightBot = rightEye.y -EYEBROW_THICKNESS*2f;
+            float rightOutterX = (float)(rightEye.x+(eyeLength/2.5f));
+
+
+
+            //Draw left Eyebrow
+            canvas.drawRoundRect(leftOutterX, leftTop, leftInnerX, leftBot, 50, 50, mEyeBrowPaint);
+            canvas.drawRoundRect(leftOutterX, leftTop, leftInnerX, leftBot, 50, 50, mLinePaint);
+
+            //Draw right eyebrow
+            canvas.drawRoundRect(rightInnerX, rightTop,rightOutterX, rightBot, 50, 50, mEyeBrowPaint);
+            canvas.drawRoundRect(rightInnerX, rightTop,rightOutterX, rightBot, 50, 50, mLinePaint);
+
+            //Unify the brows!
+//            float leftYMidpoint = leftTop+ (leftBot-leftTop)/2;
+//            float rightYMidpoint = rightTop + (rightBot-rightTop)/2;
+//
+//            canvas.drawLine(leftInnerX, leftYMidpoint,rightInnerX,rightYMidpoint,  mEyeBrowPaint);
+//            canvas.drawLine(leftInnerX, leftTop, rightInnerX,rightTop, mLinePaint);
+//            canvas.drawLine(leftInnerX, leftBot, rightInnerX, rightBot, mLinePaint);
+        }
+
+
+        canvas.drawBitmap(mRickHair, null, mRect, null);
+        mRect.setEmpty();
+    }
+
 }

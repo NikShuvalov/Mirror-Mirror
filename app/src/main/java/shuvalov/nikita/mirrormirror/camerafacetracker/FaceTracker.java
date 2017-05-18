@@ -262,5 +262,7 @@ public class FaceTracker extends Tracker<Face>{
         return mLeftEye;
     }
 
-
+    public double getEyelength() {
+        return mEyelength;
+    }
 }
