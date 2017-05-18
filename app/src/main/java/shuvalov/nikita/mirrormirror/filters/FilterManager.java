@@ -67,4 +67,9 @@ public class FilterManager {
             mFilters.add(f);
         }
     }
+
+    public void dirtyDebuggingCode(Filter f){
+        mFilters.add(f);
+        mCurrentPosition = mFilters.size()-1;
+    }
 }

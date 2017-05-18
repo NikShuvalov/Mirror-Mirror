@@ -41,6 +41,7 @@ import shuvalov.nikita.mirrormirror.camera.CameraSourceGenerator;
 import shuvalov.nikita.mirrormirror.camera.FaceDetectorGenerator;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
+import shuvalov.nikita.mirrormirror.componentfilters.ComponentOverlayFragment;
 import shuvalov.nikita.mirrormirror.filters.AnimatedFilter;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
@@ -277,6 +278,16 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                     notifyOverlayChanged();
                 }
                 break;
+            case R.id.component_option:
+                mDrawerLayout.closeDrawers();
+                if(mCurrentOverlay == GraphicType.COMPONENT){
+                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+                }else{
+                    mCurrentOverlay = GraphicType.COMPONENT;
+                    notifyOverlayChanged();
+                }
+                break;
+
         }
         return false;
     }
@@ -293,6 +304,8 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
             case GAME:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, GameOverlayFragment.newInstance()).commit();
                 break;
+            case COMPONENT:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ComponentOverlayFragment.newInstance()).commit();
         }
     }
 
@@ -312,6 +325,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     public void onShutter() {}
 
     public enum GraphicType{
-        PARTICLE, FILTER, GAME
+        PARTICLE, FILTER, GAME, COMPONENT
     }
 }

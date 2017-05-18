@@ -27,6 +27,7 @@ public class FaceTracker extends Tracker<Face>{
     private MainActivity.GraphicType mDetectionMode;
     private boolean mRightEyeOpen, mLeftEyeOpen, mMouthOpen;
     private double mEyelength;
+    private PointF mLeftMouth, mRightMouth, mNoseBase, mBottomLip, mRightEye, mLeftEye;
 
     private FaceTracker() {
         mDetectionMode = null;
@@ -94,10 +95,23 @@ public class FaceTracker extends Tracker<Face>{
 
         Matrix matrix = new Matrix();
         matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2); //Rotates the face detection across center of screen, since Front facing camera has a mirrored display
-        if(mDetectionMode!=null && mDetectionMode.equals(MainActivity.GraphicType.FILTER)){
+        if(mDetectionMode!=null && (mDetectionMode.equals(MainActivity.GraphicType.FILTER) || mDetectionMode.equals(MainActivity.GraphicType.COMPONENT))){//FixMe: Some hard-coding testing, like a proper programmer *thumbs-up*
             applyFilterParameters(matrix);
         }
         matrix.mapRect(mFaceRect);
+    }
+
+    private PointF mirrorLandMark(PointF landmark){
+        Matrix matrix = new Matrix();
+        matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2);
+        float x = landmark.x;
+        float y = landmark.y;
+        float[] coords = new float[]{x, y};
+        Log.d("Matrix", "mirrorLandMark: "+ x + "," + y);
+        matrix.mapPoints(coords);
+        Log.d("Matrix", "Flipped: "+ coords[0] + "," + coords[1]);
+        landmark.set(coords[0],y);
+        return landmark;
     }
 
     private void applyFilterParameters(Matrix matrix){
@@ -113,12 +127,39 @@ public class FaceTracker extends Tracker<Face>{
         mLeftEyeOpen = face.getIsLeftEyeOpenProbability()>.70;
         mRightEyeOpen = face.getIsRightEyeOpenProbability()>.70;
         calculateEyeLength(face);
+        storeLandmarkPositions(face);
         deduceIfMouthIsOpen(face);
     }
 
+    private void storeLandmarkPositions(Face face){
+        for(Landmark m: face.getLandmarks()){
+            switch(m.getType()){
+                case (Landmark.RIGHT_MOUTH):
+                    mRightMouth = mirrorLandMark(m.getPosition());
+                    break;
+                case (Landmark.LEFT_MOUTH):
+                    mLeftMouth = mirrorLandMark(m.getPosition());
+                    break;
+                case (Landmark.BOTTOM_MOUTH):
+                    mBottomLip = mirrorLandMark(m.getPosition());
+                    break;
+                case(Landmark.NOSE_BASE):
+                    mNoseBase = mirrorLandMark(m.getPosition());
+                    break;
+                case (Landmark.RIGHT_EYE):
+                    mRightEye = mirrorLandMark(m.getPosition());
+                    break;
+                case(Landmark.LEFT_EYE):
+                    mLeftEye = mirrorLandMark(m.getPosition());
+                    break;
+            }
+        }
+    }
+
+    //FixMe: The search here is unnecessary since we're checking for landmarks in another method, but I need to figure out if I want the position to be removed if not detected for a frame.
     private void deduceIfMouthIsOpen(Face face){
         float noseBase = Float.MIN_VALUE;
-        float bottomLip = Float.MAX_VALUE;
+        float bottomLip = Float.MIN_VALUE;
         for(Landmark mark: face.getLandmarks()){
             if(mark.getType() == Landmark.NOSE_BASE){
                 noseBase = mark.getPosition().y;
@@ -196,4 +237,30 @@ public class FaceTracker extends Tracker<Face>{
     public boolean isMouthOpen() {
         return mMouthOpen;
     }
+
+    public PointF getLeftMouth() {
+        return mLeftMouth;
+    }
+
+    public PointF getRightMouth() {
+        return mRightMouth;
+    }
+
+    public PointF getNoseBase() {
+        return mNoseBase;
+    }
+
+    public PointF getBottomLip() {
+        return mBottomLip;
+    }
+
+    public PointF getRightEye() {
+        return mRightEye;
+    }
+
+    public PointF getLeftEye() {
+        return mLeftEye;
+    }
+
+
 }
