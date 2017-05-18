@@ -128,7 +128,7 @@ public class FaceTracker extends Tracker<Face>{
             }
         }
         if(noseBase!= Float.MIN_VALUE && bottomLip!= Float.MIN_VALUE && mEyelength >0){
-            mMouthOpen = Math.abs(bottomLip-noseBase) >mEyelength;
+            mMouthOpen = Math.abs(bottomLip-noseBase) >mEyelength * 0.75;
             return;
             //Have there be a counter or something, if there's several detections of an open mouth within a time span, treat as Open Mouth, to reduce probability of a false positive.
         }
@@ -183,5 +183,17 @@ public class FaceTracker extends Tracker<Face>{
     @Override
     public void onDone() {
         clearFace();
+    }
+
+    public boolean isRightEyeOpen() {
+        return mRightEyeOpen;
+    }
+
+    public boolean isLeftEyeOpen() {
+        return mLeftEyeOpen;
+    }
+
+    public boolean isMouthOpen() {
+        return mMouthOpen;
     }
 }
