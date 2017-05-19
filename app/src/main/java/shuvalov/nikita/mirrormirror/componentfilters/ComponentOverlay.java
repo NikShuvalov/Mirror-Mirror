@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -63,7 +64,7 @@ public class ComponentOverlay extends BaseOverlay{
 
         mRickHair = BitmapFactory.decodeResource(getResources(), R.drawable.rick_hair);
         mRickVomit = BitmapFactory.decodeResource(getResources(), R.drawable.rick_vomit);
-        Filter dirtySanchez = new StaticFilter("Rick Sanchez", R.drawable.rick_hair, Filter.ImagePosition.HAIRLINE, 1.7f, 1f, 0f, -0.3f);
+        Filter dirtySanchez = new StaticFilter("Rick Sanchez", R.drawable.rick_hair, Filter.ImagePosition.HAIRLINE, 1.75f, 1f, 0f, -0.25f);
         FilterManager.getInstance().dirtyDebuggingCode(dirtySanchez);
 
     }
@@ -88,7 +89,6 @@ public class ComponentOverlay extends BaseOverlay{
         PointF leftMouth = FaceTracker.getInstance().getLeftMouth();
         PointF rightMouth = FaceTracker.getInstance().getRightMouth();
         if(leftMouth!=null && rightMouth!=null){
-            canvas.drawLine(leftMouth.x, leftMouth.y, rightMouth.x, rightMouth.y, mLinePaint); //Draw mouthline
             float left = leftMouth.x;
             canvas.drawBitmap(mRickVomit, left,Math.max(leftMouth.y, rightMouth.y),null);
         }
@@ -102,35 +102,46 @@ public class ComponentOverlay extends BaseOverlay{
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            float leftInnerX = (float)(leftEye.x+(eyeLength/2f));
-            float leftTop = leftEye.y - (EYEBROW_THICKNESS*3f);
-            float leftBot = leftEye.y -EYEBROW_THICKNESS*2f;
-            float leftOutterX = (float)(leftEye.x-(eyeLength/2.5f));
+            float leftInnerX = (float)(leftEye.x+(eyeLength/2.5f));
+            float leftTop = leftEye.y - (EYEBROW_THICKNESS*2.5f);
+            float leftBot = leftEye.y -EYEBROW_THICKNESS*1.5f;
+            float leftOutterX = (float)(leftEye.x-(eyeLength/3f));
 
             float rightInnerX = (float)(rightEye.x-(eyeLength/2.5f));
-            float rightTop = rightEye.y - (EYEBROW_THICKNESS*3f);
-            float rightBot = rightEye.y -EYEBROW_THICKNESS*2f;
-            float rightOutterX = (float)(rightEye.x+(eyeLength/2.5f));
+            float rightTop = rightEye.y - (EYEBROW_THICKNESS*2.5f);
+            float rightBot = rightEye.y -EYEBROW_THICKNESS*1.5f;
+            float rightOutterX = (float)(rightEye.x+(eyeLength/3f));
 
-
+            float leftYMidpoint = (leftTop+ leftBot)/2;
+            float rightYMidpoint = (rightTop + rightBot)/2;
 
             //Draw left Eyebrow
-            canvas.drawRoundRect(leftOutterX, leftTop, leftInnerX, leftBot, 50, 50, mEyeBrowPaint);
-            canvas.drawRoundRect(leftOutterX, leftTop, leftInnerX, leftBot, 50, 50, mLinePaint);
+            float arcRadius = 30;
+            canvas.drawLine(leftOutterX, leftYMidpoint, leftInnerX, leftYMidpoint, mEyeBrowPaint);
+            canvas.drawLine(leftInnerX, leftBot, leftOutterX,leftBot, mLinePaint);
+            canvas.drawArc(leftOutterX - arcRadius, leftTop, leftOutterX + arcRadius, leftBot, 90, 180, false, mEyeBrowPaint);
+            canvas.drawArc(leftOutterX - arcRadius, leftTop, leftOutterX + arcRadius, leftBot, 90, 180, false, mLinePaint);
+            canvas.drawLine(leftOutterX, leftTop, leftInnerX, leftTop, mLinePaint);
 
-            //Draw right eyebrow
-            canvas.drawRoundRect(rightInnerX, rightTop,rightOutterX, rightBot, 50, 50, mEyeBrowPaint);
-            canvas.drawRoundRect(rightInnerX, rightTop,rightOutterX, rightBot, 50, 50, mLinePaint);
+            //Draw Right Eyebrow
+            canvas.drawLine(rightOutterX, rightYMidpoint, rightInnerX, rightYMidpoint, mEyeBrowPaint);
+            canvas.drawLine(rightInnerX, rightBot, rightOutterX, rightBot, mLinePaint);
+            canvas.drawArc(rightOutterX - arcRadius, rightTop, rightOutterX + arcRadius, rightBot, 270, 180, false, mEyeBrowPaint);
+            canvas.drawArc(rightOutterX - arcRadius, rightTop, rightOutterX + arcRadius, rightBot, 270, 180, false, mLinePaint);
+            canvas.drawLine(rightOutterX, rightTop, rightInnerX, rightTop, mLinePaint);
 
-            //Unify the brows!
-//            float leftYMidpoint = leftTop+ (leftBot-leftTop)/2;
-//            float rightYMidpoint = rightTop + (rightBot-rightTop)/2;
-//
-//            canvas.drawLine(leftInnerX, leftYMidpoint,rightInnerX,rightYMidpoint,  mEyeBrowPaint);
-//            canvas.drawLine(leftInnerX, leftTop, rightInnerX,rightTop, mLinePaint);
-//            canvas.drawLine(leftInnerX, leftBot, rightInnerX, rightBot, mLinePaint);
+            //Unify the Brows!!!
+            Path uniBrowPath = new Path();
+            uniBrowPath.moveTo(leftInnerX, leftTop);
+            uniBrowPath.lineTo(rightInnerX, rightTop);
+            uniBrowPath.lineTo(rightInnerX, rightBot);
+            uniBrowPath.lineTo(leftInnerX, leftBot);
+            uniBrowPath.lineTo(leftInnerX, leftTop);
+            canvas.drawPath(uniBrowPath, mEyeBrowPaint);
+
+            canvas.drawLine(rightInnerX, rightTop, leftInnerX, leftTop, mLinePaint);
+            canvas.drawLine(rightInnerX, rightBot, leftInnerX, leftBot, mLinePaint);
         }
-
 
         canvas.drawBitmap(mRickHair, null, mRect, null);
         mRect.setEmpty();
