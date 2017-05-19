@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 
 import shuvalov.nikita.mirrormirror.R;
+import shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters.RickComponentFilter;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.StaticFilter;
 import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
@@ -21,8 +22,8 @@ public class ComponentOverlayFragment extends Fragment {
     private ComponentOverlay mComponentOverlay;
 
 
+    //ToDo: Create a recycler that allows user to select different component filter, make sure that recycler updates the choice in the overlay.
     public ComponentOverlayFragment() {
-        // Required empty public constructor
     }
 
 
@@ -47,9 +48,8 @@ public class ComponentOverlayFragment extends Fragment {
     }
 
     public void setUpOverlay(){
-        ArrayList<Filter> f = new ArrayList<>();
-        ComponentFilter c = new ComponentFilter("Rick Sanchez",f);//Just filling this in to appease my own code, the overlay is hard-coded.
-        mComponentOverlay = new ComponentOverlay(getContext(), c);
+        ComponentFilter componentFilter = new RickComponentFilter(getContext());
+        mComponentOverlay = new ComponentOverlay(getContext(), componentFilter);
         mComponentOverlay.setZOrderMediaOverlay(true);
         mOverlayContainer.addView(mComponentOverlay);
     }

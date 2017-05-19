@@ -1,6 +1,10 @@
 package shuvalov.nikita.mirrormirror.componentfilters;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.RectF;
+
+import com.google.android.gms.vision.face.Face;
 
 import java.util.ArrayList;
 
@@ -11,31 +15,8 @@ import shuvalov.nikita.mirrormirror.filters.Filter;
  * Created by NikitaShuvalov on 5/18/17.
  */
 
-public class ComponentFilter{
-    private String mFilterName;
-    private ArrayList<Filter> mComponentList;
-    private ArrayList<Bitmap> mComponentBitmaps;
-
-
-    public ComponentFilter(String filterName, ArrayList<Filter> componentList) {
-        mFilterName = filterName;
-        mComponentList = componentList;
-//        mComponentBitmaps = AppConstants.getBitmapList() ?
-    }
-
-    public void addComponent(Filter f){
-        mComponentList.add(f);
-    }
-
-    public String getFilterName() {
-        return mFilterName;
-    }
-
-    public ArrayList<Filter> getComponentList() {
-        return mComponentList;
-    }
-
-    public ArrayList<Bitmap> getComponentBitmaps() {
-        return mComponentBitmaps;
-    }
+public abstract class ComponentFilter{
+    public ComponentFilter() {}
+    public abstract Canvas drawComponentsToCanvas(Canvas canvas);
+    public abstract String getName();
 }

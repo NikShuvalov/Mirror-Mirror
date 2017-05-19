@@ -44,7 +44,7 @@ public class FaceTracker extends Tracker<Face>{
     }
 
 
-    public RectF resizeFaceRect(Filter filter){
+    private RectF resizeFaceRect(Filter filter){
         if(mFaceRect!=null) {
             float centerY = mFaceRect.centerY();
             float yDelta = Math.abs(centerY - mFaceRect.top);
@@ -86,17 +86,16 @@ public class FaceTracker extends Tracker<Face>{
         mFaceRect = null;
     }
 
-    public void setNewFacePosition(Face face){
+    private void setNewFacePosition(Face face){
         PointF pos = face.getPosition();
         float faceHeight = face.getHeight();
         float faceWidth = face.getWidth();
-
         mFaceRect = new RectF(pos.x, pos.y, pos.x+faceWidth, pos.y+faceHeight);
 
         Matrix matrix = new Matrix();
         matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2); //Rotates the face detection across center of screen, since Front facing camera has a mirrored display
-        if(mDetectionMode!=null && (mDetectionMode.equals(MainActivity.GraphicType.FILTER) || mDetectionMode.equals(MainActivity.GraphicType.COMPONENT))){//FixMe: Some hard-coding testing, like a proper programmer *thumbs-up*
-            applyFilterParameters(matrix);
+        if(mDetectionMode!=null && (mDetectionMode.equals(MainActivity.GraphicType.FILTER))){
+            applyFilterParameters(matrix); //Uses code to resize the location of the faceRect
         }
         matrix.mapRect(mFaceRect);
     }
@@ -107,9 +106,7 @@ public class FaceTracker extends Tracker<Face>{
         float x = landmark.x;
         float y = landmark.y;
         float[] coords = new float[]{x, y};
-        Log.d("Matrix", "mirrorLandMark: "+ x + "," + y);
         matrix.mapPoints(coords);
-        Log.d("Matrix", "Flipped: "+ coords[0] + "," + coords[1]);
         landmark.set(coords[0],y);
         return landmark;
     }
@@ -119,6 +116,7 @@ public class FaceTracker extends Tracker<Face>{
         matrix.postTranslate(0, (int)(mFaceRect.height()*filter.getOffsetYPercent()));
         resizeFaceRect(filter);
     }
+
     public void changeDetectionMode(MainActivity.GraphicType graphicType){
         mDetectionMode = graphicType;
     }
