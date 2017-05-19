@@ -16,5 +16,5 @@
 
     <item
         android:id="@+id/component_option"
-        android:title="Debug Rick"/>
+        android:title="Face Ricking"/>
 </menu>

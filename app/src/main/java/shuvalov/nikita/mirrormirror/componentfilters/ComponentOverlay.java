@@ -12,7 +12,7 @@ import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 public class ComponentOverlay extends BaseOverlay{
     private ComponentFilter mCurrentComponentFilter;
     private final Object mCanvasLock;
-    
+
     public ComponentOverlay(Context context, ComponentFilter componentFilter) {
         super(context);
         mCurrentComponentFilter = componentFilter;
