@@ -91,8 +91,6 @@ public class RickComponentFilter extends ComponentFilter {
         PointF leftMouth = faceTracker.getLeftMouth();
         PointF rightMouth = faceTracker.getRightMouth();
         mFaceRect = faceTracker.getFaceRect();
-
-        canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
         if(mFaceRect!=null){
             RectF adjustedRect = getAdjustedRect(mFaceRect);
             adjustEyebrowThickness(adjustedRect);
@@ -199,6 +197,7 @@ public class RickComponentFilter extends ComponentFilter {
             facePath.lineTo(mFaceRect.left, faceTop);
             canvas.drawPath(facePath, mFacePaint);
             canvas.drawPath(facePath, mLinePaint);
+            facePath.close();
         }
     }
 
@@ -280,6 +279,7 @@ public class RickComponentFilter extends ComponentFilter {
             uniBrowPath.lineTo(leftInnerX, leftBot);
             uniBrowPath.lineTo(leftInnerX, leftTop);
             canvas.drawPath(uniBrowPath, mEyeBrowPaint);
+            uniBrowPath.close();
 
             canvas.drawLine(rightInnerX, rightTop, leftInnerX, leftTop, mLinePaint);
             canvas.drawLine(rightInnerX, rightBot, leftInnerX, leftBot, mLinePaint);

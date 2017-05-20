@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import java.util.ArrayList;
 
 import shuvalov.nikita.mirrormirror.R;
+import shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters.NerdComponentFilter;
 import shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters.RickComponentFilter;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.StaticFilter;
@@ -48,7 +49,7 @@ public class ComponentOverlayFragment extends Fragment {
     }
 
     public void setUpOverlay(){
-        ComponentFilter componentFilter = new RickComponentFilter(getContext());
+        ComponentFilter componentFilter = new NerdComponentFilter(getContext());
         mComponentOverlay = new ComponentOverlay(getContext(), componentFilter);
         mComponentOverlay.setZOrderMediaOverlay(true);
         mOverlayContainer.addView(mComponentOverlay);

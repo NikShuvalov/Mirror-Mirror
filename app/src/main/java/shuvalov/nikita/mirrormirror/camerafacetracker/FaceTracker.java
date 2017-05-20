@@ -274,5 +274,5 @@ public class FaceTracker extends Tracker<Face>{
     public float getRightEyeOpenProbability(){
         return mFace.getIsRightEyeOpenProbability();
     }
-
+    
 }

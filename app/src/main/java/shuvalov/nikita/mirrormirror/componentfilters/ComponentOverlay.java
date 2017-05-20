@@ -2,6 +2,8 @@ package shuvalov.nikita.mirrormirror.componentfilters;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 
 import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 
@@ -23,6 +25,7 @@ public class ComponentOverlay extends BaseOverlay{
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         synchronized (mCanvasLock){
+            canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             mCurrentComponentFilter.drawComponentsToCanvas(canvas);
             try {
                 Thread.sleep(75); //FixMe: Find a more elegant solution to reduce FPS or figure out what else can be done to keep bitmaps from flickering.
