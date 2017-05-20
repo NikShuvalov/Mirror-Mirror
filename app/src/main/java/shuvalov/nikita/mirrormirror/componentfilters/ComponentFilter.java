@@ -3,6 +3,7 @@ package shuvalov.nikita.mirrormirror.componentfilters;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.view.View;
 
 import com.google.android.gms.vision.face.Face;
 
@@ -15,8 +16,9 @@ import shuvalov.nikita.mirrormirror.filters.Filter;
  * Created by NikitaShuvalov on 5/18/17.
  */
 
-public abstract class ComponentFilter{
+public abstract class ComponentFilter implements View.OnClickListener{
     public ComponentFilter() {}
     public abstract Canvas drawComponentsToCanvas(Canvas canvas);
     public abstract String getName();
+
 }

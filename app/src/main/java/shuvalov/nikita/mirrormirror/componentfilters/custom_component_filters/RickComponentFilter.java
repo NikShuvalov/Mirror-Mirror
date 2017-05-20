@@ -12,6 +12,7 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.os.Build;
+import android.view.View;
 
 
 import shuvalov.nikita.mirrormirror.R;
@@ -23,19 +24,21 @@ import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
  */
 
 public class RickComponentFilter extends ComponentFilter {
-    private Paint mLinePaint, mTextPaint, mEyeBrowPaint, mEyeBallPaint, mPupilPaint, mFacePaint, mMouthPaint, mTeethPaint;
+    private Paint mLinePaint, mTextPaint, mEyeBrowPaint, mEyeBallPaint, mPupilPaint, mFacePaint;
     private float mTextSize, mEyeBrowThickness;
     private RectF mFaceRect;
     private Bitmap mRickVomit, mRickHair;
+    private boolean mFaceRicking;
 
     private static final String FILTER_NAME = "Rick Sanchez";
-    private static final float HAIR_WIDTH_SCALE = 2.1f;
-    private static final float HAIR_HEIGHT_SCALE = 1.3f;
-    private static final float HAIR_VERTICAL_OFFSET = -0.35f;
+    private float mHairWidthScale = 2.1f;
+    private float mHairHeightScale = 1.3f;
+    private float mHairVerticalOffset = -0.35f;
 
 
     public RickComponentFilter(Context context) {
         super();
+        mFaceRicking = true;
         mTextSize = 200f;
         mEyeBrowThickness = 65f;
         createPaints();
@@ -69,10 +72,6 @@ public class RickComponentFilter extends ComponentFilter {
         mFacePaint = new Paint();
         mFacePaint.setColor(Color.argb(255, 250, 242, 242));
         mFacePaint.setStyle(Paint.Style.FILL);
-
-        mMouthPaint = new Paint();
-        mMouthPaint.setColor(Color.RED);
-        mMouthPaint.setStyle(Paint.Style.FILL);
     }
 
     private void loadBitmaps(Context c){
@@ -98,18 +97,24 @@ public class RickComponentFilter extends ComponentFilter {
             RectF adjustedRect = getAdjustedRect(mFaceRect);
             adjustEyebrowThickness(adjustedRect);
             canvas.drawBitmap(mRickHair, null, adjustedRect, null);
-            drawFace(canvas);
-            drawEars(canvas, eyeballRadius);
+            if(mFaceRicking){
+                drawFace(canvas);
+                drawEars(canvas, eyeballRadius);
+            }
             mFaceRect.setEmpty();
         }
         if(eyeballRadius>=0) {
             drawVomit(canvas, leftMouth, rightMouth, eyeballRadius);
-            drawEyes(canvas, leftEye, rightEye, eyeballRadius);
+            if(mFaceRicking) {
+                drawMouth(canvas, eyeballRadius, leftMouth, rightMouth);
+                drawEyes(canvas, leftEye, rightEye, eyeballRadius);
+                drawNose(canvas, leftEye, rightEye, eyeballRadius);
+            }
             drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
-            drawNose(canvas, leftEye, rightEye, eyeballRadius);
         }
-        //        drawMessage(canvas, faceTracker.getScreenHeight()*.8f, faceTracker.getScreenWidth());
-
+        if(!mFaceRicking){
+            drawMessage(canvas, faceTracker.getScreenHeight()*.8f, faceTracker.getScreenWidth());
+        }
         return canvas;
     }
 
@@ -120,6 +125,11 @@ public class RickComponentFilter extends ComponentFilter {
         float midY = (leftMouth.y + rightMouth.y) / 2;
         RectF vomitRect = new RectF(leftMouth.x, midY, rightMouth.x, midY + distance * .6f);
         canvas.drawBitmap(mRickVomit, null, vomitRect, null);
+    }
+
+    private void drawMouth(Canvas canvas, float eyeballRadius,PointF leftMouth, PointF rightMouth ){
+        float left = leftMouth.x - eyeballRadius;
+        float right = rightMouth.x + eyeballRadius;
         canvas.drawLine(left, leftMouth.y, right, rightMouth.y, mLinePaint);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             canvas.drawArc(left - eyeballRadius/2, leftMouth.y - eyeballRadius/2, left + eyeballRadius/2, leftMouth.y + eyeballRadius/2, 90f, 180f, false, mLinePaint);
@@ -285,20 +295,20 @@ public class RickComponentFilter extends ComponentFilter {
     private RectF getAdjustedRect(RectF faceRect){
         RectF adjustedRect = new RectF(faceRect);
         Matrix matrix = new Matrix();
-        matrix.postTranslate(0, (int)(adjustedRect.height()*HAIR_VERTICAL_OFFSET));
+        matrix.postTranslate(0, (int)(adjustedRect.height()*mHairVerticalOffset));
         matrix.mapRect(adjustedRect);
 
         float centerY = adjustedRect.centerY();
         float yDelta = Math.abs(centerY - adjustedRect.top);
-        float newTop = centerY - (yDelta * HAIR_HEIGHT_SCALE);
-        float newBottom = centerY + (yDelta * HAIR_HEIGHT_SCALE);
+        float newTop = centerY - (yDelta * mHairHeightScale);
+        float newBottom = centerY + (yDelta * mHairHeightScale);
         adjustedRect.top = newTop;
         adjustedRect.bottom = newBottom;
 
         float centerX = adjustedRect.centerX();
         float xDelta = Math.abs(centerX - adjustedRect.left);
-        float newRight = centerX + (xDelta * HAIR_WIDTH_SCALE);
-        float newLeft = centerX - (xDelta * HAIR_WIDTH_SCALE);
+        float newRight = centerX + (xDelta * mHairWidthScale);
+        float newLeft = centerX - (xDelta * mHairWidthScale);
         adjustedRect.right = newRight;
         adjustedRect.left = newLeft;
         return adjustedRect;
@@ -309,4 +319,17 @@ public class RickComponentFilter extends ComponentFilter {
         mEyeBrowPaint.setStrokeWidth(mEyeBrowThickness);
     }
 
+    @Override
+    public void onClick(View view) {
+        mFaceRicking = !mFaceRicking;
+        if(!mFaceRicking){
+            mHairWidthScale=1.75f;
+            mHairHeightScale =1f;
+            mHairVerticalOffset = -0.25f;
+        }else{
+            mHairWidthScale = 2.1f;
+            mHairHeightScale = 1.3f;
+            mHairVerticalOffset = -0.3f;
+        }
+    }
 }
