@@ -28,6 +28,7 @@ public class FaceTracker extends Tracker<Face>{
     private boolean mRightEyeOpen, mLeftEyeOpen, mMouthOpen;
     private double mEyelength;
     private PointF mLeftMouth, mRightMouth, mNoseBase, mBottomLip, mRightEye, mLeftEye;
+    private Face mFace;
 
     private FaceTracker() {
         mDetectionMode = null;
@@ -82,8 +83,9 @@ public class FaceTracker extends Tracker<Face>{
         return mScreenHeight;
     }
 
-    public void clearFace(){
+    private void clearFace(){
         mFaceRect = null;
+        mLeftMouth = mRightMouth = mNoseBase = mBottomLip = mRightEye = mLeftEye = null;
     }
 
     private void setNewFacePosition(Face face){
@@ -199,6 +201,7 @@ public class FaceTracker extends Tracker<Face>{
     }
 
     private void updateData(Face face){
+        mFace = face;
         setNewFacePosition(face);
         distinguishLandmarks(face);
     }
@@ -263,4 +266,13 @@ public class FaceTracker extends Tracker<Face>{
     public double getEyelength() {
         return mEyelength;
     }
+
+    public float getLeftEyeOpenProbability(){
+        return mFace.getIsLeftEyeOpenProbability();
+    }
+
+    public float getRightEyeOpenProbability(){
+        return mFace.getIsRightEyeOpenProbability();
+    }
+
 }

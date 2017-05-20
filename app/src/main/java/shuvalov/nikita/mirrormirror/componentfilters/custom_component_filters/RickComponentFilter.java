@@ -23,7 +23,7 @@ import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
  */
 
 public class RickComponentFilter extends ComponentFilter {
-    private Paint mLinePaint, mTextPaint, mEyeBrowPaint, mEyeBallPaint, mPupilPaint, mFacePaint;
+    private Paint mLinePaint, mTextPaint, mEyeBrowPaint, mEyeBallPaint, mPupilPaint, mFacePaint, mMouthPaint, mTeethPaint;
     private float mTextSize, mEyeBrowThickness;
     private RectF mFaceRect;
     private Bitmap mRickVomit, mRickHair;
@@ -69,6 +69,10 @@ public class RickComponentFilter extends ComponentFilter {
         mFacePaint = new Paint();
         mFacePaint.setColor(Color.argb(255, 250, 242, 242));
         mFacePaint.setStyle(Paint.Style.FILL);
+
+        mMouthPaint = new Paint();
+        mMouthPaint.setColor(Color.RED);
+        mMouthPaint.setStyle(Paint.Style.FILL);
     }
 
     private void loadBitmaps(Context c){
@@ -81,40 +85,96 @@ public class RickComponentFilter extends ComponentFilter {
         FaceTracker faceTracker = FaceTracker.getInstance();
         PointF leftEye = faceTracker.getLeftEye();
         PointF rightEye = faceTracker.getRightEye();
-        float eyeballRadius = Math.abs(leftEye.x-rightEye.x)/2.25f;
-
-        canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
-        mFaceRect = faceTracker.getFaceRect();
+        float eyeballRadius = -1;
+        if(leftEye!=null && rightEye!=null){
+             eyeballRadius = Math.abs(leftEye.x-rightEye.x)/2.25f;
+        }
         PointF leftMouth = faceTracker.getLeftMouth();
         PointF rightMouth = faceTracker.getRightMouth();
+        mFaceRect = faceTracker.getFaceRect();
+
+        canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
         if(mFaceRect!=null){
-            canvas.drawBitmap(mRickHair, null, getAdjustedRect(mFaceRect), null);
+            RectF adjustedRect = getAdjustedRect(mFaceRect);
+            adjustEyebrowThickness(adjustedRect);
+            canvas.drawBitmap(mRickHair, null, adjustedRect, null);
             drawFace(canvas);
+            drawEars(canvas, eyeballRadius);
             mFaceRect.setEmpty();
         }
-        if(leftMouth!=null && rightMouth!=null) {
-            float left = leftMouth.x - eyeballRadius;
-            float right = rightMouth.x + eyeballRadius;
-            float distance = Math.abs(right - left);
-            float midY = (leftMouth.y + rightMouth.y) / 2;
-            RectF vomitRect = new RectF(leftMouth.x, midY, rightMouth.x, midY + distance * .6f);
-            canvas.drawBitmap(mRickVomit, null, vomitRect, null);
-            canvas.drawLine(left, leftMouth.y, right, rightMouth.y, mLinePaint);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                canvas.drawArc(left - eyeballRadius/2, leftMouth.y - eyeballRadius/2, left + eyeballRadius/2, leftMouth.y + eyeballRadius/2, 90f, 180f, false, mLinePaint);
-                canvas.drawArc(right - eyeballRadius/2, rightMouth.y - eyeballRadius/2, right + eyeballRadius/2, rightMouth.y + eyeballRadius/2, 270f, 180f, false, mLinePaint);
-            }
+        if(eyeballRadius>=0) {
+            drawVomit(canvas, leftMouth, rightMouth, eyeballRadius);
+            drawEyes(canvas, leftEye, rightEye, eyeballRadius);
+            drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
+            drawNose(canvas, leftEye, rightEye, eyeballRadius);
         }
+        //        drawMessage(canvas, faceTracker.getScreenHeight()*.8f, faceTracker.getScreenWidth());
 
-        float line1Height = faceTracker.getScreenHeight()*.8f;
-        canvas.drawText("I stand", faceTracker.getScreenWidth()*.2f, line1Height, mTextPaint);
-        canvas.drawText("with Rick!",faceTracker.getScreenWidth()*.1f, line1Height+mTextSize + 16, mTextPaint);
-
-        drawEyes(canvas, leftEye, rightEye, eyeballRadius);
-        drawEyebrows(canvas, eyeballRadius*1.1, leftEye, rightEye);
         return canvas;
     }
+
+    private void drawVomit(Canvas canvas, PointF leftMouth, PointF rightMouth, float eyeballRadius){
+        float left = leftMouth.x - eyeballRadius;
+        float right = rightMouth.x + eyeballRadius;
+        float distance = Math.abs(right - left);
+        float midY = (leftMouth.y + rightMouth.y) / 2;
+        RectF vomitRect = new RectF(leftMouth.x, midY, rightMouth.x, midY + distance * .6f);
+        canvas.drawBitmap(mRickVomit, null, vomitRect, null);
+        canvas.drawLine(left, leftMouth.y, right, rightMouth.y, mLinePaint);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            canvas.drawArc(left - eyeballRadius/2, leftMouth.y - eyeballRadius/2, left + eyeballRadius/2, leftMouth.y + eyeballRadius/2, 90f, 180f, false, mLinePaint);
+            canvas.drawArc(right - eyeballRadius/2, rightMouth.y - eyeballRadius/2, right + eyeballRadius/2, rightMouth.y + eyeballRadius/2, 270f, 180f, false, mLinePaint);
+        }
+    }
+
+    private void drawMessage(Canvas canvas, float line1Height, float screenWidth){
+        canvas.drawText("I stand", screenWidth*.2f, line1Height, mTextPaint);
+        canvas.drawText("with Rick!",screenWidth*.1f, line1Height+mTextSize + 16, mTextPaint);
+    }
+
+    private void drawNose(Canvas canvas, PointF leftEye, PointF rightEye, float eyeballRadius){
+        canvas.drawArc(leftEye.x+eyeballRadius/1.5f, leftEye.y, rightEye.x - eyeballRadius/1.5f, Math.max(leftEye.y, rightEye.y)+ 2*eyeballRadius,0, 180, false, mLinePaint);
+    }
+
+    public void drawEars(Canvas canvas, float eyeballRadius){
+        float midYPoint = (mFaceRect.top + mFaceRect.bottom)/2;
+
+        //Draw left ear
+        canvas.drawArc(mFaceRect.left-eyeballRadius/2, midYPoint, mFaceRect.left+eyeballRadius/2,midYPoint+eyeballRadius, 90, 180, false, mFacePaint);
+        canvas.drawArc(mFaceRect.left-eyeballRadius/2, midYPoint, mFaceRect.left+eyeballRadius/2,midYPoint+eyeballRadius, 90, 180, true, mLinePaint);
+
+        //Draw  right ear
+        canvas.drawArc(mFaceRect.right-eyeballRadius/2, midYPoint, mFaceRect.right+eyeballRadius/2,midYPoint+eyeballRadius, 270, 180, false, mFacePaint);
+        canvas.drawArc(mFaceRect.right-eyeballRadius/2, midYPoint, mFaceRect.right+eyeballRadius/2,midYPoint+eyeballRadius, 270, 180, true, mLinePaint);
+    }
+
+    //FixMe: Mouth detection doesn't trigger nearly accurately enough, but if I do improve it, revisit this code.
+//    private void drawMouth(Canvas canvas, PointF leftCorner, PointF rightCorner){
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+//            Path mouthPath = new Path();
+//
+//            float mouthWidth = Math.abs(leftCorner.x - rightCorner.x);
+//            float mouthHeight = mouthWidth/3;
+//            float cornerRadius = mouthWidth/4;
+//
+//            float bottomLeft = leftCorner.y + mouthHeight/2;
+//            float topLeft = leftCorner.y - mouthHeight/2;
+//            float topRight = rightCorner.y - mouthHeight/2;
+//            float bottomRight = rightCorner.y - mouthHeight/2;
+//            float midX = (leftCorner.x + rightCorner.x);
+//            float topLipY = (topLeft+topRight)/2-mouthHeight/4;
+//            float botLipY = (bottomLeft+bottomRight)/2-mouthHeight/4;
+//
+//
+//            mouthPath.moveTo(leftCorner.x, leftCorner.y+mouthHeight/2);
+//            mouthPath.arcTo(leftCorner.x-cornerRadius, topLeft, leftCorner.x + cornerRadius, bottomLeft,90, 180, false);
+//            mouthPath.arcTo(leftCorner.x,topLipY,rightCorner.x, botLipY, 180, 180,false);
+//            mouthPath.arcTo(rightCorner.x - cornerRadius, topRight, rightCorner.x + cornerRadius, bottomRight, 270, 180, false);
+//            mouthPath.arcTo(leftCorner.x, botLipY, rightCorner.x, botLipY+mouthHeight, 0, -180, false);
+//            canvas.drawPath(mouthPath,mMouthPaint);
+//            canvas.drawPath(mouthPath, mLinePaint);
+//        }
+//    }
 
     private void drawFace(Canvas canvas){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -133,13 +193,43 @@ public class RickComponentFilter extends ComponentFilter {
     }
 
     private void drawEyes(Canvas canvas, PointF leftEye, PointF rightEye, float eyeballRadius){
-        canvas.drawCircle(leftEye.x, leftEye.y, eyeballRadius, mEyeBallPaint);
-        canvas.drawCircle(leftEye.x, leftEye.y, eyeballRadius, mLinePaint);
-        canvas.drawCircle(leftEye.x, leftEye.y, 10, mPupilPaint);
 
+        float rightEyeOpenChance = FaceTracker.getInstance().getRightEyeOpenProbability();
+        float leftEyeOpenChance = FaceTracker.getInstance().getLeftEyeOpenProbability();
+
+        //Left-Eye draw logic
+        if(leftEyeOpenChance > .3f && leftEyeOpenChance<.7) {
+            canvas.drawCircle(leftEye.x, leftEye.y, eyeballRadius, mEyeBallPaint);
+            canvas.drawArc(leftEye.x - eyeballRadius, leftEye.y - eyeballRadius, leftEye.x + eyeballRadius, leftEye.y + eyeballRadius, 180, 180, true, mFacePaint);
+            canvas.drawArc(leftEye.x - eyeballRadius, leftEye.y - eyeballRadius, leftEye.x + eyeballRadius, leftEye.y + eyeballRadius, 180, 180, true, mLinePaint);
+            canvas.drawCircle(leftEye.x, leftEye.y+10, 10, mPupilPaint);
+        }else if(leftEyeOpenChance<.3f){
+            canvas.drawCircle(leftEye.x, leftEye.y, eyeballRadius, mFacePaint);
+            canvas.drawLine(leftEye.x - eyeballRadius, leftEye.y, leftEye.x + eyeballRadius, leftEye.y, mLinePaint);
+        }else{
+            canvas.drawCircle(leftEye.x, leftEye.y, eyeballRadius, mEyeBallPaint);
+            canvas.drawCircle(leftEye.x, leftEye.y, 10, mPupilPaint);
+
+        }
+        canvas.drawCircle(leftEye.x, leftEye.y, eyeballRadius, mLinePaint);
+
+        //Right-Eye draw logic
         canvas.drawCircle(rightEye.x, rightEye.y, eyeballRadius, mEyeBallPaint);
+        if(rightEyeOpenChance> .4f && rightEyeOpenChance<.7) {
+            canvas.drawCircle(rightEye.x, rightEye.y, eyeballRadius, mEyeBallPaint);
+            canvas.drawArc(rightEye.x - eyeballRadius, rightEye.y - eyeballRadius, rightEye.x + eyeballRadius, rightEye.y + eyeballRadius, 180, 180, true, mFacePaint);
+            canvas.drawArc(rightEye.x - eyeballRadius, rightEye.y - eyeballRadius, rightEye.x + eyeballRadius, rightEye.y + eyeballRadius, 180, 180, true, mLinePaint);
+            canvas.drawCircle(rightEye.x, rightEye.y+10, 10, mPupilPaint);
+        }else if (rightEyeOpenChance<.3f){
+            canvas.drawCircle(rightEye.x, rightEye.y, eyeballRadius, mFacePaint);
+            canvas.drawLine(rightEye.x - eyeballRadius, rightEye.y, rightEye.x + eyeballRadius, rightEye.y, mLinePaint);
+        }else{
+            canvas.drawCircle(rightEye.x, rightEye.y, eyeballRadius, mEyeBallPaint);
+            canvas.drawCircle(rightEye.x, rightEye.y, 10, mPupilPaint);
+
+        }
+
         canvas.drawCircle(rightEye.x, rightEye.y, eyeballRadius, mLinePaint);
-        canvas.drawCircle(rightEye.x, rightEye.y, 10, mPupilPaint);
     }
 
     private void drawEyebrows(Canvas canvas, double eyeballRadius, PointF leftEye, PointF rightEye){
@@ -211,9 +301,12 @@ public class RickComponentFilter extends ComponentFilter {
         float newLeft = centerX - (xDelta * HAIR_WIDTH_SCALE);
         adjustedRect.right = newRight;
         adjustedRect.left = newLeft;
-
-        mEyeBrowThickness = faceRect.height()/13;
-        mEyeBrowPaint.setStrokeWidth(mEyeBrowThickness);
         return adjustedRect;
     }
+
+    private void adjustEyebrowThickness(RectF faceRect){
+        mEyeBrowThickness = faceRect.height()/13;
+        mEyeBrowPaint.setStrokeWidth(mEyeBrowThickness);
+    }
+
 }

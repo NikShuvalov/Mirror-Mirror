@@ -25,7 +25,7 @@ public class ComponentOverlay extends BaseOverlay{
         synchronized (mCanvasLock){
             mCurrentComponentFilter.drawComponentsToCanvas(canvas);
             try {
-                Thread.sleep(50); //FixMe: Find a more elegant solution to reduce FPS or figure out what else can be done to keep bitmaps from flickering.
+                Thread.sleep(75); //FixMe: Find a more elegant solution to reduce FPS or figure out what else can be done to keep bitmaps from flickering.
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
