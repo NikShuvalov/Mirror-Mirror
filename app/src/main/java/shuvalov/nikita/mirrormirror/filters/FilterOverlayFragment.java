@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,8 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     private FrameLayout mOverlayContainer;
     private FilterOverlay mFilterOverlay;
     private RecyclerView mFilterRecycler;
-    private ImageButton mCameraButton;
+    private ImageButton mCameraButton, mFilterSelectionButton;
+    private View mCameraHud;
     public boolean mFilterSelectorVisible;
 
     public FilterOverlayFragment() {
@@ -58,11 +60,14 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     public void setOnClickListeners(){
         mOverlayContainer.setOnClickListener(this);
         mCameraButton.setOnClickListener(this);
+        mFilterSelectionButton.setOnClickListener(this);
     }
     public void findViews(View v){
         mCameraButton = (ImageButton) v.findViewById(R.id.camera_button);
+        mFilterSelectionButton = (ImageButton) v.findViewById(R.id.filter_button);
         mOverlayContainer = (FrameLayout) v.findViewById(R.id.overlay_container);
         mFilterRecycler = (RecyclerView) v.findViewById(R.id.filters_recycler);
+        mCameraHud = v.findViewById(R.id.camera_hud);
     }
 
     public void setUpOverlay(){
@@ -134,14 +139,18 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
             case R.id.camera_button:
                 ((MainActivity)getActivity()).captureImage();
                 break;
-            default:
+            case R.id.filter_button:
                 if (!mFilterSelectorVisible) {
-                    replaceBottomView(mCameraButton, mFilterRecycler);
+                    replaceBottomView(mCameraHud, mFilterRecycler);
                     mFilterSelectorVisible = true;
-                } else {
-                    replaceBottomView(mFilterRecycler, mCameraButton);
+                }
+                break;
+            case R.id.overlay_container:
+                if(mFilterSelectorVisible) {
+                    replaceBottomView(mFilterRecycler, mCameraHud);
                     mFilterSelectorVisible = false;
                 }
+                break;
         }
     }
 }

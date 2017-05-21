@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/filters_recycler"
@@ -11,15 +12,41 @@
         android:visibility="invisible"/>
 
 
-    <ImageButton
-        android:id="@+id/camera_button"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:clickable="true"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/camera_button_selector"
-        />
+    <RelativeLayout
+        android:id="@+id/camera_hud"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageButton
+            android:id="@+id/camera_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:clickable="true"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Image Capture"
+            android:background="@drawable/camera_button_selector"
+            />
+
+        <ImageButton
+            android:id="@+id/filter_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/camera_button"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:scaleType="fitXY"
+            android:contentDescription="Open Filter Choices"
+            android:background="@drawable/filter_button_selector"
+            />
+
+    </RelativeLayout>
+
+
 
 </RelativeLayout>
