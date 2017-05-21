@@ -49,7 +49,7 @@ public class ComponentOverlayFragment extends Fragment {
     }
 
     public void setUpOverlay(){
-        ComponentFilter componentFilter = new NerdComponentFilter(getContext());
+        ComponentFilter componentFilter = new RickComponentFilter(getContext());
         mComponentOverlay = new ComponentOverlay(getContext(), componentFilter);
         mComponentOverlay.setZOrderMediaOverlay(true);
         mOverlayContainer.addView(mComponentOverlay);

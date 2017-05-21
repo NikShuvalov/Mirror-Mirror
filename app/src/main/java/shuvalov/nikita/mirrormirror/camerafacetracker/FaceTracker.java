@@ -274,5 +274,12 @@ public class FaceTracker extends Tracker<Face>{
     public float getRightEyeOpenProbability(){
         return mFace.getIsRightEyeOpenProbability();
     }
-    
+
+    public float getEyeballRadius(){
+        if(mLeftEye!=null && mRightEye!=null){
+            return Math.abs(mLeftEye.x-mRightEye.x)/4f;
+        }
+        return -1;
+    }
+
 }

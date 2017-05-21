@@ -9,7 +9,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
-import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.os.Build;
 import android.view.View;
@@ -84,10 +83,7 @@ public class RickComponentFilter extends ComponentFilter {
         FaceTracker faceTracker = FaceTracker.getInstance();
         PointF leftEye = faceTracker.getLeftEye();
         PointF rightEye = faceTracker.getRightEye();
-        float eyeballRadius = -1;
-        if(leftEye!=null && rightEye!=null){
-             eyeballRadius = Math.abs(leftEye.x-rightEye.x)/2.25f;
-        }
+        float eyeballRadius = faceTracker.getEyeballRadius() * 1.75f;
         PointF leftMouth = faceTracker.getLeftMouth();
         PointF rightMouth = faceTracker.getRightMouth();
         mFaceRect = faceTracker.getFaceRect();
