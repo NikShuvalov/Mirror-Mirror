@@ -95,17 +95,19 @@ public class RickComponentFilter extends ComponentFilter {
                 drawFace(canvas);
                 drawEars(canvas, eyeballRadius);
             }
+            if(eyeballRadius>=0) {
+                    drawVomit(canvas, leftMouth, rightMouth, eyeballRadius);
+                if(mFaceRicking) {
+                    drawMouth(canvas, eyeballRadius, leftMouth, rightMouth);
+                    drawEyes(canvas, leftEye, rightEye, eyeballRadius);
+                    drawNose(canvas, leftEye, rightEye, eyeballRadius);
+                }
+                drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
+            }
             mFaceRect.setEmpty();
         }
-        if(eyeballRadius>=0) {
-            drawVomit(canvas, leftMouth, rightMouth, eyeballRadius);
-            if(mFaceRicking) {
-                drawMouth(canvas, eyeballRadius, leftMouth, rightMouth);
-                drawEyes(canvas, leftEye, rightEye, eyeballRadius);
-                drawNose(canvas, leftEye, rightEye, eyeballRadius);
-            }
-            drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
-        }
+
+
         if(!mFaceRicking){
             drawMessage(canvas, faceTracker.getScreenHeight()*.8f, faceTracker.getScreenWidth());
         }
@@ -115,8 +117,8 @@ public class RickComponentFilter extends ComponentFilter {
     private void drawVomit(Canvas canvas, PointF leftMouth, PointF rightMouth, float eyeballRadius){
         float left = leftMouth.x - eyeballRadius;
         float right = rightMouth.x + eyeballRadius;
-        float distance = Math.abs(right - left);
         float midY = (leftMouth.y + rightMouth.y) / 2;
+        float distance = Math.abs(right - left);
         RectF vomitRect = new RectF(leftMouth.x, midY, rightMouth.x, midY + distance * .6f);
         canvas.drawBitmap(mRickVomit, null, vomitRect, null);
     }

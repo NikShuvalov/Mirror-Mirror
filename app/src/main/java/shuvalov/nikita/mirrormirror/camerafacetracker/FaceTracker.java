@@ -4,12 +4,16 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.hardware.Camera;
+import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.Landmark;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.filters.Filter;
@@ -103,6 +107,9 @@ public class FaceTracker extends Tracker<Face>{
     }
 
     private PointF mirrorLandMark(PointF landmark){
+        if(landmark==null) {
+            return null;
+        }
         Matrix matrix = new Matrix();
         matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2);
         float x = landmark.x;
@@ -132,6 +139,13 @@ public class FaceTracker extends Tracker<Face>{
     }
 
     private void storeLandmarkPositions(Face face){
+//        mRightMouth = mirrorLandMark(getLandmarkPosition(face, Landmark.RIGHT_MOUTH));
+//        mLeftMouth = mirrorLandMark(getLandmarkPosition(face, Landmark.LEFT_MOUTH));
+//        mBottomLip = mirrorLandMark(getLandmarkPosition(face, Landmark.BOTTOM_MOUTH));
+//        mNoseBase = mirrorLandMark(getLandmarkPosition(face, Landmark.NOSE_BASE));
+//        mRightEye = mirrorLandMark(getLandmarkPosition(face, Landmark.RIGHT_EYE));
+//        mLeftEye = mirrorLandMark(getLandmarkPosition(face, Landmark.LEFT_EYE));
+
         for(Landmark m: face.getLandmarks()){
             switch(m.getType()){
                 case (Landmark.RIGHT_MOUTH):
@@ -156,17 +170,19 @@ public class FaceTracker extends Tracker<Face>{
         }
     }
 
+    //FixMe: Might be better to check if mouth is open when needed rather than always.
     //FixMe: The search here is unnecessary since we're checking for landmarks in another method, but I need to figure out if I want the position to be removed if not detected for a frame.
     private void deduceIfMouthIsOpen(Face face){
         float noseBase = Float.MIN_VALUE;
         float bottomLip = Float.MIN_VALUE;
-        for(Landmark mark: face.getLandmarks()){
-            if(mark.getType() == Landmark.NOSE_BASE){
-                noseBase = mark.getPosition().y;
-            }
-            if(mark.getType() == Landmark.BOTTOM_MOUTH){
-                bottomLip = mark.getPosition().y;
-            }
+
+        PointF noseBasePos = getLandmarkPosition(face, Landmark.NOSE_BASE);
+        PointF bottomLipPos = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
+        if(noseBasePos!=null){
+            noseBase = noseBasePos.x;
+        }
+        if(bottomLipPos !=null){
+            bottomLip = bottomLipPos.x;
         }
         if(noseBase!= Float.MIN_VALUE && bottomLip!= Float.MIN_VALUE && mEyelength >0){
             mMouthOpen = Math.abs(bottomLip-noseBase) >mEyelength * 0.75;
@@ -185,13 +201,13 @@ public class FaceTracker extends Tracker<Face>{
     private void calculateEyeLength(Face face){
         float leftEyeCenter = Float.MIN_VALUE;
         float rightEyeCenter = Float.MIN_VALUE;
-        for(Landmark mark :face.getLandmarks()){
-            if(mark.getType() == Landmark.LEFT_EYE){
-                leftEyeCenter = mark.getPosition().x;
-            }
-            if (mark.getType() == Landmark.RIGHT_EYE){
-                rightEyeCenter = mark.getPosition().x;
-            }
+        PointF leftEyePos = getLandmarkPosition(face, Landmark.LEFT_EYE);
+        PointF rightEyePos = getLandmarkPosition(face, Landmark.RIGHT_EYE);
+        if(leftEyePos!=null){
+            leftEyeCenter = leftEyePos.x;
+        }
+        if(rightEyePos !=null){
+            rightEyeCenter = rightEyePos.x;
         }
         if(leftEyeCenter!= Float.MIN_VALUE && rightEyeCenter != Float.MIN_VALUE){
             mEyelength = Math.abs(rightEyeCenter - leftEyeCenter);
@@ -240,11 +256,19 @@ public class FaceTracker extends Tracker<Face>{
     }
 
     public PointF getLeftMouth() {
-        return mLeftMouth;
+        return (mFaceRect!=null) ?
+                (mLeftMouth != null) ?
+                        mLeftMouth:
+                        new PointF((mFaceRect.left*2 + mFaceRect.centerX())/3f,(mFaceRect.bottom*2 + mFaceRect.centerY())/3f)
+                : null;
     }
 
     public PointF getRightMouth() {
-        return mRightMouth;
+        return (mFaceRect!=null) ?
+                (mRightMouth !=null) ?
+                        mRightMouth:
+                        new PointF((mFaceRect.right*2 + mFaceRect.centerX())/3f,(mFaceRect.bottom*2 + mFaceRect.centerY())/3f)
+                : null;
     }
 
     public PointF getNoseBase() {
@@ -256,11 +280,19 @@ public class FaceTracker extends Tracker<Face>{
     }
 
     public PointF getRightEye() {
-        return mRightEye;
+        return (mFaceRect!=null) ?
+                (mRightEye != null) ?
+                        mRightEye :
+                        new PointF((mFaceRect.left*2 + mFaceRect.centerX())/3f, (mFaceRect.centerY() + mFaceRect.top)/2f)
+                : null;
     }
 
     public PointF getLeftEye() {
-        return mLeftEye;
+        return (mFaceRect!=null) ?
+                (mLeftEye != null) ?
+                        mLeftEye :
+                        new PointF((mFaceRect.right*2 + mFaceRect.centerX())/3f,(mFaceRect.centerY() + mFaceRect.top)/2f)
+                :null;
     }
 
     public double getEyelength() {
@@ -268,18 +300,24 @@ public class FaceTracker extends Tracker<Face>{
     }
 
     public float getLeftEyeOpenProbability(){
-        return mFace.getIsLeftEyeOpenProbability();
+        return (mFace!=null) ?  mFace.getIsLeftEyeOpenProbability() : -1;
     }
 
     public float getRightEyeOpenProbability(){
-        return mFace.getIsRightEyeOpenProbability();
+        return (mFace != null) ?  mFace.getIsRightEyeOpenProbability() : -1;
     }
 
     public float getEyeballRadius(){
-        if(mLeftEye!=null && mRightEye!=null){
-            return Math.abs(mLeftEye.x-mRightEye.x)/4f;
+        return (mLeftEye!=null && mRightEye !=null ) ? Math.abs(mLeftEye.x-mRightEye.x)/4f : -1;
+    }
+
+    private PointF getLandmarkPosition(Face face, int landmarkId) {
+        for (Landmark landmark : face.getLandmarks()) {
+            if (landmark.getType() == landmarkId) {
+                return landmark.getPosition();
+            }
         }
-        return -1;
+        return null;
     }
 
 }
