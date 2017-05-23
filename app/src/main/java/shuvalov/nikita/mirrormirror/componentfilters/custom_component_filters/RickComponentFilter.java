@@ -106,8 +106,6 @@ public class RickComponentFilter extends ComponentFilter {
             }
             mFaceRect.setEmpty();
         }
-
-
         if(!mFaceRicking){
             drawMessage(canvas, faceTracker.getScreenHeight()*.8f, faceTracker.getScreenWidth());
         }

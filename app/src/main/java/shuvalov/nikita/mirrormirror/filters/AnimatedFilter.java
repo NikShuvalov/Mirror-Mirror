@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by NikitaShuvalov on 5/4/17.
@@ -48,4 +49,8 @@ public class AnimatedFilter extends Filter {
         return true;
     }
 
+    public AnimatedFilter randomizeStartFrame (){
+        mIndex = new Random().nextInt(mAnimationList.size()-1);
+        return this;
+    }
 }

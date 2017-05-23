@@ -22,7 +22,7 @@ public class FaceDetectorGenerator {
                 .setLandmarkType(FaceDetector.ALL_LANDMARKS)
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .setTrackingEnabled(true)
-                .setMode(FaceDetector.FAST_MODE)
+                .setMode(FaceDetector.ACCURATE_MODE)
                 .setProminentFaceOnly(true)
                 .setMinFaceSize(0.35f)
                 .build();
@@ -36,4 +36,5 @@ public class FaceDetectorGenerator {
     public FaceDetector getFaceDetector() {
         return mFaceDetector;
     }
+
 }

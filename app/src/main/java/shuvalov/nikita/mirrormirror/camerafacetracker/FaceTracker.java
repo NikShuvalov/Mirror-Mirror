@@ -320,4 +320,14 @@ public class FaceTracker extends Tracker<Face>{
         return null;
     }
 
+    public float getFaceAngle(){
+     return (mFace == null) ?
+             Float.MIN_VALUE :
+             mFace.getEulerY();
+    }
+    public float getFaceTilt(){
+        return (mFace == null) ?
+                Float.MIN_VALUE :
+                mFace.getEulerZ();
+    }
 }
