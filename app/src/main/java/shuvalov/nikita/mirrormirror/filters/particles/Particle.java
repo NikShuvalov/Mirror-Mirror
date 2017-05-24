@@ -20,6 +20,7 @@ public class Particle {
     private static final long mMillisPerFrame =200;
     private boolean mAnimated;
     private int mMaxParticles;
+    private String mName;
 
 
     /**
@@ -34,7 +35,8 @@ public class Particle {
      *              for a parallaxing effect.
      *@param maxParticles Max number of particles allowed to be populated for this particle.
      */
-    public Particle(List<Bitmap> bitmaps, boolean animated,  double XVel, double YVel, double scale, int maxParticles) {
+    public Particle(String name, List<Bitmap> bitmaps, boolean animated,  double XVel, double YVel, double scale, int maxParticles) {
+        mName = name;
         mBitmapList = bitmaps;
 
         mStartX= 0;
@@ -133,7 +135,7 @@ public class Particle {
     }
 
     public Particle makeCarbonCopy(){
-        return new Particle(mBitmapList, mAnimated, mXVel, mYVel, mScale, mMaxParticles);
+        return new Particle(mName, mBitmapList, mAnimated, mXVel, mYVel, mScale, mMaxParticles);
     }
 
     public void setStartX(double startX) {
@@ -152,5 +154,13 @@ public class Particle {
 
     public int getMaxParticles() {
         return mMaxParticles;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public Bitmap getPreviewBitmap(){
+        return mBitmapList.get(0);
     }
 }
