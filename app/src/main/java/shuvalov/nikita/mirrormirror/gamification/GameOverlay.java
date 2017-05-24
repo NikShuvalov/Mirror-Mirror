@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -20,8 +22,9 @@ public class GameOverlay extends BaseOverlay {
     private Paint mGreyPaint;
     private Paint mScorePaint;
     private Paint mRedPaint;
-    private Paint mBlackPaint;
+    private Paint mLinePaint;
     private Rect mGoalBounds;
+    private Path mTrianglePath;
     private static final float mTextSize = 40f;
 
     private SoccerEngine mSoccerEngine;
@@ -37,17 +40,27 @@ public class GameOverlay extends BaseOverlay {
         mGreyPaint.setColor(Color.LTGRAY);
         mRedPaint = new Paint();
         mRedPaint.setColor(Color.RED);
-        mBlackPaint = new Paint();
-        mBlackPaint.setColor(Color.BLACK);
+
+        mLinePaint = new Paint();
+        mLinePaint.setColor(Color.BLACK);
+        mLinePaint.setStyle(Paint.Style.STROKE);
+        mLinePaint.setStrokeWidth(5);
+
         mScorePaint = new Paint();
         mScorePaint.setColor(Color.RED);
         mScorePaint.setTextSize(mTextSize);
+
+        mTrianglePath = new Path();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if(canvas!=null) {
+            Ball soccerBall = mSoccerEngine.getSoccerBall();
+            float soccerBallRadius = (float)soccerBall.getRadius();
+            double soccerBallBottom = soccerBall.getCenterY() + soccerBallRadius;
+            float soccerBallCenterX = (float)soccerBall.getCenterX();
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             RectF face = FaceTracker.getInstance().getFaceRect();
             if (face != null) {
@@ -55,13 +68,22 @@ public class GameOverlay extends BaseOverlay {
                 canvas.drawRect(face, mBluePaint);
             }
             mSoccerEngine.updateFacePosition(face);
-            //ToDo: Draw rounded Rect for API 21+
 
-            Ball soccerBall = mSoccerEngine.getSoccerBall();
             canvas.drawRect(mGoalBounds, mGreyPaint);
             canvas.drawText("Score: "+ mSoccerEngine.getPlayerScore(), mGoalBounds.centerX() - mTextSize , mGoalBounds.top + mTextSize, mScorePaint);
 
-            canvas.drawCircle((float)soccerBall.getCenterX(), (float)soccerBall.getCenterY(), (float)soccerBall.getRadius(), soccerBall.getPaint());
+            canvas.drawCircle(soccerBallCenterX, (float)soccerBall.getCenterY(), (float)soccerBall.getRadius(), soccerBall.getPaint());
+            if (soccerBallBottom <= 0){
+
+                mTrianglePath.moveTo(soccerBallCenterX - soccerBallRadius, soccerBallRadius + 20);
+                mTrianglePath.lineTo(soccerBallCenterX, 20);
+                mTrianglePath.lineTo(soccerBallCenterX + soccerBallRadius, soccerBallRadius + 20);
+                mTrianglePath.close();
+                canvas.drawPath(mTrianglePath, mRedPaint);
+                canvas.drawPath(mTrianglePath, mLinePaint);
+                canvas.drawText((int)(Math.abs(soccerBallBottom)/25) + "cm", soccerBallCenterX - soccerBallRadius, soccerBallRadius + 90, mScorePaint);
+                mTrianglePath.reset();
+            }
         }
         mSoccerEngine.moveSoccerBall();
     }
