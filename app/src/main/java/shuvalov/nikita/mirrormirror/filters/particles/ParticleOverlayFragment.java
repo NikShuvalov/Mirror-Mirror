@@ -32,6 +32,7 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
     private OptionsDisplayed mOptionsDisplayed;
     private View mCameraHud;
     private boolean mAnimationLocked;
+    private ParticleEngine mParticleEngine;
 
     private enum OptionsDisplayed{
         CAMERA_BUTTON, PARTICLE_SELECTOR, PHYSICS_SELECTOR
@@ -57,6 +58,7 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
         mAnimationLocked = false;
         findViews(particleFragment);
         setUpManager();
+        mParticleEngine = getFunctionalParticleEngine();
         setUpOverlay();
         setOnClickListeners();
         setUpRecyclers();
@@ -81,8 +83,8 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
     }
 
     private void setUpRecyclers(){
-        ParticleRecyclerAdapter  particleAdapter = new ParticleRecyclerAdapter(ParticleManager.getInstance().getParticleList());
-        PhysicsRecyclerAdapter physicsAdapter = new PhysicsRecyclerAdapter(ParticleManager.getInstance().getSupportedPhysicsTypes());
+        ParticleRecyclerAdapter  particleAdapter = new ParticleRecyclerAdapter(ParticleManager.getInstance().getParticleList(), mParticleEngine);
+        PhysicsRecyclerAdapter physicsAdapter = new PhysicsRecyclerAdapter(ParticleManager.getInstance().getSupportedPhysicsTypes(), mParticleEngine);
         LinearLayoutManager particleLinearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         LinearLayoutManager physicsLinearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mParticleSelector.setAdapter(particleAdapter);
@@ -105,14 +107,15 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
     public void setUpOverlay(){
         mParticleOverlay = new ParticleOverlay(getContext());
         mParticleOverlay.setZOrderMediaOverlay(true);
-        mParticleOverlay.setParticleEngine(getFunctionalParticleEngine());
+        mParticleOverlay.setParticleEngine(mParticleEngine);
         mOverlayContainer.addView(mParticleOverlay);
     }
 
     public ParticleEngine getFunctionalParticleEngine(){
+        ParticleManager particleManager = ParticleManager.getInstance();
         Rect screenBounds = ((MainActivity)getActivity()).getScreenBounds();
-        ParticleEngine pEngine = new ParticleEngine(ParticleEngine.PhysicsType.RADIATING, screenBounds, null);
-        pEngine.populateParticles(ParticleManager.getInstance().getCurrentParticle());
+        ParticleEngine pEngine = new ParticleEngine(particleManager.getPhysicsType(), screenBounds, null);
+        pEngine.populateParticles(particleManager.getCurrentParticle());
         return pEngine;
     }
 

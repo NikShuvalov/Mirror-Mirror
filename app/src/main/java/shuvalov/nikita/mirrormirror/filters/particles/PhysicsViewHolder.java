@@ -44,7 +44,7 @@ public class PhysicsViewHolder extends RecyclerView.ViewHolder {
         if(isSelected){
             mCardView.setBackgroundColor(Color.argb(100,0,0,150));
         }else{
-            mCardView.setBackgroundColor(Color.argb(200,0,0,0));
+            mCardView.setBackgroundColor(Color.argb(200,225,225,225));
         }
     }
 }

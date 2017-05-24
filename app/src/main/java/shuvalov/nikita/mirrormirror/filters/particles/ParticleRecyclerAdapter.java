@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import shuvalov.nikita.mirrormirror.R;
+import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
+import shuvalov.nikita.mirrormirror.overlay.ParticleOverlay;
 
 /**
  * Created by NikitaShuvalov on 5/24/17.
@@ -15,9 +17,11 @@ import shuvalov.nikita.mirrormirror.R;
 
 public class ParticleRecyclerAdapter extends RecyclerView.Adapter<ParticleViewHolder> {
     private ArrayList<Particle> mAvailableParticles;
+    private ParticleEngine mParticleEngine;
 
-    public ParticleRecyclerAdapter(ArrayList<Particle> availableParticles) {
+    public ParticleRecyclerAdapter(ArrayList<Particle> availableParticles, ParticleEngine particleEngine) {
         mAvailableParticles = availableParticles;
+        mParticleEngine = particleEngine;
     }
 
     @Override
@@ -26,13 +30,15 @@ public class ParticleRecyclerAdapter extends RecyclerView.Adapter<ParticleViewHo
     }
 
     @Override
-    public void onBindViewHolder(ParticleViewHolder holder, int position) {
+    public void onBindViewHolder(ParticleViewHolder holder, final int position) {
         holder.bindDataToViews(mAvailableParticles.get(position));
         holder.markAsSelected(position == ParticleManager.getInstance().getCurrentParticleIndex());
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Select
+                ParticleManager.getInstance().setCurrentParticleIndex(position);
+                mParticleEngine.populateParticles(ParticleManager.getInstance().getCurrentParticle());
+                notifyDataSetChanged();
             }
         });
 

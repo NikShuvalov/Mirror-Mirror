@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import shuvalov.nikita.mirrormirror.R;
+import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 
 /**
  * Created by NikitaShuvalov on 5/24/17.
@@ -15,9 +16,11 @@ import shuvalov.nikita.mirrormirror.R;
 
 public class PhysicsRecyclerAdapter extends RecyclerView.Adapter<PhysicsViewHolder> {
     private ParticleEngine.PhysicsType[] mSupportedPhysicTypes;
+    private ParticleEngine mParticleEngine;
 
-    public PhysicsRecyclerAdapter(ParticleEngine.PhysicsType[] supportedPhysicTypes) {
+    public PhysicsRecyclerAdapter(ParticleEngine.PhysicsType[] supportedPhysicTypes, ParticleEngine particleEngine) {
         mSupportedPhysicTypes = supportedPhysicTypes;
+        mParticleEngine = particleEngine;
     }
 
     @Override
@@ -26,14 +29,17 @@ public class PhysicsRecyclerAdapter extends RecyclerView.Adapter<PhysicsViewHold
     }
 
     @Override
-    public void onBindViewHolder(PhysicsViewHolder holder, int position) {
+    public void onBindViewHolder(PhysicsViewHolder holder, final int position) {
         ParticleEngine.PhysicsType pType = mSupportedPhysicTypes[position];
         holder.bindDataToViews(pType);
         holder.markAsSelected(pType == ParticleManager.getInstance().getPhysicsType());
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Do the thing.
+                ParticleManager particleManager = ParticleManager.getInstance();
+                particleManager.setPhysicsType(position);
+                mParticleEngine.changePhysicsType(particleManager.getPhysicsType());
+                notifyDataSetChanged();
             }
         });
     }

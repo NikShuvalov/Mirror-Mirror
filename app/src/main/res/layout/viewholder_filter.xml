@@ -9,7 +9,7 @@
         android:id="@+id/filter_selector_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        card_view:cardBackgroundColor="@android:color/transparent">
+        android:layout_margin="8dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"

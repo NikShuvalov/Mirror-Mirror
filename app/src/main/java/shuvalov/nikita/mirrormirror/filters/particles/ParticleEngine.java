@@ -275,4 +275,8 @@ public class ParticleEngine {
         mFaceYShift = mPreviousPosition.y - mCurrentPosition.y;
         mCumulativeYShift += mFaceYShift;
     }
+
+    public void changePhysicsType(PhysicsType physicsType){
+        mPhysicsType = physicsType;
+    }
 }
