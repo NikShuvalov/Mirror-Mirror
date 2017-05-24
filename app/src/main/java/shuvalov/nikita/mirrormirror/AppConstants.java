@@ -55,9 +55,35 @@ public class AppConstants {
      * @param endAngle angle at which the coords are located
      * @return x,y coords in PointF
      */
-    public static PointF getEndPointOfOvalArc(RectF oval, float endAngle){
-        return null;
-    }
+//    public static PointF getEndPointOfOvalArc(RectF oval, float endAngle){
+//        float majorRadius;
+//        float minorRadius;
+//        float fociDistance;
+//        float ovalHeight = Math.abs(oval.height());
+//        float ovalWidth = Math.abs(oval.width());
+//        if(ovalWidth > ovalHeight){
+//            majorRadius = ovalWidth;
+//            minorRadius = ovalHeight;
+//        }else{
+//            majorRadius = ovalHeight;
+//            minorRadius = ovalWidth;
+//        }
+//        fociDistance = (float)Math.sqrt((majorRadius * majorRadius) - (minorRadius*minorRadius));
+//
+//        float radians = (float)Math.toRadians(endAngle);
+//        float hypotenuse = (float)Math.cos(radians)/fociDistance;
+//        float height = (float)Math.sin(radians) * hypotenuse;
+//        float width = (float) Math.cos(radians) * hypotenuse;
+//
+//        if(Math.abs(height)<1e-10){
+//            height = 0;
+//        }
+//        if(Math.abs(width)<1e-10){
+//            width = 0;
+//        }
+//
+//        return new PointF(width, height);
+//    }
 
 
     /**

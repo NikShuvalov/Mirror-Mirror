@@ -75,6 +75,20 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         FilterManager.getInstance().addAnimatedFilters(f);
     }
 
+//    private void testUtil(){
+//        RectF oval = new RectF(-1, 2, 1, -2);
+//
+//        PointF oval0 = AppConstants.getEndPointOfOvalArc(oval, 0);
+//        PointF oval90 = AppConstants.getEndPointOfOvalArc(oval, 90);
+//        PointF oval180 = AppConstants.getEndPointOfOvalArc(oval, 180);
+//        PointF oval270 = AppConstants.getEndPointOfOvalArc(oval, 270);
+//
+//        Log.d("Math", "testUtil: " + oval0.x + "," + oval0.y);
+//        Log.d("Math", "testUtil: " + oval90.x + "," + oval90.y);
+//        Log.d("Math", "testUtil: " + oval180.x + "," + oval180.y);
+//        Log.d("Math", "testUtil: " + oval270.x + "," + oval270.y);
+//    }
+
     @Override
     protected void onResume() {
         super.onResume();
