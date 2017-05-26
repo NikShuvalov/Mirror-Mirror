@@ -1,7 +1,6 @@
 package shuvalov.nikita.mirrormirror.filters.particles;
 
 
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +13,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 
@@ -25,14 +25,15 @@ import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.overlay.ParticleOverlay;
 
 public class ParticleOverlayFragment extends Fragment implements View.OnClickListener {
-    private ImageButton mParticleButton, mCameraButton, mPhysicsButton;
-    private FrameLayout mOverlayContainer;
+    private ImageButton mCameraButton, mParticleButton;
+    private FrameLayout mOverlayContainer, mPhysicsButton;
     private ParticleOverlay mParticleOverlay;
     private RecyclerView mPhysicsSelector, mParticleSelector;
     private OptionsDisplayed mOptionsDisplayed;
     private View mCameraHud;
     private boolean mAnimationLocked;
     private ParticleEngine mParticleEngine;
+    private ImageView mParticlePreview, mPhysicsDisplay;
 
     private enum OptionsDisplayed{
         CAMERA_BUTTON, PARTICLE_SELECTOR, PHYSICS_SELECTOR
@@ -62,6 +63,7 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
         setUpOverlay();
         setOnClickListeners();
         setUpRecyclers();
+        updatePhysicsTypeImage(ParticleManager.getInstance().getPhysicsType());
         return particleFragment;
     }
 
@@ -71,8 +73,9 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
         mParticleSelector = (RecyclerView) particleFragment.findViewById(R.id.particle_selector_recycler);
         mCameraButton = (ImageButton) particleFragment.findViewById(R.id.camera_button);
         mParticleButton = (ImageButton)particleFragment.findViewById(R.id.particle_button);
-        mPhysicsButton = (ImageButton)particleFragment.findViewById(R.id.physics_button);
+        mPhysicsButton = (FrameLayout)particleFragment.findViewById(R.id.physics_button);
         mCameraHud = particleFragment.findViewById(R.id.camera_hud);
+        mPhysicsDisplay = (ImageView) particleFragment.findViewById(R.id.current_physics_display);
     }
 
     private void setOnClickListeners(){
@@ -194,18 +197,35 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
             default:
                 if(mOptionsDisplayed!= OptionsDisplayed.CAMERA_BUTTON && !mAnimationLocked){
                     View viewToHide = null;
+                    ParticleManager particleManager = ParticleManager.getInstance();
                     switch(mOptionsDisplayed){
                         case PARTICLE_SELECTOR:
                             viewToHide = mParticleSelector;
                             break;
                         case PHYSICS_SELECTOR:
                             viewToHide = mPhysicsSelector;
+                            updatePhysicsTypeImage(particleManager.getPhysicsType());
                             break;
                     }
                     mAnimationLocked=true;
+
                     replaceBottomView(viewToHide, mCameraHud);
                     mOptionsDisplayed = OptionsDisplayed.CAMERA_BUTTON;
                 }
+        }
+    }
+
+    private void updatePhysicsTypeImage(ParticleEngine.PhysicsType p){
+        switch(p){
+            case SIMPLE:
+                mPhysicsDisplay.setImageResource(R.drawable.icon_simple);
+                break;
+            case OSCILLATING:
+                mPhysicsDisplay.setImageResource(R.drawable.icon_wavy);
+                break;
+            case RADIATING:
+                mPhysicsDisplay.setImageResource(R.drawable.icon_radial);
+                break;
         }
     }
 }

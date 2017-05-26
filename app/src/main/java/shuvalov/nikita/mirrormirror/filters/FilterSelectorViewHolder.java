@@ -32,9 +32,11 @@ public class FilterSelectorViewHolder extends RecyclerView.ViewHolder {
 
     public void markAsSelected(boolean isSelected){
         if(isSelected){
-            mCardView.setBackgroundColor(Color.argb(100,0,0,150));
+            mCardView.setBackgroundColor(Color.argb(255,220, 220,255));
+            mFiltNameText.setTextColor(Color.WHITE);
         }else{
-            mCardView.setBackgroundColor(Color.argb(200,225,225,225));
+            mCardView.setBackgroundColor(Color.argb(225,255,255,255));
+            mFiltNameText.setTextColor(Color.BLACK);
         }
     }
 }

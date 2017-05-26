@@ -30,21 +30,26 @@ public class PhysicsViewHolder extends RecyclerView.ViewHolder {
         switch (pType){
             case SIMPLE:
                 mTextView.setText("Simple");
+                mImageView.setImageResource(R.drawable.icon_simple);
                 break;
             case OSCILLATING:
                 mTextView.setText("Wavy");
+                mImageView.setImageResource(R.drawable.icon_wavy);
                 break;
             case RADIATING:
                 mTextView.setText("Radiating");
+                mImageView.setImageResource(R.drawable.icon_radial);
                 break;
         }
     }
 
     public void markAsSelected(boolean isSelected){
         if(isSelected){
-            mCardView.setBackgroundColor(Color.argb(100,0,0,150));
+            mCardView.setBackgroundColor(Color.argb(255,220, 220,255));
+            mTextView.setTextColor(Color.WHITE);
         }else{
-            mCardView.setBackgroundColor(Color.argb(200,225,225,225));
+            mCardView.setBackgroundColor(Color.argb(225,255,255,255));
+            mTextView.setTextColor(Color.BLACK);
         }
     }
 }

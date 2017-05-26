@@ -11,6 +11,7 @@ android {
         versionName "v0.4.0 Drawers And Dragons"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false

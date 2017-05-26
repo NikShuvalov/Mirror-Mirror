@@ -217,7 +217,7 @@ public class ParticleEngine {
     }
 
     private double getYDisplacementOscillating(long elapsedTime, Particle p){
-        double scaledYSpeed = (p.getYVel()-mFaceYShift) * p.getScale();//The speed at which the particle will move up based on it's "distance" from the lens. Speed is per 30ms
+        double scaledYSpeed = p.getYVel() * p.getScale();//The speed at which the particle will move up based on it's "distance" from the lens. Speed is per 30ms
         return scaledYSpeed * (elapsedTime / Particle.REFRESH_RATE);
     }
 
