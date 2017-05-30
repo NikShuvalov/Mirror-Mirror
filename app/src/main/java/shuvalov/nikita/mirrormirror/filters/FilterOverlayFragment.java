@@ -1,6 +1,7 @@
 package shuvalov.nikita.mirrormirror.filters;
 
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,11 +17,12 @@ import android.widget.ImageButton;
 
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
+import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 import shuvalov.nikita.mirrormirror.overlay.ParticleOverlay;
 
-public class FilterOverlayFragment extends Fragment implements View.OnClickListener {
+public class FilterOverlayFragment extends Fragment implements View.OnClickListener, FilterSelectorAdapter.FilterSelectorListener {
     private FrameLayout mOverlayContainer;
     private FilterOverlay mFilterOverlay;
     private RecyclerView mFilterRecycler;
@@ -35,13 +37,11 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
 
     public static FilterOverlayFragment newInstance(){
         return new FilterOverlayFragment();
-
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -51,7 +51,6 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mFilterSelectorVisible = false;
         findViews(filterFragment);
 
-        setUpOverlay();
         setUpFilterSelector();
         setOnClickListeners();
         return filterFragment;
@@ -62,6 +61,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mCameraButton.setOnClickListener(this);
         mFilterSelectionButton.setOnClickListener(this);
     }
+
     public void findViews(View v){
         mCameraButton = (ImageButton) v.findViewById(R.id.camera_button);
         mFilterSelectionButton = (ImageButton) v.findViewById(R.id.filter_button);
@@ -70,22 +70,19 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mCameraHud = v.findViewById(R.id.camera_hud);
     }
 
-    public void setUpOverlay(){
-        mFilterOverlay = new FilterOverlay(getContext());
-        mFilterOverlay.setZOrderMediaOverlay(true);
-        mOverlayContainer.addView(mFilterOverlay);
-    }
-
     public void setUpFilterSelector() {
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mFilterRecycler.setAdapter(new FilterSelectorAdapter(FilterManager.getInstance().getFilters(), mFilterOverlay));
+        mFilterRecycler.setAdapter(new FilterSelectorAdapter(this,FilterManager.getInstance().getFilters()));
         mFilterRecycler.setLayoutManager(horizontalLayoutManager);
     }
     @Override
     public void onPause() {
         super.onPause();
-        mFilterOverlay.stopGraphicThread();
-        mOverlayContainer.removeView(mFilterOverlay);
+        if(mFilterOverlay!=null) {
+            mFilterOverlay.stopGraphicThread();
+            mOverlayContainer.removeView(mFilterOverlay);
+        }
+        FilterManager.getInstance().clearFilterSelection();
     }
 
     public void replaceBottomView(final View viewToHide, final View viewToShow) {
@@ -153,4 +150,33 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
                 break;
         }
     }
+
+    @Override
+    public void onFilterSelected() {
+        if(mFilterOverlay==null){
+            setUpOverlay();
+        }
+        FaceTracker.getInstance().setActive(FilterManager.getInstance().getCurrentIndex()>0);
+        mFilterOverlay.notifyFilterChange();
+    }
+
+    public void setUpOverlay(){
+        mFilterOverlay = new FilterOverlay(getContext());
+        mFilterOverlay.setZOrderMediaOverlay(true);
+        mOverlayContainer.addView(mFilterOverlay);
+    }
+
+
+//    private class FilterLoaderTask extends AsyncTask<Void, Void, Void>{
+//
+//        @Override
+//        protected Void doInBackground(Void... voids) {
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void aVoid) {
+//            super.onPostExecute(aVoid);
+//        }
+//    }
 }

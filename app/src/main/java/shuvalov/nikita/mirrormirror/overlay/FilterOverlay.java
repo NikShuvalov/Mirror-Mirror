@@ -30,13 +30,7 @@ public class FilterOverlay extends BaseOverlay{
 
     public FilterOverlay(Context context) {
         super(context);
-
-        Filter f = FilterManager.getInstance().getSelectedFilter();
-        if(mUsingAnimated = f.isAnimated()){
-            mBitmap = f.getBitmap(SystemClock.uptimeMillis());
-        }else{
-            mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
-        }
+        notifyFilterChange();
         mRect = new Rect();
     }
 
@@ -44,9 +38,8 @@ public class FilterOverlay extends BaseOverlay{
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         RectF face =  FaceTracker.getInstance().getFaceRect();
-//        RectF face = faceTracker.resizeFaceRect(FilterManager.getInstance().getSelectedFilter());//ToDo: Might be better to return the tracker instead of the RectF to avoid confusion by having the method do more than it should.
         canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
-        if(face!=null){
+        if(face!=null && mBitmap!=null){
             face.round(mRect);
             //ToDo: Consider just checking if we're using an animated filter here if issues arise. But for now it seems it would be more optimal if we update the boolean on filter change.
             if(mUsingAnimated){
@@ -60,10 +53,13 @@ public class FilterOverlay extends BaseOverlay{
 
     public void notifyFilterChange() {
         Filter f = FilterManager.getInstance().getSelectedFilter();
-        if(mUsingAnimated = f.isAnimated()){
-            mBitmap = f.getBitmap(SystemClock.uptimeMillis());
-        }else{
-            mBitmap = BitmapFactory.decodeResource(getResources(), f.getResourceInt());
+        if(f!=null) {
+            mBitmap = (mUsingAnimated = f.isAnimated()) ?
+                    f.getBitmap(SystemClock.uptimeMillis()) :
+                    BitmapFactory.decodeResource(getResources(), f.getResourceInt());
+            return;
         }
+        mUsingAnimated = false;
+        mBitmap = null;
     }
 }

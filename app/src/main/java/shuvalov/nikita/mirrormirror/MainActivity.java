@@ -75,20 +75,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         FilterManager.getInstance().addAnimatedFilters(f);
     }
 
-//    private void testUtil(){
-//        RectF oval = new RectF(-1, 2, 1, -2);
-//
-//        PointF oval0 = AppConstants.getEndPointOfOvalArc(oval, 0);
-//        PointF oval90 = AppConstants.getEndPointOfOvalArc(oval, 90);
-//        PointF oval180 = AppConstants.getEndPointOfOvalArc(oval, 180);
-//        PointF oval270 = AppConstants.getEndPointOfOvalArc(oval, 270);
-//
-//        Log.d("Math", "testUtil: " + oval0.x + "," + oval0.y);
-//        Log.d("Math", "testUtil: " + oval90.x + "," + oval90.y);
-//        Log.d("Math", "testUtil: " + oval180.x + "," + oval180.y);
-//        Log.d("Math", "testUtil: " + oval270.x + "," + oval270.y);
-//    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -227,25 +213,25 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         Bitmap drawnTogether = Bitmap.createBitmap(mViewWidth, mViewHeight, cameraPreview.getConfig());
         Canvas canvas = new Canvas(drawnTogether);
         Filter filter = FilterManager.getInstance().getSelectedFilter();
-        Bitmap filterBmp = BitmapFactory.decodeResource(getResources(), filter.getResourceInt());
-
+        Bitmap filterBmp = null;
         FaceTracker faceTracker = FaceTracker.getInstance();
-        RectF faceRect = faceTracker.getFaceRect(); //ToDo: Lock faceRect so that it isn't pulled until after it's done being resized/moved?
-
+        RectF faceRect = faceTracker.getFaceRect();
         Matrix mirrorFilter = new Matrix();
-        float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();
-        float scaleY = drawnTogether.getHeight()/faceTracker.getScreenHeight();
-        mirrorFilter.postScale(-1, 1, mViewWidth/2, mViewHeight/2);
-        mirrorFilter.mapRect(faceRect);
-        filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth()*(int)scaleX, filterBmp.getHeight()*(int)scaleY, mirrorFilter, true); //ToDo: If it turns I need matrix, don't forget to add in the matrix parameters here.
-
+        Rect previewRect = new Rect(0,0,mViewWidth,mViewHeight);
         Rect fr = new Rect();
         faceRect.round(fr);
-
-        Rect previewRect = new Rect(0,0,mViewWidth,mViewHeight);
-
+        mirrorFilter.postScale(-1, 1, mViewWidth/2, mViewHeight/2);
+        mirrorFilter.mapRect(faceRect);
+        if(filter!=null){
+            float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();
+            float scaleY = drawnTogether.getHeight()/faceTracker.getScreenHeight();
+            filterBmp = BitmapFactory.decodeResource(getResources(), filter.getResourceInt());
+            filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth()*(int)scaleX, filterBmp.getHeight()*(int)scaleY, mirrorFilter, true);
+        }
         canvas.drawBitmap(cameraPreview, null, previewRect, null);
-        canvas.drawBitmap(filterBmp, null, fr, null);
+        if(filterBmp!=null ) {
+            canvas.drawBitmap(filterBmp, null, fr, null);
+        }
         return drawnTogether;
     }
 
@@ -302,7 +288,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                     notifyOverlayChanged();
                 }
                 break;
-
         }
         return false;
     }
@@ -325,14 +310,8 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     }
 
     public Rect getScreenBounds(){
-//        Display display = getWindow().getWindowManager().getDefaultDisplay();
         Rect displayRect = new Rect();
         mPreviewContainer.getHitRect(displayRect);
-//        Log.d("frame", "getScreenBounds: "+ mPreviewContainer.getHeight());
-//        Point size = new Point();
-//        display.getSize(size);
-//        Log.d("frame", "defaultDisplay: " + size.y);
-//        return new Rect(0, 0, size.x, size.y);
         return displayRect;
     }
 

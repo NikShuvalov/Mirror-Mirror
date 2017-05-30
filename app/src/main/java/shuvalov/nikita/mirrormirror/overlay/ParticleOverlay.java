@@ -38,7 +38,9 @@ public class ParticleOverlay extends BaseOverlay {
         super.onDraw(canvas);
         canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
         RectF faceRect =FaceTracker.getInstance().getFaceRect();
-        for (Particle p : (ArrayList<Particle>)mParticleEngine.getParticles().clone()) {
+        ArrayList<Particle> particles = mParticleEngine.getParticles();
+        for (int i= 0; i < particles.size(); i++) {
+            Particle p = particles.get(i);
             double scale = p.getScale();
             int sideLen = (int) scale * 100;
             int top = (int) p.getYLoc() - sideLen / 2;
@@ -61,4 +63,5 @@ public class ParticleOverlay extends BaseOverlay {
     public void setParticleEngine(ParticleEngine p){
         mParticleEngine = p;
     }
+
 }

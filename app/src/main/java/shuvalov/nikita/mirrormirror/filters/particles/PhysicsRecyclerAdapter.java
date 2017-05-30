@@ -16,11 +16,11 @@ import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 
 public class PhysicsRecyclerAdapter extends RecyclerView.Adapter<PhysicsViewHolder> {
     private ParticleEngine.PhysicsType[] mSupportedPhysicTypes;
-    private ParticleEngine mParticleEngine;
+    private PhysicsSelectorListener mPhysicsSelectorListener;
 
-    public PhysicsRecyclerAdapter(ParticleEngine.PhysicsType[] supportedPhysicTypes, ParticleEngine particleEngine) {
+    public PhysicsRecyclerAdapter(PhysicsSelectorListener physicsSelectorListener, ParticleEngine.PhysicsType[] supportedPhysicTypes) {
         mSupportedPhysicTypes = supportedPhysicTypes;
-        mParticleEngine = particleEngine;
+        mPhysicsSelectorListener = physicsSelectorListener;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class PhysicsRecyclerAdapter extends RecyclerView.Adapter<PhysicsViewHold
             public void onClick(View view) {
                 ParticleManager particleManager = ParticleManager.getInstance();
                 particleManager.setPhysicsType(position);
-                mParticleEngine.changePhysicsType(particleManager.getPhysicsType());
+                mPhysicsSelectorListener.onPhysicsSelected();
                 notifyDataSetChanged();
             }
         });
@@ -47,5 +47,9 @@ public class PhysicsRecyclerAdapter extends RecyclerView.Adapter<PhysicsViewHold
     @Override
     public int getItemCount() {
         return mSupportedPhysicTypes.length;
+    }
+
+    public interface PhysicsSelectorListener{
+        void onPhysicsSelected();
     }
 }

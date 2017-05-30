@@ -23,11 +23,11 @@ public class ParticleEngine {
     private long mLastUpdate = SystemClock.elapsedRealtime();
     private Random mRng;
     private PointF mCurrentPosition, mPreviousPosition;
-//    private PointF[] mRecentPositions;
     public static final int FACE_CACHE_SIZE = 10;
     private double mFaceXShift, mFaceYShift, mCumulativeXShift, mCumulativeYShift;
     private static final double MAX_REPULSION_FORCE = 30; //ToDo: Adjust as necessary.
     private int[] mParticleResourceImages;
+    private boolean mActive;
 
 
     /**
@@ -63,11 +63,16 @@ public class ParticleEngine {
 
     public void populateParticles(Particle sampleParticle) {
         mParticles.clear();
+        if (sampleParticle==null) {
+            mActive = false;
+            return;
+        }
+        mActive = true;
         while (mParticles.size() <= sampleParticle.getMaxParticles()) {
             Particle p = sampleParticle.makeCarbonCopy();
             resetParticle(p);
             if (!addParticle(p)) { //Just in case.
-                break;
+                return;
             }
         }
     }
@@ -87,7 +92,7 @@ public class ParticleEngine {
 
     public void moveParticles() {
         long val = SystemClock.elapsedRealtime() - mLastUpdate;
-        if (val >= Particle.REFRESH_RATE) {
+        if (val >= Particle.REFRESH_RATE && mActive) {
             switch (mPhysicsType) {
                 case SNOWGLOBE:
                     processSnowglobeMovement();

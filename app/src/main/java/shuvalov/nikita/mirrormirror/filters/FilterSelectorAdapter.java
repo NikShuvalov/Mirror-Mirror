@@ -17,11 +17,11 @@ import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 
 public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorViewHolder> {
     private ArrayList<Filter> mFilters;
-    private BaseOverlay mFilterOverlay;
+    private FilterSelectorListener mFilterSelectorListener;
 
-    public FilterSelectorAdapter(ArrayList<Filter> filters, BaseOverlay filterOverlay) {
+    public FilterSelectorAdapter(FilterSelectorListener filterSelectorListener, ArrayList<Filter> filters) {
         mFilters = filters;
-        mFilterOverlay = filterOverlay;
+        mFilterSelectorListener = filterSelectorListener;
     }
 
     @Override
@@ -30,16 +30,16 @@ public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorVi
     }
 
     @Override
-    public void onBindViewHolder(final FilterSelectorViewHolder holder, int position) {
+    public void onBindViewHolder(final FilterSelectorViewHolder holder, final int position) {
         holder.bindDataToViews(mFilters.get(position));
         int selectedPosition = FilterManager.getInstance().getCurrentPosition();
         holder.markAsSelected(position == selectedPosition);
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FilterManager.getInstance().setCurrentPosition(holder.getAdapterPosition());
-                ((FilterOverlay)mFilterOverlay).notifyFilterChange();//FixMe: Use the BaseOverlay if I want to reuse the graphic selector for other overlays.
-                notifyDataSetChanged(); //FixMe: Optimize
+                FilterManager.getInstance().setCurrentPosition(position<0 ? 0: position);
+                mFilterSelectorListener.onFilterSelected();
+                notifyDataSetChanged();
             }
         });
     }
@@ -49,5 +49,9 @@ public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorVi
     @Override
     public int getItemCount() {
         return mFilters.size();
+    }
+
+    public interface FilterSelectorListener{
+        void onFilterSelected();
     }
 }

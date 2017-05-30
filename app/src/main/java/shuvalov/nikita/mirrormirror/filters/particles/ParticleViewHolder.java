@@ -26,8 +26,13 @@ public class ParticleViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindDataToViews(Particle p){
-        mTextView.setText(p.getName());
-        mImageView.setImageBitmap(p.getPreviewBitmap());
+        if(p!=null) {
+            mTextView.setText(p.getName());
+            mImageView.setImageBitmap(p.getPreviewBitmap());
+        }else{
+            mTextView.setText("Empty");
+            mImageView.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        }
     }
 
     public void markAsSelected(boolean isSelected){

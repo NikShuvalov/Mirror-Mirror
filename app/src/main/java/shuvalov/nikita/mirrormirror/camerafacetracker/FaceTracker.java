@@ -33,10 +33,12 @@ public class FaceTracker extends Tracker<Face>{
     private double mEyelength;
     private PointF mLeftMouth, mRightMouth, mNoseBase, mBottomLip, mRightEye, mLeftEye;
     private Face mFace;
+    private boolean mActive;
 
     private FaceTracker() {
         mDetectionMode = null;
         mMouthOpen = false;
+        mActive = true;
     }
 
     private static FaceTracker sFaceTracker;
@@ -97,7 +99,6 @@ public class FaceTracker extends Tracker<Face>{
         float faceHeight = face.getHeight();
         float faceWidth = face.getWidth();
         mFaceRect = new RectF(pos.x, pos.y, pos.x+faceWidth, pos.y+faceHeight);
-
         Matrix matrix = new Matrix();
         matrix.postScale(-1, 1, mScreenWidth/2, mScreenHeight/2); //Rotates the face detection across center of screen, since Front facing camera has a mirrored display
         if(mDetectionMode!=null && (mDetectionMode.equals(MainActivity.GraphicType.FILTER))){
@@ -122,8 +123,10 @@ public class FaceTracker extends Tracker<Face>{
 
     private void applyFilterParameters(Matrix matrix){
         Filter filter = FilterManager.getInstance().getSelectedFilter();
-        matrix.postTranslate(0, (int)(mFaceRect.height()*filter.getOffsetYPercent()));
-        resizeFaceRect(filter);
+        if(filter!=null) {
+            matrix.postTranslate(0, (int) (mFaceRect.height() * filter.getOffsetYPercent()));
+            resizeFaceRect(filter);
+        }
     }
 
     public void changeDetectionMode(MainActivity.GraphicType graphicType){
@@ -225,12 +228,16 @@ public class FaceTracker extends Tracker<Face>{
 
     @Override
     public void onNewItem(int i, Face face) {
-        updateData(face);
+        if(mActive) {
+            updateData(face);
+        }
     }
 
     @Override
     public void onUpdate(Detector.Detections<Face> detections, Face face) {
-        updateData(face);
+        if(mActive) {
+            updateData(face);
+        }
     }
 
     @Override
@@ -329,5 +336,20 @@ public class FaceTracker extends Tracker<Face>{
         return (mFace == null) ?
                 Float.MIN_VALUE :
                 mFace.getEulerZ();
+    }
+
+    public void pause(){
+        mActive= false;
+    }
+
+    public void start(){
+        mActive = true;
+    }
+    public void setActive(boolean b){
+        mActive= b;
+    }
+
+    public boolean isActive() {
+        return mActive;
     }
 }

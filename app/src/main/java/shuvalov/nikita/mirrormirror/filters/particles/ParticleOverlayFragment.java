@@ -2,10 +2,12 @@ package shuvalov.nikita.mirrormirror.filters.particles;
 
 
 import android.graphics.Rect;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,20 +22,23 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import shuvalov.nikita.mirrormirror.AppConstants;
-import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
+import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.overlay.ParticleOverlay;
 
-public class ParticleOverlayFragment extends Fragment implements View.OnClickListener {
+import static android.content.ContentValues.TAG;
+
+public class ParticleOverlayFragment extends Fragment implements View.OnClickListener, ParticleRecyclerAdapter.EngineIgnitionListener, PhysicsRecyclerAdapter.PhysicsSelectorListener {
     private ImageButton mCameraButton, mParticleButton;
     private FrameLayout mOverlayContainer, mPhysicsButton;
     private ParticleOverlay mParticleOverlay;
     private RecyclerView mPhysicsSelector, mParticleSelector;
     private OptionsDisplayed mOptionsDisplayed;
     private View mCameraHud;
-    private boolean mAnimationLocked;
+    private boolean mAnimationLocked, mOverlayLoaded;
     private ParticleEngine mParticleEngine;
-    private ImageView mParticlePreview, mPhysicsDisplay;
+    private ImageView mPhysicsDisplay;
+
 
     private enum OptionsDisplayed{
         CAMERA_BUTTON, PARTICLE_SELECTOR, PHYSICS_SELECTOR
@@ -57,14 +62,21 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
         View particleFragment = inflater.inflate(R.layout.fragment_particle_overlay, container, false);
         mOptionsDisplayed = OptionsDisplayed.CAMERA_BUTTON;
         mAnimationLocked = false;
+        mOverlayLoaded = false;
         findViews(particleFragment);
         setUpManager();
-        mParticleEngine = getFunctionalParticleEngine();
-        setUpOverlay();
         setOnClickListeners();
         setUpRecyclers();
         updatePhysicsTypeImage(ParticleManager.getInstance().getPhysicsType());
         return particleFragment;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mOverlayLoaded){
+            setUpOverlay();
+        }
     }
 
     private void findViews(View particleFragment){
@@ -86,8 +98,8 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
     }
 
     private void setUpRecyclers(){
-        ParticleRecyclerAdapter  particleAdapter = new ParticleRecyclerAdapter(ParticleManager.getInstance().getParticleList(), mParticleEngine);
-        PhysicsRecyclerAdapter physicsAdapter = new PhysicsRecyclerAdapter(ParticleManager.getInstance().getSupportedPhysicsTypes(), mParticleEngine);
+        ParticleRecyclerAdapter  particleAdapter = new ParticleRecyclerAdapter(this, ParticleManager.getInstance().getParticleList());
+        PhysicsRecyclerAdapter physicsAdapter = new PhysicsRecyclerAdapter(this, ParticleManager.getInstance().getSupportedPhysicsTypes());
         LinearLayoutManager particleLinearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         LinearLayoutManager physicsLinearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mParticleSelector.setAdapter(particleAdapter);
@@ -103,22 +115,32 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
 
     private ArrayList<Particle> getSupportedParticles(){
         ArrayList<Particle> supportedParticles = new ArrayList<>();
+        supportedParticles.add(null);
         supportedParticles.add(new Particle("Songbird",AppConstants.getBitmapList(getContext(),R.array.musical_notes_list),false, 0, 10, 2,7));
         supportedParticles.add(new Particle("Flames", AppConstants.getBitmapList(getContext(), R.array.flame_animation_list),true, 0,10,2,30));
         return supportedParticles;
     }
+
     public void setUpOverlay(){
+        Log.d(TAG, "setUpOverlay: started");
+        if(mParticleEngine== null){
+            mParticleEngine = getFunctionalParticleEngine();
+        }
         mParticleOverlay = new ParticleOverlay(getContext());
         mParticleOverlay.setZOrderMediaOverlay(true);
         mParticleOverlay.setParticleEngine(mParticleEngine);
         mOverlayContainer.addView(mParticleOverlay);
+        Log.d(TAG, "setUpOverlay: ended");
     }
 
     public ParticleEngine getFunctionalParticleEngine(){
+        Log.d(TAG, "getFunctionalParticleEngine: started");
         ParticleManager particleManager = ParticleManager.getInstance();
-        Rect screenBounds = ((MainActivity)getActivity()).getScreenBounds();
+        Rect screenBounds = new Rect();
+        mOverlayContainer.getHitRect(screenBounds);
         ParticleEngine pEngine = new ParticleEngine(particleManager.getPhysicsType(), screenBounds, null);
-        pEngine.populateParticles(particleManager.getCurrentParticle());
+        new EnginePopulatorTask().execute(pEngine);
+        Log.d(TAG, "getFunctionalParticleEngine: ended");
         return pEngine;
     }
 
@@ -126,8 +148,11 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
     @Override
     public void onPause() {
         super.onPause();
-        mParticleOverlay.stopGraphicThread();
-        mOverlayContainer.removeView(mParticleOverlay);
+        ParticleManager.getInstance().clearParticleSelection();
+        if(mParticleOverlay!=null){
+            mParticleOverlay.stopGraphicThread();
+            mOverlayContainer.removeView(mParticleOverlay);
+        }
     }
 
     public void replaceBottomView(final View viewToHide, final View viewToShow) {
@@ -174,7 +199,6 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
         v.setAnimation(showAnim);
         v.setVisibility(View.VISIBLE);
     }
-
     @Override
     public void onClick(View view) {
         switch(view.getId()){
@@ -208,7 +232,6 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
                             break;
                     }
                     mAnimationLocked=true;
-
                     replaceBottomView(viewToHide, mCameraHud);
                     mOptionsDisplayed = OptionsDisplayed.CAMERA_BUTTON;
                 }
@@ -226,6 +249,42 @@ public class ParticleOverlayFragment extends Fragment implements View.OnClickLis
             case RADIATING:
                 mPhysicsDisplay.setImageResource(R.drawable.icon_radial);
                 break;
+        }
+    }
+
+    @Override
+    public void onEngineIgnition() {
+        FaceTracker faceTracker = FaceTracker.getInstance();
+        if(!mOverlayLoaded){
+            mOverlayLoaded = true;
+            setUpOverlay();
+        }
+        if(!faceTracker.isActive()){
+            FaceTracker.getInstance().start();
+        }
+        new EnginePopulatorTask().execute(mParticleEngine);
+    }
+
+    @Override
+    public void onEngineShutDown() {
+        mParticleEngine.populateParticles(ParticleManager.getInstance().getCurrentParticle());
+        FaceTracker.getInstance().pause();
+    }
+
+    @Override
+    public void onPhysicsSelected() {
+        if(mParticleEngine==null) {
+            mParticleEngine = getFunctionalParticleEngine();
+        }
+        mParticleEngine.changePhysicsType(ParticleManager.getInstance().getPhysicsType());
+    }
+
+    private class EnginePopulatorTask extends AsyncTask<ParticleEngine, Void, Void>{
+
+        @Override
+        protected Void doInBackground(ParticleEngine... particleEngines) {
+            particleEngines[0].populateParticles(ParticleManager.getInstance().getCurrentParticle());
+            return null;
         }
     }
 }

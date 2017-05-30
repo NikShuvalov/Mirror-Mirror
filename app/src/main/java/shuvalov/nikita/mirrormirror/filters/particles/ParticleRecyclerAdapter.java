@@ -17,11 +17,11 @@ import shuvalov.nikita.mirrormirror.overlay.ParticleOverlay;
 
 public class ParticleRecyclerAdapter extends RecyclerView.Adapter<ParticleViewHolder> {
     private ArrayList<Particle> mAvailableParticles;
-    private ParticleEngine mParticleEngine;
+    private EngineIgnitionListener mEngineIgnitionListener;
 
-    public ParticleRecyclerAdapter(ArrayList<Particle> availableParticles, ParticleEngine particleEngine) {
+    public ParticleRecyclerAdapter(EngineIgnitionListener engineIgnitionListener, ArrayList<Particle> availableParticles) {
         mAvailableParticles = availableParticles;
-        mParticleEngine = particleEngine;
+        mEngineIgnitionListener = engineIgnitionListener;
     }
 
     @Override
@@ -37,7 +37,11 @@ public class ParticleRecyclerAdapter extends RecyclerView.Adapter<ParticleViewHo
             @Override
             public void onClick(View view) {
                 ParticleManager.getInstance().setCurrentParticleIndex(position);
-                mParticleEngine.populateParticles(ParticleManager.getInstance().getCurrentParticle());
+                if(position == 0){
+                    mEngineIgnitionListener.onEngineShutDown();
+                }else{
+                    mEngineIgnitionListener.onEngineIgnition();
+                }
                 notifyDataSetChanged();
             }
         });
@@ -47,5 +51,10 @@ public class ParticleRecyclerAdapter extends RecyclerView.Adapter<ParticleViewHo
     @Override
     public int getItemCount() {
         return mAvailableParticles.size();
+    }
+
+    public interface EngineIgnitionListener{
+        void onEngineIgnition();
+        void onEngineShutDown();
     }
 }

@@ -2,6 +2,7 @@ package shuvalov.nikita.mirrormirror.gamification;
 
 
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;

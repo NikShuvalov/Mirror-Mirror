@@ -22,6 +22,7 @@ public class FilterManager {
 
     private void prepareAllImages(){
         mFilters = new ArrayList<>();
+        mFilters.add(null);
         mFilters.add(new StaticFilter("Instant Beauty", R.drawable.beautify_mirror, Filter.ImagePosition.FACE,1.1f, 1.2f, 0, 0));
         mFilters.add(new StaticFilter("Corgi", R.drawable.corgi, Filter.ImagePosition.FACE,1.1f, 1.2f, 0, 0));
         mFilters.add(new StaticFilter("Top Hat", R.drawable.top_hat, Filter.ImagePosition.TOP_OF_HEAD, 1f, 1f, 0, -0.5f));
@@ -66,6 +67,14 @@ public class FilterManager {
         for(Filter f: animatedFilters){
             mFilters.add(f);
         }
+    }
+
+    public int getCurrentIndex(){
+        return mCurrentPosition;
+    }
+
+    public void clearFilterSelection(){
+        mCurrentPosition = 0;
     }
 
     public void dirtyDebuggingCode(Filter f){

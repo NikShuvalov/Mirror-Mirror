@@ -26,8 +26,13 @@ public class FilterSelectorViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindDataToViews(Filter f){
-        mFiltNameText.setText(f.getFilterName());
-        mFiltPreviewImgView.setImageResource(f.getResourceInt());
+        if(f != null) {
+            mFiltNameText.setText(f.getFilterName());
+            mFiltPreviewImgView.setImageResource(f.getResourceInt());
+        }else{
+            mFiltNameText.setText("Empty");
+            mFiltPreviewImgView.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        }
     }
 
     public void markAsSelected(boolean isSelected){

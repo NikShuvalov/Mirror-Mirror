@@ -76,4 +76,8 @@ public class ParticleManager {
     public void setCurrentParticleIndex(int i){
         mCurrentParticleIndex = i;
     }
+
+    public void clearParticleSelection(){
+        mCurrentParticleIndex = 0;
+    }
 }
