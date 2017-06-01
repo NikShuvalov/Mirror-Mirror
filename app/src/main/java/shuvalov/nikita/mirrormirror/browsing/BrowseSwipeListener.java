@@ -4,6 +4,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * Created by NikitaShuvalov on 4/12/17.
  */

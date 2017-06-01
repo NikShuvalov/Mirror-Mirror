@@ -23,7 +23,6 @@ public abstract class BaseOverlay extends SurfaceView implements SurfaceHolder.C
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         surfaceHolder.addCallback(this);
     }
-
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if(mGraphicThread!=null) {return;}

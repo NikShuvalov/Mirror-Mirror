@@ -7,6 +7,10 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.util.Random;
+
+import static android.content.ContentValues.TAG;
+
 /**
  * Created by NikitaShuvalov on 5/10/17.
  */
@@ -29,16 +33,20 @@ Or, have the ball need to travel some distance up after a hit to count towards a
  */
 
 
+
+    //Idea; Make balls progressively smaller
+    //Idea 2: Color balls and goals, spawn several balls and have player get balls into corresponding color goals.
 public class SoccerEngine {
 
     // ============================================= Variables===============================================
     private Rect mScreenBounds, mGoalBounds;
+
     private Ball mSoccerBall;
+    private float mSoccerRadius, mGoalWidth;
     private RectF mFaceRect;
     private RectF[] mPreviousRectPositions;
     private int mPlayerScore;
-    private boolean mPointRegistered;
-    private boolean mIsSurvivalMode;
+    private boolean mIsSurvivalMode, mBallHit;
     private long mLastUpdateTime;
 
     public static final int FACE_LENGTH = 400;
@@ -58,9 +66,11 @@ public class SoccerEngine {
 
     public SoccerEngine(Rect screenBounds) {
         mScreenBounds = screenBounds;
-        int goalWidth = mScreenBounds.width()/3;
-        mGoalBounds = new Rect(mScreenBounds.centerX()-goalWidth/2, 0, mScreenBounds.centerX()+goalWidth/2,50);
-        mSoccerBall = new Ball(mScreenBounds.centerX(), mScreenBounds.centerY()-mScreenBounds.height()/4, goalWidth/4, 1, -5, Color.YELLOW);
+        mGoalWidth = mScreenBounds.width()/6;
+        mSoccerRadius = mGoalWidth/3;
+        spawnNewGoal();
+        respawnBall();
+
         mLastUpdateTime = SystemClock.elapsedRealtime();
         float centerX = mScreenBounds.exactCenterX();
         float centerY = mScreenBounds.exactCenterY();
@@ -73,9 +83,9 @@ public class SoccerEngine {
         mPreviousRectPositions = new RectF[]{mFaceRect, mFaceRect, mFaceRect, mFaceRect};
     }
 
+
     public void gameStart(){
         mIsSurvivalMode = false;
-        mPointRegistered = false;
         mPlayerScore = 0;
     }
 
@@ -111,8 +121,8 @@ public class SoccerEngine {
             int floor = mScreenBounds.bottom;
             double bottomOfBall = mSoccerBall.getCenterY() + mSoccerBall.getRadius();
             if(mSoccerBall.intersectRect(mFaceRect)){ //Logic if ball hits face
+                mBallHit = true;
                 if(mSoccerBall.getYSpeed()>0){
-                    mPointRegistered = false;
                     if(mIsSurvivalMode){ //ToDo: Need to remove bounceFriction as well, except for maybe the side bounces.
                        verticalBallBounce((int)mFaceRect.top, bottomOfBall, 0);
                     }else{
@@ -134,7 +144,8 @@ public class SoccerEngine {
             }else if (rightOfBall>mScreenBounds.right){
                 wallBallBounce(Wall.RIGHT_SIDE);
             }
-            checkIfScored();
+            if(mBallHit) {checkIfScored();}
+            
             mLastUpdateTime = currentTime;
         }
     }
@@ -213,11 +224,14 @@ public class SoccerEngine {
      * Score only counts if the ball was heading upwards, and only if the user had hit the ball with their head prior to it entering the goal.
      */
     private void checkIfScored(){
-        if(!mPointRegistered && mSoccerBall.getYSpeed()<0){
-            if(mGoalBounds.contains((int)mSoccerBall.getCenterX(), (int)mSoccerBall.getCenterY())){
-                mPlayerScore++;
-                mPointRegistered=true;
-            }
+        double distanceX = Math.abs(mSoccerBall.getCenterX() - mGoalBounds.centerX());
+        double distanceY = Math.abs(mSoccerBall.getCenterY() - mGoalBounds.centerY());
+        double distanceFromGoal = Math.sqrt((distanceX*distanceX) + (distanceY* distanceY));
+        if(distanceFromGoal<mGoalWidth/2){
+            mPlayerScore++;
+            spawnNewGoal();
+            respawnBall();
+            //ToDo: Shrink ball, shrink goal, respawn goal and ball. OR have the player hit the ball like 3 times before spawning the ball.
         }
     }
 
@@ -247,6 +261,7 @@ public class SoccerEngine {
     private void applyGravity(long elapsedTime){
         mSoccerBall.setYSpeed(mSoccerBall.getYSpeed()+ GRAVITY_ACCELERATION*elapsedTime);
     }
+
 
 //    private void applyAirFriction(){
 //        double newSpeed = xSpeed;
@@ -290,6 +305,30 @@ public class SoccerEngine {
             mPreviousRectPositions[i] = mPreviousRectPositions[i-1];
         }
         mPreviousRectPositions[0] = mFaceRect;
+    }
+
+    // ================================================ Game Methods ====================================================
+
+    public void spawnNewGoal(){
+        if(mGoalBounds!=null) {
+            Random rng = new Random();
+            int spawnX = rng.nextInt(mScreenBounds.width()- (int)mSoccerRadius*2) + (int)mSoccerRadius;
+            mGoalBounds.set(spawnX - (int)mGoalWidth/2, 10+(int)mGoalWidth/2, spawnX+(int)mGoalWidth/2, 10 + (int)mGoalWidth);
+            return;
+        }
+        //On First spawn, spawn in same location...always
+        mGoalBounds = new Rect((int)(mScreenBounds.centerX()-mGoalWidth/2), 10 + (int)mGoalWidth/2, (int)(mScreenBounds.centerX()+mGoalWidth/2), 10 + (int)mGoalWidth);
+    }
+
+    public void respawnBall(){
+        Random rng = new Random();
+        mBallHit = false;
+        if(mSoccerBall==null){
+            mSoccerBall = new Ball(mScreenBounds.centerX(), mScreenBounds.centerY()-mScreenBounds.height()/4, mSoccerRadius, rng.nextInt(4)-4, -5, Color.YELLOW);
+            return;
+        }
+        int spawnX = rng.nextInt(mScreenBounds.width()- (int)mSoccerRadius) + (int)mSoccerRadius;
+        mSoccerBall.recycleBall(spawnX, mScreenBounds.centerY()-mScreenBounds.height()/4, mSoccerRadius, rng.nextInt(4)-4, -5, Color.YELLOW);
     }
 
 }

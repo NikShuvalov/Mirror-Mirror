@@ -18,7 +18,7 @@ import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
  */
 
 public class GameOverlay extends BaseOverlay {
-    private Paint mBluePaint;
+    private Paint mBluePaint, mScoreBoxPaint, mGoalPaint;
     private Paint mGreyPaint;
     private Paint mScorePaint;
     private Paint mRedPaint;
@@ -31,13 +31,22 @@ public class GameOverlay extends BaseOverlay {
 
     public GameOverlay(Context context) {
         super(context);
+        createPaints();
+        mTrianglePath = new Path();
+    }
+
+    private void createPaints(){
         mBluePaint= new Paint();
         mBluePaint.setColor(Color.BLUE);
         mBluePaint.setStyle(Paint.Style.STROKE);
         mBluePaint.setStrokeWidth(2f);
 
+        mGoalPaint = new Paint();
+        mGoalPaint.setColor(Color.argb(255,25,25,25));
+
         mGreyPaint = new Paint();
         mGreyPaint.setColor(Color.LTGRAY);
+
         mRedPaint = new Paint();
         mRedPaint.setColor(Color.RED);
 
@@ -46,11 +55,12 @@ public class GameOverlay extends BaseOverlay {
         mLinePaint.setStyle(Paint.Style.STROKE);
         mLinePaint.setStrokeWidth(5);
 
+        mScoreBoxPaint = new Paint();
+        mScoreBoxPaint.setColor(Color.argb(255, 255, 200, 255));
+
         mScorePaint = new Paint();
         mScorePaint.setColor(Color.RED);
         mScorePaint.setTextSize(mTextSize);
-
-        mTrianglePath = new Path();
     }
 
     @Override
@@ -68,13 +78,10 @@ public class GameOverlay extends BaseOverlay {
                 canvas.drawRect(face, mBluePaint);
             }
             mSoccerEngine.updateFacePosition(face);
-
-            canvas.drawRect(mGoalBounds, mGreyPaint);
-            canvas.drawText("Score: "+ mSoccerEngine.getPlayerScore(), mGoalBounds.centerX() - mTextSize , mGoalBounds.top + mTextSize, mScorePaint);
-
+            canvas.drawCircle(mGoalBounds.centerX(),mGoalBounds.centerY(), mGoalBounds.width()/2, mGoalPaint);
+            drawScoreBox(canvas);
             canvas.drawCircle(soccerBallCenterX, (float)soccerBall.getCenterY(), (float)soccerBall.getRadius(), soccerBall.getPaint());
             if (soccerBallBottom <= 0){
-
                 mTrianglePath.moveTo(soccerBallCenterX - soccerBallRadius, soccerBallRadius + 20);
                 mTrianglePath.lineTo(soccerBallCenterX, 20);
                 mTrianglePath.lineTo(soccerBallCenterX + soccerBallRadius, soccerBallRadius + 20);
@@ -86,6 +93,14 @@ public class GameOverlay extends BaseOverlay {
             }
         }
         mSoccerEngine.moveSoccerBall();
+    }
+
+    private void drawScoreBox(Canvas canvas){
+        String scoreText = "Score: " + mSoccerEngine.getPlayerScore();
+        float boxStart = canvas.getWidth()*.75f;
+        float boxMargin = 16;
+        canvas.drawRect(boxStart, boxMargin, (float)canvas.getWidth() - boxMargin, (boxMargin*2) + mTextSize, mScoreBoxPaint);
+        canvas.drawText(scoreText, boxStart + 16, boxMargin+ mTextSize, mScorePaint);
     }
 
     public void adjustHitBox(RectF hitBox){

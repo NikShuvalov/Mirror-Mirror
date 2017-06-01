@@ -89,4 +89,15 @@ public class Ball {
         double ballLeft = mCenterX-mRadius;
         return !(ballRight < rectF.left || ballLeft > rectF.right);
     }
+
+    public void recycleBall(double centerX, double centerY, double radius, double xSpeed, double ySpeed, int color){
+        mCenterX = centerX;
+        mCenterY = centerY;
+        mRadius = radius;
+
+        //Instead of using direction, I'm going to indicate vector velocity for horizontal and vertical motion since those 2 values will be affected by gravity and friction.
+        mXSpeed = xSpeed;
+        mYSpeed = ySpeed;
+        mPaint.setColor(color);
+    }
 }

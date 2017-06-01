@@ -202,4 +202,5 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
         startActivity(Intent.createChooser(intent, "Share to: "));
     }
 
+
 }
