@@ -8,12 +8,14 @@ import android.graphics.RectF;
  */
 
 public class Ball {
-    private double mCenterX, mCenterY, mRadius, mXSpeed, mYSpeed; //Charlie used pxPerMs for speed
+    private double mCenterX, mCenterY, mOriginalRadius, mRadius, mXSpeed, mYSpeed; //Charlie used pxPerMs for speed
     private Paint mPaint;
+    private int mShrinkage;
 
     public Ball(double centerX, double centerY, double radius, double xSpeed, double ySpeed, int color) {
         mCenterX = centerX;
         mCenterY = centerY;
+        mOriginalRadius = radius;
         mRadius = radius;
 
         //Instead of using direction, I'm going to indicate vector velocity for horizontal and vertical motion since those 2 values will be affected by gravity and friction.
@@ -21,6 +23,7 @@ public class Ball {
         mYSpeed = ySpeed;
         mPaint = new Paint();
         mPaint.setColor(color);
+        mShrinkage = 1;
     }
 
     public double getCenterX() {
@@ -94,10 +97,32 @@ public class Ball {
         mCenterX = centerX;
         mCenterY = centerY;
         mRadius = radius;
+        mOriginalRadius = radius;
+
 
         //Instead of using direction, I'm going to indicate vector velocity for horizontal and vertical motion since those 2 values will be affected by gravity and friction.
         mXSpeed = xSpeed;
         mYSpeed = ySpeed;
         mPaint.setColor(color);
+    }
+
+    public int getShrinkage() {
+        return mShrinkage;
+    }
+
+
+
+    public void shrinkBall(){
+        mShrinkage++;
+        mRadius = mOriginalRadius/Math.log(mShrinkage);
+    }
+
+    public void resetShrinkage(){
+        mShrinkage = 1;
+    }
+
+    public void setCenter(float x, float y){
+        mCenterX = x;
+        mCenterY = y;
     }
 }

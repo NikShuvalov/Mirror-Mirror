@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -92,7 +91,7 @@ public class GameOverlay extends BaseOverlay {
                 mTrianglePath.reset();
             }
         }
-        mSoccerEngine.moveSoccerBall();
+        mSoccerEngine.process();
     }
 
     private void drawScoreBox(Canvas canvas){

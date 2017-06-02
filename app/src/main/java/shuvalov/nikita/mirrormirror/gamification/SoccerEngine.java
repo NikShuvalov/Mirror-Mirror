@@ -1,6 +1,7 @@
 package shuvalov.nikita.mirrormirror.gamification;
 
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
@@ -8,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.Random;
+
+import shuvalov.nikita.mirrormirror.filters.particles.Particle;
 
 import static android.content.ContentValues.TAG;
 
@@ -46,8 +49,10 @@ public class SoccerEngine {
     private RectF mFaceRect;
     private RectF[] mPreviousRectPositions;
     private int mPlayerScore;
-    private boolean mIsSurvivalMode, mBallHit;
+    private boolean mIsSurvivalMode, mBallHit, mBallDisappearing, mGoalMoving;
     private long mLastUpdateTime;
+    private PointF[] mGoalInterpolation;
+    private int mGoalIndex;
 
     public static final int FACE_LENGTH = 400;
     public static final int SECOND = 1000;
@@ -68,6 +73,9 @@ public class SoccerEngine {
         mScreenBounds = screenBounds;
         mGoalWidth = mScreenBounds.width()/6;
         mSoccerRadius = mGoalWidth/3;
+        mGoalInterpolation = new PointF[10];
+        mBallDisappearing = false;
+        mGoalMoving = false;
         spawnNewGoal();
         respawnBall();
 
@@ -109,43 +117,79 @@ public class SoccerEngine {
 
     // ======================================== Main Move Method==================================================
 
-    public void moveSoccerBall(){
+    public void process(){
+        if(mBallDisappearing){
+            disappearBall();
+        }else if (mGoalMoving){
+            moveGoal();
+        }else {
+            moveSoccerBall();
+        }
+    }
+
+    private void disappearBall(){
+        if(mSoccerBall.getShrinkage() <6){
+            mSoccerBall.shrinkBall();
+        }else{
+            mSoccerBall.setCenterX(-1000);
+            mBallDisappearing=false;
+            mSoccerBall.resetShrinkage();
+            Rect targetLocation = generateGoalLocation();
+            generateGoalInterpolatedPath(new PointF(mGoalBounds.centerX(), mGoalBounds.centerY()),new PointF(targetLocation.centerX(), targetLocation.centerY()));
+        }
+    }
+
+    private void moveGoal(){
+        if(mGoalIndex< mGoalInterpolation.length){
+            PointF nextSpot = mGoalInterpolation[mGoalIndex];
+            mGoalBounds.offset((int)nextSpot.x -  mGoalBounds.centerX(), (int)nextSpot.y -  mGoalBounds.centerY());
+            mGoalIndex++;
+        }else{
+            PointF finalPoint = mGoalInterpolation[mGoalInterpolation.length-1];
+            mGoalBounds.offset( (int)finalPoint.x - mGoalBounds.centerX(), (int)finalPoint.y - mGoalBounds.centerY());
+            mGoalMoving = false;
+            mGoalIndex =0;
+            respawnBall();
+            mLastUpdateTime = SystemClock.elapsedRealtime();
+        }
+    }
+
+    private void moveSoccerBall(){
         long currentTime = SystemClock.elapsedRealtime();
-        long elapsedTime = currentTime- mLastUpdateTime;
-        if(elapsedTime> REFRESH_DELAY){
+        long elapsedTime = currentTime - mLastUpdateTime;
+        if (elapsedTime > REFRESH_DELAY) {
             double yDisplacement = getYDisplacement(elapsedTime);
             double xDisplacement = getXDisplacement(elapsedTime);
             mSoccerBall.moveSoccerBall(xDisplacement, yDisplacement);
             applyGravity(elapsedTime);
-
             int floor = mScreenBounds.bottom;
             double bottomOfBall = mSoccerBall.getCenterY() + mSoccerBall.getRadius();
-            if(mSoccerBall.intersectRect(mFaceRect)){ //Logic if ball hits face
+            if (mSoccerBall.intersectRect(mFaceRect)) { //Logic if ball hits face
                 mBallHit = true;
-                if(mSoccerBall.getYSpeed()>0){
-                    if(mIsSurvivalMode){ //ToDo: Need to remove bounceFriction as well, except for maybe the side bounces.
-                       verticalBallBounce((int)mFaceRect.top, bottomOfBall, 0);
-                    }else{
-                        verticalBallBounce((int)mFaceRect.top, bottomOfBall, calculateOpposingForce(elapsedTime, mPreviousRectPositions[3].top, mFaceRect.top));
+                if (mSoccerBall.getYSpeed() > 0) {
+                    if (mIsSurvivalMode) { //ToDo: Need to remove bounceFriction as well, except for maybe the side bounces.
+                        verticalBallBounce((int) mFaceRect.top, bottomOfBall, 0);
+                    } else {
+                        verticalBallBounce((int) mFaceRect.top, bottomOfBall, calculateOpposingForce(elapsedTime, mPreviousRectPositions[3].top, mFaceRect.top));
                     }
                 }
                 skewForAngledBounce();
-            }
-            else if(bottomOfBall>floor){//Check if the ball went through the floor, if so we need to adjust the position and adjust it's vertical velocity
+            } else if (bottomOfBall > floor) {//Check if the ball went through the floor, if so we need to adjust the position and adjust it's vertical velocity
                 verticalBallBounce(floor, bottomOfBall, 0); //Adjusted the speed at which the ball will travel after bouncing.
             }
             double radius = mSoccerBall.getRadius();
             double centerX = mSoccerBall.getCenterX();
-            double leftOfBall = centerX-radius;
-            double rightOfBall = centerX+radius;
+            double leftOfBall = centerX - radius;
+            double rightOfBall = centerX + radius;
 
-            if(leftOfBall<mScreenBounds.left){
+            if (leftOfBall < mScreenBounds.left) {
                 wallBallBounce(Wall.LEFT_SIDE);
-            }else if (rightOfBall>mScreenBounds.right){
+            } else if (rightOfBall > mScreenBounds.right) {
                 wallBallBounce(Wall.RIGHT_SIDE);
             }
-            if(mBallHit) {checkIfScored();}
-            
+            if (mBallHit) {
+                checkIfScored();
+            }
             mLastUpdateTime = currentTime;
         }
     }
@@ -189,7 +233,6 @@ public class SoccerEngine {
             case LEFT_SIDE:
                 double leftBallEdge = centerX-ballRadius;
                 mSoccerBall.setCenterX(Math.abs(leftBallEdge) + ballRadius);
-                Log.d("OverLap", "wallBallBounce: " + mSoccerBall.getCenterX());
                 break;
             case RIGHT_SIDE:
                 int rightWall = mScreenBounds.right;
@@ -229,9 +272,9 @@ public class SoccerEngine {
         double distanceFromGoal = Math.sqrt((distanceX*distanceX) + (distanceY* distanceY));
         if(distanceFromGoal<mGoalWidth/2){
             mPlayerScore++;
-            spawnNewGoal();
-            respawnBall();
-            //ToDo: Shrink ball, shrink goal, respawn goal and ball. OR have the player hit the ball like 3 times before spawning the ball.
+            mBallDisappearing = true;
+            mGoalMoving = true;
+            mSoccerBall.setCenter(mGoalBounds.centerX(), mGoalBounds.centerY());
         }
     }
 
@@ -309,14 +352,36 @@ public class SoccerEngine {
 
     // ================================================ Game Methods ====================================================
 
+    private Rect generateGoalLocation(){
+        Rect goalBounds = new Rect();
+        Random rng = new Random();
+        int spawnX = rng.nextInt(mScreenBounds.width()- (int)mSoccerRadius*2) + (int)mSoccerRadius;
+        goalBounds.set(spawnX - (int)mGoalWidth/2, 10+(int)mGoalWidth/2, spawnX+(int)mGoalWidth/2, 10 + (int)mGoalWidth);
+        return goalBounds;
+    }
+
+    private void generateGoalInterpolatedPath(PointF oldCenter, PointF newCenter){
+        mGoalIndex = 0;
+        mGoalInterpolation[0] = oldCenter;
+        mGoalInterpolation[mGoalInterpolation.length-1] = newCenter;
+        float distanceX = oldCenter.x - newCenter.x;
+        float distanceY = oldCenter.y - newCenter.y;
+        float incrementsX = distanceX / mGoalInterpolation.length-1;
+        float incrementsY = distanceY / mGoalInterpolation.length-1;
+        for (int i = 1; i < mGoalInterpolation.length-1; i++){
+            PointF lastPosition = mGoalInterpolation[i-1];
+            mGoalInterpolation[i] = new PointF(lastPosition.x - incrementsX, lastPosition.y - incrementsY);
+        }
+    }
+
     public void spawnNewGoal(){
+        //ToDo: Remove this if I Don't plan on using interpolater for whatever reason or decide to do some thingy of sort.
         if(mGoalBounds!=null) {
             Random rng = new Random();
             int spawnX = rng.nextInt(mScreenBounds.width()- (int)mSoccerRadius*2) + (int)mSoccerRadius;
             mGoalBounds.set(spawnX - (int)mGoalWidth/2, 10+(int)mGoalWidth/2, spawnX+(int)mGoalWidth/2, 10 + (int)mGoalWidth);
             return;
         }
-        //On First spawn, spawn in same location...always
         mGoalBounds = new Rect((int)(mScreenBounds.centerX()-mGoalWidth/2), 10 + (int)mGoalWidth/2, (int)(mScreenBounds.centerX()+mGoalWidth/2), 10 + (int)mGoalWidth);
     }
 
@@ -327,8 +392,8 @@ public class SoccerEngine {
             mSoccerBall = new Ball(mScreenBounds.centerX(), mScreenBounds.centerY()-mScreenBounds.height()/4, mSoccerRadius, rng.nextInt(4)-4, -5, Color.YELLOW);
             return;
         }
-        int spawnX = rng.nextInt(mScreenBounds.width()- (int)mSoccerRadius) + (int)mSoccerRadius;
-        mSoccerBall.recycleBall(spawnX, mScreenBounds.centerY()-mScreenBounds.height()/4, mSoccerRadius, rng.nextInt(4)-4, -5, Color.YELLOW);
+//        int spawnX = rng.nextInt(mScreenBounds.width()- (int)mSoccerRadius) + (int)mSoccerRadius;
+        mSoccerBall.recycleBall(mGoalBounds.centerX(), mGoalBounds.centerY(), mSoccerRadius, rng.nextInt(10)-5, -5, Color.YELLOW);
     }
 
 }
