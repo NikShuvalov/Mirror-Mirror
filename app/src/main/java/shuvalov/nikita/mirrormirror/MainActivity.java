@@ -3,13 +3,11 @@ package shuvalov.nikita.mirrormirror;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Point;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
@@ -17,13 +15,11 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.hardware.display.DisplayManagerCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -34,8 +30,7 @@ import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
+
 
 import shuvalov.nikita.mirrormirror.browsing.BrowsingActivity;
 import shuvalov.nikita.mirrormirror.camera.CameraSourceGenerator;
@@ -62,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     private Toolbar mToolbar;
     public CameraSource mCameraSource;
     private FaceDetector mFaceDetector;
+    private FaceDetectorGenerator mFaceDetectorGenerator;
     public GraphicType mCurrentOverlay;
 
     @Override
@@ -94,13 +90,24 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
             }
         } else {
-            mFaceDetector = new FaceDetectorGenerator(this).getFaceDetector();
-
-            //Note: Width and height are reversed here because we are using portrait mode instead of landscape mode.
-            mCameraSource = new CameraSourceGenerator(this, mFaceDetector, CameraSource.CAMERA_FACING_FRONT,mViewHeight,mViewWidth).getCameraSource();
+            updateDetectorMode(FaceDetector.ACCURATE_MODE);
             setUp();
         }
         notifyOverlayChanged();
+    }
+
+    /**
+     * Updates the detector mode as well as handles creating a new camerasource and applying it to the preview.
+     */
+    private void updateDetectorMode(int faceDetectorMode){
+        mFaceDetectorGenerator = new FaceDetectorGenerator(this, faceDetectorMode);
+        mFaceDetector = mFaceDetectorGenerator.getFaceDetector();
+        //Note: Width and height are reversed here because we are using portrait mode instead of landscape mode.
+        mCameraSource = new CameraSourceGenerator(this, mFaceDetector, CameraSource.CAMERA_FACING_FRONT,mViewHeight,mViewWidth).getCameraSource();
+        if(mPreview == null) {
+            mPreview = new Preview(this);
+        }
+        mPreview.setCameraSource(mCameraSource);
     }
 
     @Override
@@ -125,8 +132,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
     public void setUp() {
         setUpNavigationDrawer();
-        mPreview = new Preview(this);
-        mPreview.setCameraSource(mCameraSource);
         mPreviewContainer.addView(mPreview);
     }
 

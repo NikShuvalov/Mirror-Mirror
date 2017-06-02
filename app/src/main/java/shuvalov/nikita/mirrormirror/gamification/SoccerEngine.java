@@ -38,18 +38,20 @@ Or, have the ball need to travel some distance up after a hit to count towards a
 
 
     //Idea; Make balls progressively smaller
+    //Idea: Moving goals.
     //Idea 2: Color balls and goals, spawn several balls and have player get balls into corresponding color goals.
 public class SoccerEngine {
 
     // ============================================= Variables===============================================
     private Rect mScreenBounds, mGoalBounds;
-
     private Ball mSoccerBall;
     private float mSoccerRadius, mGoalWidth;
     private RectF mFaceRect;
     private RectF[] mPreviousRectPositions;
     private int mPlayerScore;
-    private boolean mIsSurvivalMode, mBallHit, mBallDisappearing, mGoalMoving;
+    private boolean mIsSurvivalMode;
+    private boolean mBallHit, mBallDisappearing, mGoalMoving;
+    private boolean mTutorialMode;
     private long mLastUpdateTime;
     private PointF[] mGoalInterpolation;
     private int mGoalIndex;
@@ -75,7 +77,7 @@ public class SoccerEngine {
         mGoalWidth = mScreenBounds.width()/6;
         mSoccerRadius = mGoalWidth/3;
         mGoalInterpolation = new PointF[10];
-
+        mTutorialMode = true;
         spawnNewGoal();
         respawnBall();
 
@@ -127,6 +129,10 @@ public class SoccerEngine {
         return mBoundaryLine;
     }
 
+    public boolean isTutorialMode() {
+        return mTutorialMode;
+    }
+
     // ======================================== Main Move Method==================================================
 
     public void process(){
@@ -176,7 +182,13 @@ public class SoccerEngine {
             applyGravity(elapsedTime);
             int floor = mScreenBounds.bottom;
             double bottomOfBall = mSoccerBall.getCenterY() + mSoccerBall.getRadius();
-            if (mSoccerBall.intersectRect(mFaceRect)) { //Logic if ball hits face
+            boolean facePassedThroughBall = false;
+
+            //Logic if ball hits face, and just in case user passed head through the ball it'll still register the hit.
+            for (RectF faceRect: mPreviousRectPositions){
+                if(facePassedThroughBall = mSoccerBall.intersectRect(faceRect))break;
+            }
+            if (facePassedThroughBall) {
                 mBallHit = true;
                 if (mSoccerBall.getYSpeed() > 0) {
                     if (mIsSurvivalMode) { //ToDo: Need to remove bounceFriction as well, except for maybe the side bounces.
@@ -422,4 +434,8 @@ public class SoccerEngine {
     }
 
 
+    public void exitTutorial(){
+        mTutorialMode = false;
+        mLastUpdateTime = SystemClock.elapsedRealtime();
+    }
 }

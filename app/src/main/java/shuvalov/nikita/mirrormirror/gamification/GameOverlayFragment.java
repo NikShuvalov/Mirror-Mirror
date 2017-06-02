@@ -15,7 +15,7 @@ import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
 
 
-public class GameOverlayFragment extends Fragment {
+public class GameOverlayFragment extends Fragment implements View.OnClickListener{
     private FrameLayout mOverlayContainer;
     private GameOverlay mGameOverlay;
 
@@ -40,6 +40,7 @@ public class GameOverlayFragment extends Fragment {
         mGameOverlay.setSoccerEngine(soccerEngine);
         mGameOverlay.setZOrderMediaOverlay(true);
         mOverlayContainer.addView(mGameOverlay);
+        mGameOverlay.setOnClickListener(this);
     }
 
     @Override
@@ -56,5 +57,10 @@ public class GameOverlayFragment extends Fragment {
         super.onPause();
         mOverlayContainer.removeView(mGameOverlay);
         mGameOverlay.stopGraphicThread();
+    }
+
+    @Override
+    public void onClick(View view) {
+        mGameOverlay.onScreenClick();
     }
 }

@@ -5,9 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
+import android.view.View;
 
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
@@ -16,8 +19,9 @@ import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
  * Created by NikitaShuvalov on 5/10/17.
  */
 
-public class GameOverlay extends BaseOverlay {
+public class GameOverlay extends BaseOverlay{
     private Paint mBluePaint, mScoreBoxPaint, mGoalPaint;
+    private Paint mArrowPaint, mArrowOutlinePaint;
     private Paint mGreyPaint;
     private Paint mBoundaryPaint;
     private Paint mScorePaint;
@@ -27,6 +31,7 @@ public class GameOverlay extends BaseOverlay {
     private Path mTrianglePath;
     private static final float TEXT_SIZE = 40f;
     private static final float BOUNDARY_PAINT_WIDTH = 30f;
+    private Path mGoalArrowPath, mBallArrowPath, mFaceArrowPath;
 
     private SoccerEngine mSoccerEngine;
 
@@ -41,6 +46,14 @@ public class GameOverlay extends BaseOverlay {
         mBoundaryPaint.setColor(Color.argb(255, 220,235,220));
         mBoundaryPaint.setStrokeWidth(BOUNDARY_PAINT_WIDTH);
         mBoundaryPaint.setStyle(Paint.Style.STROKE);
+
+        mArrowPaint =new Paint();
+        mArrowPaint.setColor(Color.argb(255, 255, 255,255));
+
+        mArrowOutlinePaint = new Paint();
+        mArrowOutlinePaint.setColor(Color.argb(255,0, 0, 0));
+        mArrowOutlinePaint.setStyle(Paint.Style.STROKE);
+        mArrowOutlinePaint.setStrokeWidth(4f);
 
         mBluePaint= new Paint();
         mBluePaint.setColor(Color.BLUE);
@@ -64,9 +77,29 @@ public class GameOverlay extends BaseOverlay {
         mScoreBoxPaint = new Paint();
         mScoreBoxPaint.setColor(Color.argb(255, 255, 200, 255));
 
+
         mScorePaint = new Paint();
         mScorePaint.setColor(Color.RED);
         mScorePaint.setTextSize(TEXT_SIZE);
+
+    }
+
+    private void createTutorialArrows(){
+        float goalRadius = mGoalBounds.width()/2f;
+        PointF goalArrowOrigin = new PointF(mGoalBounds.centerX() + goalRadius*2, mGoalBounds.centerY());
+        mGoalArrowPath = new Path();
+        mGoalArrowPath.moveTo(goalArrowOrigin.x, goalArrowOrigin.y);
+        mGoalArrowPath.rLineTo(goalRadius, goalRadius);
+        mGoalArrowPath.rLineTo(0 ,-goalRadius/2);
+        mGoalArrowPath.arcTo(goalArrowOrigin.x, mGoalBounds.centerY() + mGoalBounds.width()/4, goalArrowOrigin.x + goalRadius*2, mGoalBounds.centerY() + mGoalBounds.width()/4 + goalRadius*2,270, 90, false);
+        mGoalArrowPath.rLineTo(0, goalRadius);
+        mGoalArrowPath.rLineTo(goalRadius, 0);
+        mGoalArrowPath.rLineTo(0,-goalRadius);
+        mGoalArrowPath.arcTo(goalArrowOrigin.x - goalRadius, mGoalBounds.centerY() - goalRadius/2, goalArrowOrigin.x + goalRadius*3, mGoalBounds.centerY() + mGoalBounds.width()/4 +goalRadius*3, 0,-90,false);
+        mGoalArrowPath.rLineTo(0, -goalRadius/2);
+        mGoalArrowPath.close();
+
+
     }
 
     @Override
@@ -74,20 +107,29 @@ public class GameOverlay extends BaseOverlay {
         super.onDraw(canvas);
         if(canvas!=null) {
             Ball soccerBall = mSoccerEngine.getSoccerBall();
-            float soccerBallRadius = (float)soccerBall.getRadius();
+            float soccerBallRadius = (float) soccerBall.getRadius();
             double soccerBallBottom = soccerBall.getCenterY() + soccerBallRadius;
-            float soccerBallCenterX = (float)soccerBall.getCenterX();
+            float soccerBallCenterX = (float) soccerBall.getCenterX();
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             drawBoundaryLine(canvas);
             drawFaceOutline(canvas);
-            canvas.drawCircle(mGoalBounds.centerX(),mGoalBounds.centerY(), mGoalBounds.width()/2, mGoalPaint);//Draws goal, aka black hole of death.
+            canvas.drawCircle(mGoalBounds.centerX(), mGoalBounds.centerY(), mGoalBounds.width() / 2, mGoalPaint);//Draws goal, aka black hole of death.
             drawScoreBox(canvas);
-            canvas.drawCircle(soccerBallCenterX, (float)soccerBall.getCenterY(), (float)soccerBall.getRadius(), soccerBall.getPaint());
-            if (soccerBallBottom <= 0){
+            canvas.drawCircle(soccerBallCenterX, (float) soccerBall.getCenterY(), (float) soccerBall.getRadius(), soccerBall.getPaint());
+            if (soccerBallBottom <= 0) {
                 drawIndicator(canvas, soccerBallRadius, soccerBallBottom, soccerBallCenterX);
             }
+
+            if (mSoccerEngine.isTutorialMode()) {
+                canvas.drawColor(Color.argb(100, 0,0,0));
+                canvas.drawPath(mGoalArrowPath, mArrowPaint);
+                canvas.drawPath(mGoalArrowPath, mArrowOutlinePaint);
+                canvas.drawText("The Goal", mGoalBounds.centerX () + (int)(mGoalBounds.width()*1.75), mGoalBounds.centerY() + (int)(mGoalBounds.width()*1.25) + TEXT_SIZE, mScorePaint);
+                //Draw Some arrows and such pointing to the different things.
+            } else {
+                mSoccerEngine.process();
+            }
         }
-        mSoccerEngine.process();
     }
 
     private void drawBoundaryLine(Canvas canvas){
@@ -124,5 +166,14 @@ public class GameOverlay extends BaseOverlay {
     public void setSoccerEngine(SoccerEngine soccerEngine){
         mSoccerEngine = soccerEngine;
         mGoalBounds = mSoccerEngine.getGoalBounds();
+        createTutorialArrows();
+    }
+
+    public void onScreenClick(){
+        if(mSoccerEngine.isTutorialMode()){
+            mSoccerEngine.exitTutorial();
+        }else{
+            mSoccerEngine.respawnBall();
+        }
     }
 }
