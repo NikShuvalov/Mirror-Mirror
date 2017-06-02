@@ -19,12 +19,14 @@ import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 public class GameOverlay extends BaseOverlay {
     private Paint mBluePaint, mScoreBoxPaint, mGoalPaint;
     private Paint mGreyPaint;
+    private Paint mBoundaryPaint;
     private Paint mScorePaint;
     private Paint mRedPaint;
     private Paint mLinePaint;
     private Rect mGoalBounds;
     private Path mTrianglePath;
-    private static final float mTextSize = 40f;
+    private static final float TEXT_SIZE = 40f;
+    private static final float BOUNDARY_PAINT_WIDTH = 30f;
 
     private SoccerEngine mSoccerEngine;
 
@@ -35,6 +37,11 @@ public class GameOverlay extends BaseOverlay {
     }
 
     private void createPaints(){
+        mBoundaryPaint = new Paint();
+        mBoundaryPaint.setColor(Color.argb(255, 220,235,220));
+        mBoundaryPaint.setStrokeWidth(BOUNDARY_PAINT_WIDTH);
+        mBoundaryPaint.setStyle(Paint.Style.STROKE);
+
         mBluePaint= new Paint();
         mBluePaint.setColor(Color.BLUE);
         mBluePaint.setStyle(Paint.Style.STROKE);
@@ -59,7 +66,7 @@ public class GameOverlay extends BaseOverlay {
 
         mScorePaint = new Paint();
         mScorePaint.setColor(Color.RED);
-        mScorePaint.setTextSize(mTextSize);
+        mScorePaint.setTextSize(TEXT_SIZE);
     }
 
     @Override
@@ -71,42 +78,47 @@ public class GameOverlay extends BaseOverlay {
             double soccerBallBottom = soccerBall.getCenterY() + soccerBallRadius;
             float soccerBallCenterX = (float)soccerBall.getCenterX();
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
-            RectF face = FaceTracker.getInstance().getFaceRect();
-            if (face != null) {
-                adjustHitBox(face);
-                canvas.drawRect(face, mBluePaint);
-            }
-            mSoccerEngine.updateFacePosition(face);
-            canvas.drawCircle(mGoalBounds.centerX(),mGoalBounds.centerY(), mGoalBounds.width()/2, mGoalPaint);
+            drawBoundaryLine(canvas);
+            drawFaceOutline(canvas);
+            canvas.drawCircle(mGoalBounds.centerX(),mGoalBounds.centerY(), mGoalBounds.width()/2, mGoalPaint);//Draws goal, aka black hole of death.
             drawScoreBox(canvas);
             canvas.drawCircle(soccerBallCenterX, (float)soccerBall.getCenterY(), (float)soccerBall.getRadius(), soccerBall.getPaint());
             if (soccerBallBottom <= 0){
-                mTrianglePath.moveTo(soccerBallCenterX - soccerBallRadius, soccerBallRadius + 20);
-                mTrianglePath.lineTo(soccerBallCenterX, 20);
-                mTrianglePath.lineTo(soccerBallCenterX + soccerBallRadius, soccerBallRadius + 20);
-                mTrianglePath.close();
-                canvas.drawPath(mTrianglePath, mRedPaint);
-                canvas.drawPath(mTrianglePath, mLinePaint);
-                canvas.drawText((int)(Math.abs(soccerBallBottom)/25) + "cm", soccerBallCenterX - soccerBallRadius, soccerBallRadius + 90, mScorePaint);
-                mTrianglePath.reset();
+                drawIndicator(canvas, soccerBallRadius, soccerBallBottom, soccerBallCenterX);
             }
         }
         mSoccerEngine.process();
     }
 
+    private void drawBoundaryLine(Canvas canvas){
+        int y = mSoccerEngine.getBoundaryLine();
+        canvas.drawLine(0,y,canvas.getWidth(), y, mBoundaryPaint);
+    }
+
+    private void drawIndicator(Canvas canvas, float soccerBallRadius, double soccerBallBottom, float soccerBallCenterX){
+        mTrianglePath.moveTo(soccerBallCenterX - soccerBallRadius, soccerBallRadius + 20);
+        mTrianglePath.lineTo(soccerBallCenterX, 20);
+        mTrianglePath.lineTo(soccerBallCenterX + soccerBallRadius, soccerBallRadius + 20);
+        mTrianglePath.close();
+        canvas.drawPath(mTrianglePath, mRedPaint);
+        canvas.drawPath(mTrianglePath, mLinePaint);
+        canvas.drawText((int)(Math.abs(soccerBallBottom)/25) + "cm", soccerBallCenterX - soccerBallRadius, soccerBallRadius + 90, mScorePaint);
+        mTrianglePath.reset();
+    }
+
+    private void drawFaceOutline(Canvas canvas){
+        mSoccerEngine.updateFacePosition(FaceTracker.getInstance().getFaceRect());
+        RectF face = mSoccerEngine.getFaceRect();
+        if (face != null) {
+            canvas.drawRect(face, mBluePaint);
+        }
+    }
     private void drawScoreBox(Canvas canvas){
         String scoreText = "Score: " + mSoccerEngine.getPlayerScore();
         float boxStart = canvas.getWidth()*.75f;
         float boxMargin = 16;
-        canvas.drawRect(boxStart, boxMargin, (float)canvas.getWidth() - boxMargin, (boxMargin*2) + mTextSize, mScoreBoxPaint);
-        canvas.drawText(scoreText, boxStart + 16, boxMargin+ mTextSize, mScorePaint);
-    }
-
-    public void adjustHitBox(RectF hitBox){
-        float centerX = hitBox.centerX();
-        float centerY = hitBox.centerY();
-        float faceRadius = SoccerEngine.FACE_LENGTH/2; //It's not really a radius because it's a rectangle, but it's easier to name it this way.
-        hitBox.set(centerX-faceRadius, centerY-faceRadius, centerX+faceRadius, centerY+faceRadius);
+        canvas.drawRect(boxStart, boxMargin, (float)canvas.getWidth() - boxMargin, (boxMargin*2) + TEXT_SIZE, mScoreBoxPaint);
+        canvas.drawText(scoreText, boxStart + 16, boxMargin+ TEXT_SIZE, mScorePaint);
     }
 
     public void setSoccerEngine(SoccerEngine soccerEngine){

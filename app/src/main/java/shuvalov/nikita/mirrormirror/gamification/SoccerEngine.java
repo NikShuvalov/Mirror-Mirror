@@ -53,6 +53,7 @@ public class SoccerEngine {
     private long mLastUpdateTime;
     private PointF[] mGoalInterpolation;
     private int mGoalIndex;
+    private int mBoundaryLine;
 
     public static final int FACE_LENGTH = 400;
     public static final int SECOND = 1000;
@@ -74,12 +75,10 @@ public class SoccerEngine {
         mGoalWidth = mScreenBounds.width()/6;
         mSoccerRadius = mGoalWidth/3;
         mGoalInterpolation = new PointF[10];
-        mBallDisappearing = false;
-        mGoalMoving = false;
+
         spawnNewGoal();
         respawnBall();
 
-        mLastUpdateTime = SystemClock.elapsedRealtime();
         float centerX = mScreenBounds.exactCenterX();
         float centerY = mScreenBounds.exactCenterY();
         mFaceRect = new RectF(centerX-FACE_LENGTH/2, centerY-FACE_LENGTH/2, centerX+FACE_LENGTH/2, centerY+FACE_LENGTH/2);
@@ -95,6 +94,10 @@ public class SoccerEngine {
     public void gameStart(){
         mIsSurvivalMode = false;
         mPlayerScore = 0;
+        mBallDisappearing = false;
+        mGoalMoving = false;
+        mLastUpdateTime = SystemClock.elapsedRealtime();
+        mBoundaryLine = mScreenBounds.centerY();// x = y, y = x, cause why, I don't know.
     }
 
     // ======================================== Getter Methods ==================================================
@@ -113,6 +116,15 @@ public class SoccerEngine {
 
     public int getPlayerScore(){
         return mPlayerScore;
+    }
+
+
+    public RectF getFaceRect() {
+        return mFaceRect;
+    }
+
+    public int getBoundaryLine() {
+        return mBoundaryLine;
     }
 
     // ======================================== Main Move Method==================================================
@@ -338,6 +350,11 @@ public class SoccerEngine {
      */
     public void updateFacePosition(@Nullable RectF faceRect){
         if(faceRect!=null){
+            adjustHitBox(faceRect);
+            float overStep = mBoundaryLine - faceRect.top ;
+            if(overStep > 0 ){
+                faceRect.offset(0, overStep);
+            }
             mFaceRect = faceRect;
         }
         updateFaceRectCache();
@@ -395,5 +412,14 @@ public class SoccerEngine {
 //        int spawnX = rng.nextInt(mScreenBounds.width()- (int)mSoccerRadius) + (int)mSoccerRadius;
         mSoccerBall.recycleBall(mGoalBounds.centerX(), mGoalBounds.centerY(), mSoccerRadius, rng.nextInt(10)-5, -5, Color.YELLOW);
     }
+
+
+    public void adjustHitBox(RectF hitBox){
+        float centerX = hitBox.centerX();
+        float centerY = hitBox.centerY();
+        float faceRadius = SoccerEngine.FACE_LENGTH/2; //It's not really a radius because it's a rectangle, but it's easier to name it this way.
+        hitBox.set(centerX-faceRadius, centerY-faceRadius, centerX+faceRadius, centerY+faceRadius);
+    }
+
 
 }
