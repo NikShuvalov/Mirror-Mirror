@@ -22,7 +22,7 @@ import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 public class GameOverlay extends BaseOverlay{
     private Paint mBluePaint, mScoreBoxPaint, mGoalPaint;
     private Paint mArrowPaint, mArrowOutlinePaint;
-    private Paint mGreyPaint;
+    private Paint mStartPaint, mIdentifierPaint;
     private Paint mBoundaryPaint;
     private Paint mScorePaint;
     private Paint mRedPaint;
@@ -31,7 +31,10 @@ public class GameOverlay extends BaseOverlay{
     private Path mTrianglePath;
     private static final float TEXT_SIZE = 40f;
     private static final float BOUNDARY_PAINT_WIDTH = 30f;
-    private Path mGoalArrowPath, mBallArrowPath, mFaceArrowPath;
+    private Path mGoalArrowPath, mBallArrowPath;
+
+    private float mStartBlinkTime;
+    private boolean mStartBlink;
 
     private SoccerEngine mSoccerEngine;
 
@@ -39,6 +42,8 @@ public class GameOverlay extends BaseOverlay{
         super(context);
         createPaints();
         mTrianglePath = new Path();
+        mStartBlinkTime = 0;
+        mStartBlink = true;
     }
 
     private void createPaints(){
@@ -63,9 +68,6 @@ public class GameOverlay extends BaseOverlay{
         mGoalPaint = new Paint();
         mGoalPaint.setColor(Color.argb(255,25,25,25));
 
-        mGreyPaint = new Paint();
-        mGreyPaint.setColor(Color.LTGRAY);
-
         mRedPaint = new Paint();
         mRedPaint.setColor(Color.RED);
 
@@ -81,6 +83,14 @@ public class GameOverlay extends BaseOverlay{
         mScorePaint = new Paint();
         mScorePaint.setColor(Color.RED);
         mScorePaint.setTextSize(TEXT_SIZE);
+
+        mStartPaint = new Paint();
+        mStartPaint.setColor(Color.YELLOW);
+        mStartPaint.setTextSize(TEXT_SIZE * 1.5f);
+
+        mIdentifierPaint = new Paint();
+        mIdentifierPaint.setColor(Color.WHITE);
+        mIdentifierPaint.setTextSize(TEXT_SIZE);
 
     }
 
@@ -99,7 +109,19 @@ public class GameOverlay extends BaseOverlay{
         mGoalArrowPath.rLineTo(0, -goalRadius/2);
         mGoalArrowPath.close();
 
+        Ball soccerBall = mSoccerEngine.getSoccerBall();
+        PointF ballCenter = new PointF((float)soccerBall.getCenterX(), (float)soccerBall.getCenterY());
+        float ballRadius = (float) soccerBall.getRadius();
 
+        mBallArrowPath = new Path();
+        mBallArrowPath.moveTo(ballCenter.x - ballRadius, ballCenter.y - ballRadius);
+        mBallArrowPath.rLineTo(0,  - ballRadius * 2);
+        mBallArrowPath.rLineTo( -ballRadius/1.5f, ballRadius/1.5f);
+        mBallArrowPath.rLineTo(-ballRadius * 3 , - ballRadius * 3);
+        mBallArrowPath.rLineTo(- ballRadius/1.5f,  ballRadius/1.5f);
+        mBallArrowPath.rLineTo(ballRadius  * 3, ballRadius * 3);
+        mBallArrowPath.rLineTo(-ballRadius /1.5f, ballRadius /1.5f);
+        mBallArrowPath.close();
     }
 
     @Override
@@ -110,25 +132,63 @@ public class GameOverlay extends BaseOverlay{
             float soccerBallRadius = (float) soccerBall.getRadius();
             double soccerBallBottom = soccerBall.getCenterY() + soccerBallRadius;
             float soccerBallCenterX = (float) soccerBall.getCenterX();
+            float soccerBallCenterY = (float)soccerBall.getCenterY();
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             drawBoundaryLine(canvas);
             drawFaceOutline(canvas);
             canvas.drawCircle(mGoalBounds.centerX(), mGoalBounds.centerY(), mGoalBounds.width() / 2, mGoalPaint);//Draws goal, aka black hole of death.
             drawScoreBox(canvas);
-            canvas.drawCircle(soccerBallCenterX, (float) soccerBall.getCenterY(), (float) soccerBall.getRadius(), soccerBall.getPaint());
+            canvas.drawCircle(soccerBallCenterX, soccerBallCenterY, soccerBallRadius, soccerBall.getPaint());
             if (soccerBallBottom <= 0) {
                 drawIndicator(canvas, soccerBallRadius, soccerBallBottom, soccerBallCenterX);
             }
 
             if (mSoccerEngine.isTutorialMode()) {
                 canvas.drawColor(Color.argb(100, 0,0,0));
+
                 canvas.drawPath(mGoalArrowPath, mArrowPaint);
                 canvas.drawPath(mGoalArrowPath, mArrowOutlinePaint);
-                canvas.drawText("The Goal", mGoalBounds.centerX () + (int)(mGoalBounds.width()*1.75), mGoalBounds.centerY() + (int)(mGoalBounds.width()*1.25) + TEXT_SIZE, mScorePaint);
-                //Draw Some arrows and such pointing to the different things.
+
+                canvas.drawPath(mBallArrowPath, mArrowPaint);
+                canvas.drawPath(mBallArrowPath, mArrowOutlinePaint);
+
+                canvas.drawText("The Goal", mGoalBounds.centerX () + (int)(mGoalBounds.width()*1.75), mGoalBounds.centerY() + (int)(mGoalBounds.width()*1.25) + TEXT_SIZE, mIdentifierPaint);
+                canvas.drawText("The Ball", soccerBallCenterX - (5 * soccerBallRadius) - TEXT_SIZE, soccerBallCenterY - (5 * soccerBallRadius) - TEXT_SIZE, mIdentifierPaint);
+                drawFaceArrow(canvas,soccerBallRadius);
+
+                canvas.drawText("You can't pass this line", canvas.getWidth()/3, canvas.getHeight()/2, mIdentifierPaint);
+                if(mStartBlinkTime< 50 && mStartBlink){
+                    canvas.drawText("Tap Anywhere to Start", canvas.getWidth()/3, canvas.getHeight()/3, mStartPaint);
+                    mStartBlinkTime ++;
+                }else if (mStartBlinkTime >= 50){
+                    mStartBlink = !mStartBlink;
+                    mStartBlinkTime = 0;
+                }else{
+                    mStartBlinkTime ++;
+                }
+
             } else {
                 mSoccerEngine.process();
             }
+        }
+    }
+
+    private void drawFaceArrow(Canvas canvas, float ballRadius){
+        RectF face = mSoccerEngine.getFaceRect();
+        Path faceArrow = new Path();
+        if(face!=null) {
+            faceArrow.moveTo(face.centerX(), canvas.getHeight() / 2 - (ballRadius * 2));
+            faceArrow.rLineTo(ballRadius, -ballRadius);
+            faceArrow.rLineTo(-ballRadius / 2, 0);
+            faceArrow.rLineTo(0, -ballRadius * 2);
+            faceArrow.rLineTo(-ballRadius, 0);
+            faceArrow.rLineTo(0, ballRadius * 2);
+            faceArrow.rLineTo(-ballRadius / 2, 0);
+            faceArrow.close();
+
+            canvas.drawPath(faceArrow, mArrowPaint);
+            canvas.drawPath(faceArrow, mArrowOutlinePaint);
+            canvas.drawText("Your Face", (face.centerX() + face.left)/2f, canvas.getHeight()/2 - (ballRadius *6) + TEXT_SIZE, mIdentifierPaint);
         }
     }
 
