@@ -195,17 +195,17 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
             //ToDo: Allow user instead to choose whether they want to keep or discard an image.
             FileOutputStream outputStream = new FileOutputStream(imageFile);
-            Bitmap unfiltered = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            Bitmap unfiltered = BitmapFactory.decodeByteArray(bytes, 0, bytes.length); //This gets the photo as seen from the camera
 
             Matrix matrix = new Matrix();
             matrix.postRotate(270);
-
-
             unfiltered = Bitmap.createBitmap(unfiltered, 0, 0, unfiltered.getWidth(),
                     unfiltered.getHeight(), matrix, true);
 
-            Bitmap bitmap = getFilteredImage(unfiltered);
+            Bitmap bitmap = getFilteredImage(unfiltered);//Puts the filter on top of the photo
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+//            unfiltered.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+
             outputStream.flush();
             outputStream.close();
             openScreenshot(imageFile);
@@ -217,25 +217,25 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     public Bitmap getFilteredImage(Bitmap cameraPreview) {
         Bitmap drawnTogether = Bitmap.createBitmap(mViewWidth, mViewHeight, cameraPreview.getConfig());
         Canvas canvas = new Canvas(drawnTogether);
+
         Filter filter = FilterManager.getInstance().getSelectedFilter();
         Bitmap filterBmp = null;
         FaceTracker faceTracker = FaceTracker.getInstance();
-        RectF faceRect = faceTracker.getFaceRect();
-        Matrix mirrorFilter = new Matrix();
+        RectF filterRect = faceTracker.getFaceRect();
         Rect previewRect = new Rect(0,0,mViewWidth,mViewHeight);
-        Rect fr = new Rect();
-        faceRect.round(fr);
+
+        Matrix mirrorFilter = new Matrix();
         mirrorFilter.postScale(-1, 1, mViewWidth/2, mViewHeight/2);
-        mirrorFilter.mapRect(faceRect);
+        mirrorFilter.mapRect(filterRect);
         if(filter!=null){
             float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();
             float scaleY = drawnTogether.getHeight()/faceTracker.getScreenHeight();
-            filterBmp = BitmapFactory.decodeResource(getResources(), filter.getResourceInt());
-            filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth()*(int)scaleX, filterBmp.getHeight()*(int)scaleY, mirrorFilter, true);
+            filterBmp = BitmapFactory.decodeResource(getResources(), filter.getResourceInt()); //Create a bitmap using the Filter object's info
+            filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth()*(int)scaleX, filterBmp.getHeight()*(int)scaleY, mirrorFilter, true); //Apply scaling and the matrix filter... again?
         }
         canvas.drawBitmap(cameraPreview, null, previewRect, null);
         if(filterBmp!=null ) {
-            canvas.drawBitmap(filterBmp, null, fr, null);
+            canvas.drawBitmap(filterBmp, null, filterRect, null);
         }
         return drawnTogether;
     }

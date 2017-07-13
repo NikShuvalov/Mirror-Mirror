@@ -207,7 +207,9 @@ public class ParticleEngine {
             p = mParticles.get(i);
             double yDisplacement = getYDisplacementOscillating(elapsedTime, p);
 
-            xAxis = p.getStartX() - (mCumulativeXShift * p.getScale()/3);
+//            xAxis = p.getStartX() - (mCumulativeXShift * p.getScale()/3);
+            xAxis = p.getStartX();
+
             p.translatePosition(0, yDisplacement);
             double newXPosition = (100 * Math.sin(p.getYLoc() / 100)) + xAxis;
 
@@ -263,7 +265,7 @@ public class ParticleEngine {
         if(cx!= Float.MIN_VALUE){
             mCurrentPosition.set(cx, cy);
         }
-        calculateForFaceShift();
+//        calculateForFaceShift();
     }
 
     private void calculateForFaceShift(){

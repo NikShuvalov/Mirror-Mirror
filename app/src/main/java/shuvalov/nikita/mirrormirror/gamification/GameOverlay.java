@@ -158,7 +158,7 @@ public class GameOverlay extends BaseOverlay{
 
                 canvas.drawText("You can't pass this line", canvas.getWidth()/3, canvas.getHeight()/2, mIdentifierPaint);
                 if(mStartBlinkTime< 50 && mStartBlink){
-                    canvas.drawText("Tap Anywhere to Start", canvas.getWidth()/3, canvas.getHeight()/3, mStartPaint);
+                    canvas.drawText("Tap to Start", canvas.getWidth()/3f, canvas.getHeight()*.7f, mStartPaint);
                     mStartBlinkTime ++;
                 }else if (mStartBlinkTime >= 50){
                     mStartBlink = !mStartBlink;
