@@ -30,9 +30,10 @@ import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 
-import shuvalov.nikita.mirrormirror.browsing.BrowsingActivity;
+import shuvalov.nikita.mirrormirror.browsing.BrowseFragment;
 import shuvalov.nikita.mirrormirror.camera.CameraSourceGenerator;
 import shuvalov.nikita.mirrormirror.camera.FaceDetectorGenerator;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
@@ -57,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     private Toolbar mToolbar;
     public CameraSource mCameraSource;
     private FaceDetector mFaceDetector;
-    private FaceDetectorGenerator mFaceDetectorGenerator;
     public GraphicType mCurrentOverlay;
 
     @Override
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
             }
         } else {
-            updateDetectorMode(FaceDetector.ACCURATE_MODE);
+            updateDetectorMode(FaceDetector.FAST_MODE);
             setUp();
         }
         notifyOverlayChanged();
@@ -99,9 +99,8 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     /**
      * Updates the detector mode as well as handles creating a new camerasource and applying it to the preview.
      */
-    private void updateDetectorMode(int faceDetectorMode){
-        mFaceDetectorGenerator = new FaceDetectorGenerator(this, faceDetectorMode);
-        mFaceDetector = mFaceDetectorGenerator.getFaceDetector();
+    private void updateDetectorMode(int faceDetectorMode){ //Don't think I should change the detection mode after the fact since it will be detrimental to performance.
+        mFaceDetector = new FaceDetectorGenerator(this, faceDetectorMode).getFaceDetector();
         //Note: Width and height are reversed here because we are using portrait mode instead of landscape mode.
         mCameraSource = new CameraSourceGenerator(this, mFaceDetector, CameraSource.CAMERA_FACING_FRONT,mViewHeight,mViewWidth).getCameraSource();
         if(mPreview == null) {
@@ -204,7 +203,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
             Bitmap bitmap = getFilteredImage(unfiltered);//Puts the filter on top of the photo
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-//            unfiltered.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
 
             outputStream.flush();
             outputStream.close();
@@ -245,17 +243,28 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         intent.setAction(Intent.ACTION_VIEW);
         Uri uri = Uri.fromFile(imageFile);
         intent.setDataAndType(uri, "image/*");
-        startActivity(intent);        //FixMe: APK 24+ doesn't allow this to work
+        startActivity(Intent.createChooser(intent, "View with..."));
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            
+            //ToDo: Consider whether or not it's worth changing Browsing into a fragment; Camerasource is still active in background.
+            //I can either stop the cameraSource and have it restart once we return to a fragment that requires it
+            // OR
+            // Go back to the previous architecture where browsing was an activity.
+
             case R.id.browse_option:
-                //ToDo: Fix this up if necessary cause things might get weird with the fragments being added
                 mDrawerLayout.closeDrawers();
-                Intent browseIntent = new Intent(this, BrowsingActivity.class);
-                startActivity(browseIntent);
+                if(mCurrentOverlay == GraphicType.BROWSE){
+                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+                }else{
+                    mCurrentOverlay = GraphicType.BROWSE;
+                    notifyOverlayChanged();
+                }
+//                Intent browseIntent = new Intent(this, BrowsingActivity.class);
+//                startActivity(browseIntent);
                 break;
             case R.id.particle_option:
                 mDrawerLayout.closeDrawers();
@@ -311,6 +320,10 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 break;
             case COMPONENT:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ComponentOverlayFragment.newInstance()).commit();
+                break;
+            case BROWSE:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, BrowseFragment.newInstance()).commit();
+                break;
         }
     }
 
@@ -324,6 +337,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     public void onShutter() {}
 
     public enum GraphicType{
-        PARTICLE, FILTER, GAME, COMPONENT
+        PARTICLE, FILTER, GAME, COMPONENT, BROWSE
     }
 }
