@@ -30,7 +30,6 @@ import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 
 import shuvalov.nikita.mirrormirror.browsing.BrowseFragment;
@@ -249,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            
+
             //ToDo: Consider whether or not it's worth changing Browsing into a fragment; Camerasource is still active in background.
             //I can either stop the cameraSource and have it restart once we return to a fragment that requires it
             // OR
