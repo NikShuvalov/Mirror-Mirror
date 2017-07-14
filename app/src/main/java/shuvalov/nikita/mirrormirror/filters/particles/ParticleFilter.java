@@ -11,8 +11,8 @@ import shuvalov.nikita.mirrormirror.filters.Filter;
 public class ParticleFilter extends Filter{
 
 
-    public ParticleFilter(String filterName, int resourceInt, ImagePosition imagePosition, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
-        super(filterName, resourceInt, imagePosition, scaleX, scaleY, offsetXPercent, offsetYPercent);
+    public ParticleFilter(String filterName, int resourceInt, FilterType filterType, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
+        super(filterName, resourceInt, filterType, scaleX, scaleY, offsetXPercent, offsetYPercent);
     }
 
     @Override

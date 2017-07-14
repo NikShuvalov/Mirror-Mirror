@@ -31,8 +31,8 @@ public class DemonComponentFilter extends ComponentFilter {
     private Paint mLinePaint, mHornPaint, mGoateePaint;
 
     public DemonComponentFilter(Context context) {
-        mLeftFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.ImagePosition.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
-        mRightFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.ImagePosition.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
+        mLeftFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
+        mRightFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
         preparePaints();
     }
 

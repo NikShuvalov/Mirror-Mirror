@@ -44,6 +44,7 @@ import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.FilterOverlayFragment;
 import shuvalov.nikita.mirrormirror.filters.particles.ParticleOverlayFragment;
 import shuvalov.nikita.mirrormirror.gamification.GameOverlayFragment;
+import shuvalov.nikita.mirrormirror.video.VideoFragment;
 
 
 public class MainActivity extends AppCompatActivity implements  CameraSource.PictureCallback, CameraSource.ShutterCallback, NavigationView.OnNavigationItemSelectedListener{
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
         mCurrentOverlay = GraphicType.FILTER;
         //toDo: Should put a static image for animated filters to put in the recycler.
-        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.ImagePosition.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
+        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
         FilterManager.getInstance().addAnimatedFilters(f);
     }
 
@@ -301,6 +302,16 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                     notifyOverlayChanged();
                 }
                 break;
+            case R.id.video_option:
+                mDrawerLayout.closeDrawers();
+
+                if(mCurrentOverlay == GraphicType.VIDEO){
+                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+                }else{
+                    mCurrentOverlay = GraphicType.VIDEO;
+                    notifyOverlayChanged();
+                }
+                break;
         }
         return false;
     }
@@ -323,6 +334,9 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
             case BROWSE:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, BrowseFragment.newInstance()).commit();
                 break;
+            case VIDEO:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, VideoFragment.newInstance()).commit();
+                break;
         }
     }
 
@@ -336,6 +350,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     public void onShutter() {}
 
     public enum GraphicType{
-        PARTICLE, FILTER, GAME, COMPONENT, BROWSE
+        PARTICLE, FILTER, GAME, COMPONENT, BROWSE, VIDEO
     }
 }

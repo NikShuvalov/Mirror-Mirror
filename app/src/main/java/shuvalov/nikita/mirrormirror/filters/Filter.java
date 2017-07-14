@@ -8,15 +8,15 @@ import android.graphics.Bitmap;
 
 public abstract class Filter {
     private int mResourceInt;
-    private ImagePosition mImagePosition;
     private float mScaleX, mScaleY;
     private float mOffsetXPercent, mOffsetYPercent;
     private String mFilterName;
+    private FilterType mFilterType;
 
-    public Filter(String filterName, int resourceInt, ImagePosition imagePosition, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
+    public Filter(String filterName, int resourceInt, FilterType filterType, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
         mFilterName = filterName;
         mResourceInt = resourceInt;
-        mImagePosition = imagePosition;
+        mFilterType = filterType;
         mScaleX = scaleX;
         mScaleY = scaleY;
         mOffsetXPercent = offsetXPercent;
@@ -34,17 +34,9 @@ public abstract class Filter {
 
     public boolean isParticle(){return false;}
 
-    //FixME: This is effectively useless, unless if I decide to use different filters at once. Like a mix-and-match type deal.
-    public enum ImagePosition{
-        TOP_OF_HEAD, FACE, BELOW_FACE, HAIRLINE
-    }
 
     public int getResourceInt() {
         return mResourceInt;
-    }
-
-    public ImagePosition getImagePosition() {
-        return mImagePosition;
     }
 
     public float getScaleX() {
@@ -65,5 +57,13 @@ public abstract class Filter {
 
     public String getFilterName() {
         return mFilterName;
+    }
+
+    public FilterType getFilterType() {
+        return mFilterType;
+    }
+
+    public enum FilterType{
+        FULL, CENTER, BANNER_TOP, BANNER_BOTTOM, FACE, TOP_OF_HEAD, BELOW_FACE, HAIRLINE
     }
 }

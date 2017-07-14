@@ -23,11 +23,11 @@ public class FilterManager {
     private void prepareAllImages(){
         mFilters = new ArrayList<>();
         mFilters.add(null);
-        mFilters.add(new StaticFilter("Instant Beauty", R.drawable.beautify_mirror, Filter.ImagePosition.FACE,1.1f, 1.2f, 0, 0));
-        mFilters.add(new StaticFilter("Corgi", R.drawable.corgi, Filter.ImagePosition.FACE,1.1f, 1.2f, 0, 0));
-        mFilters.add(new StaticFilter("Top Hat", R.drawable.top_hat, Filter.ImagePosition.TOP_OF_HEAD, 1f, 1f, 0, -0.5f));
-        mFilters.add(new StaticFilter("Truompee", R.drawable.trump_toupee, Filter.ImagePosition.HAIRLINE, 0.85f, 0.4f, 0, -0.35f));
-        mFilters.add(new StaticFilter("Saiyan", R.drawable.super_saiyan, Filter.ImagePosition.HAIRLINE, 1.75f, 1.5f, 0, -0.5f));
+        mFilters.add(new StaticFilter("Instant Beauty", R.drawable.beautify_mirror, Filter.FilterType.FACE,1.1f, 1.2f, 0, 0));
+        mFilters.add(new StaticFilter("Corgi", R.drawable.corgi, Filter.FilterType.FACE,1.1f, 1.2f, 0, 0));
+        mFilters.add(new StaticFilter("Top Hat", R.drawable.top_hat, Filter.FilterType.TOP_OF_HEAD, 1f, 1f, 0, -0.5f));
+        mFilters.add(new StaticFilter("Truompee", R.drawable.trump_toupee, Filter.FilterType.HAIRLINE, 0.85f, 0.4f, 0, -0.35f));
+        mFilters.add(new StaticFilter("Saiyan", R.drawable.super_saiyan, Filter.FilterType.HAIRLINE, 1.75f, 1.5f, 0, -0.5f));
     }
 
     private static FilterManager sFilterManager;

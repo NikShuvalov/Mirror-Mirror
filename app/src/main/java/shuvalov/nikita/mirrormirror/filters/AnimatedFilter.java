@@ -17,8 +17,8 @@ public class AnimatedFilter extends Filter {
     private long mLastFrameMillis, mMillisPerFrame;
 
 
-    public AnimatedFilter(String filterName, int resourceInt, ImagePosition imagePosition, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent, List<Bitmap> animationList) {
-        super(filterName, resourceInt, imagePosition, scaleX, scaleY, offsetXPercent, offsetYPercent);
+    public AnimatedFilter(String filterName, int resourceInt, FilterType filterType, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent, List<Bitmap> animationList) {
+        super(filterName, resourceInt, filterType, scaleX, scaleY, offsetXPercent, offsetYPercent);
         mAnimationList = animationList;
         mIndex = 0;
         mMillisPerFrame = 200; //ToDo: Change from hard-coded value.

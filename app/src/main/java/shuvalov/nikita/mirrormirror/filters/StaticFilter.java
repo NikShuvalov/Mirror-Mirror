@@ -9,8 +9,8 @@ import android.graphics.Bitmap;
 public class StaticFilter extends Filter {
 
 
-    public StaticFilter(String filterName, int resourceInt, ImagePosition imagePosition, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
-        super(filterName, resourceInt, imagePosition, scaleX, scaleY, offsetXPercent, offsetYPercent);
+    public StaticFilter(String filterName, int resourceInt, FilterType filterType, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
+        super(filterName, resourceInt, filterType, scaleX, scaleY, offsetXPercent, offsetYPercent);
     }
 
     @Override
