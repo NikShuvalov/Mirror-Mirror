@@ -9,7 +9,10 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.os.SystemClock;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
+import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 
@@ -76,4 +79,6 @@ public class VideoOverlay extends BaseOverlay{
         mUsingAnimated = false;
         mBitmap = null;
     }
+
+
 }

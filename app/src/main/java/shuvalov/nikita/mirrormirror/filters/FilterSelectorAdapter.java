@@ -37,8 +37,7 @@ public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorVi
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FilterManager.getInstance().setCurrentPosition(position<0 ? 0: position);
-                mFilterSelectorListener.onFilterSelected();
+                mFilterSelectorListener.onFilterSelected(position<0 ? 0:position);
                 notifyDataSetChanged();
             }
         });
@@ -52,6 +51,6 @@ public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorVi
     }
 
     public interface FilterSelectorListener{
-        void onFilterSelected();
+        void onFilterSelected(int index);
     }
 }

@@ -50,7 +50,6 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         View filterFragment = inflater.inflate(R.layout.fragment_filter_overlay, container, false);
         mFilterSelectorVisible = false;
         findViews(filterFragment);
-
         setUpFilterSelector();
         setOnClickListeners();
         return filterFragment;
@@ -75,6 +74,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mFilterRecycler.setAdapter(new FilterSelectorAdapter(this,FilterManager.getInstance().getFilters()));
         mFilterRecycler.setLayoutManager(horizontalLayoutManager);
     }
+
     @Override
     public void onPause() {
         super.onPause();
@@ -152,7 +152,8 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     }
 
     @Override
-    public void onFilterSelected() {
+    public void onFilterSelected(int i) {
+        FilterManager.getInstance().setCurrentPosition(i);
         if(mFilterOverlay==null){
             setUpOverlay();
         }
