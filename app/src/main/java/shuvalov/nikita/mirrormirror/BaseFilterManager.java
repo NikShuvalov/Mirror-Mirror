@@ -41,4 +41,8 @@ public abstract class BaseFilterManager {
         return mFilters.get(mSelectedIndex);
     }
 
+    public void addFilter(Filter f){
+        mFilters.add(f);
+    }
+
 }

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
+import shuvalov.nikita.mirrormirror.BaseFilterManager;
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
@@ -16,12 +17,12 @@ import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
  */
 
 public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorViewHolder> {
-    private ArrayList<Filter> mFilters;
     private FilterSelectorListener mFilterSelectorListener;
+    private BaseFilterManager mFilterManager;
 
-    public FilterSelectorAdapter(FilterSelectorListener filterSelectorListener, ArrayList<Filter> filters) {
-        mFilters = filters;
+    public FilterSelectorAdapter(FilterSelectorListener filterSelectorListener, BaseFilterManager baseFilterManager) {
         mFilterSelectorListener = filterSelectorListener;
+        mFilterManager = baseFilterManager;
     }
 
     @Override
@@ -30,14 +31,14 @@ public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorVi
     }
 
     @Override
-    public void onBindViewHolder(final FilterSelectorViewHolder holder, final int position) {
-        holder.bindDataToViews(mFilters.get(position));
-        int selectedPosition = FilterManager.getInstance().getCurrentPosition();
+    public void onBindViewHolder(final FilterSelectorViewHolder holder, int position) {
+        holder.bindDataToViews(mFilterManager.getFilters().get(position));
+        int selectedPosition = mFilterManager.getSelectedIndex();
         holder.markAsSelected(position == selectedPosition);
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mFilterSelectorListener.onFilterSelected(position<0 ? 0:position);
+                mFilterSelectorListener.onFilterSelected(holder.getAdapterPosition()<0 ? 0:holder.getAdapterPosition());
                 notifyDataSetChanged();
             }
         });
@@ -47,7 +48,7 @@ public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorVi
 
     @Override
     public int getItemCount() {
-        return mFilters.size();
+        return mFilterManager.getFilters().size();
     }
 
     public interface FilterSelectorListener{

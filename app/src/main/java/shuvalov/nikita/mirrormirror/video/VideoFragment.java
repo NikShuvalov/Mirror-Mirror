@@ -15,8 +15,6 @@ import android.widget.ImageButton;
 
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
-import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
-import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.FilterSelectorAdapter;
 
 public class VideoFragment extends Fragment implements View.OnClickListener, FilterSelectorAdapter.FilterSelectorListener {
@@ -58,7 +56,7 @@ public class VideoFragment extends Fragment implements View.OnClickListener, Fil
 
     public void setUpFilterSelector() {
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mFilterRecycler.setAdapter(new FilterSelectorAdapter(this,VideoFilterManager.getInstance().getFilters()));
+        mFilterRecycler.setAdapter(new FilterSelectorAdapter(this,VideoFilterManager.getInstance()));
         mFilterRecycler.setLayoutManager(horizontalLayoutManager);
     }
 
@@ -149,4 +147,14 @@ public class VideoFragment extends Fragment implements View.OnClickListener, Fil
         mVideoOverlay.notifyFilterChange();
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(mVideoOverlay!=null){
+            mVideoOverlay.stopGraphicThread();
+            mOverlayContainer.removeView(mVideoOverlay);
+        }
+        VideoFilterManager.getInstance().clearSelectionIndex();
+    }
 }

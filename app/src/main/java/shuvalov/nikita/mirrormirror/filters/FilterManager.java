@@ -5,29 +5,29 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import shuvalov.nikita.mirrormirror.BaseFilterManager;
 import shuvalov.nikita.mirrormirror.R;
 
 /**
  * Created by NikitaShuvalov on 4/2/17.
  */
 
-public class FilterManager {
-    private ArrayList<Filter> mFilters;
-    private int mCurrentPosition;
+public class FilterManager extends BaseFilterManager{
 
     private FilterManager() {
-        mCurrentPosition=0;
+        super();
         prepareAllImages();
     }
 
     private void prepareAllImages(){
-        mFilters = new ArrayList<>();
-        mFilters.add(null);
-        mFilters.add(new StaticFilter("Instant Beauty", R.drawable.beautify_mirror, Filter.FilterType.FACE,1.1f, 1.2f, 0, 0));
-        mFilters.add(new StaticFilter("Corgi", R.drawable.corgi, Filter.FilterType.FACE,1.1f, 1.2f, 0, 0));
-        mFilters.add(new StaticFilter("Top Hat", R.drawable.top_hat, Filter.FilterType.TOP_OF_HEAD, 1f, 1f, 0, -0.5f));
-        mFilters.add(new StaticFilter("Truompee", R.drawable.trump_toupee, Filter.FilterType.HAIRLINE, 0.85f, 0.4f, 0, -0.35f));
-        mFilters.add(new StaticFilter("Saiyan", R.drawable.super_saiyan, Filter.FilterType.HAIRLINE, 1.75f, 1.5f, 0, -0.5f));
+        ArrayList<Filter> filters = new ArrayList<>();
+        filters.add(null);
+        filters.add(new StaticFilter("Instant Beauty", R.drawable.beautify_mirror, Filter.FilterType.FACE,1.1f, 1.2f, 0, 0));
+        filters.add(new StaticFilter("Corgi", R.drawable.corgi, Filter.FilterType.FACE,1.1f, 1.2f, 0, 0));
+        filters.add(new StaticFilter("Top Hat", R.drawable.top_hat, Filter.FilterType.TOP_OF_HEAD, 1f, 1f, 0, -0.5f));
+        filters.add(new StaticFilter("Truompee", R.drawable.trump_toupee, Filter.FilterType.HAIRLINE, 0.85f, 0.4f, 0, -0.35f));
+        filters.add(new StaticFilter("Saiyan", R.drawable.super_saiyan, Filter.FilterType.HAIRLINE, 1.75f, 1.5f, 0, -0.5f));
+        super.setFilters(filters);
     }
 
     private static FilterManager sFilterManager;
@@ -40,45 +40,10 @@ public class FilterManager {
         return sFilterManager;
     }
 
-    public void moveToNextPosition(){
-        mCurrentPosition++;
-        if(mCurrentPosition>=mFilters.size()){
-            mCurrentPosition=0;
-        }
-    }
-
-    public Filter getSelectedFilter(){
-        return mFilters.get(mCurrentPosition);
-    }
-
-    public ArrayList<Filter> getFilters() {
-        return mFilters;
-    }
-
-    public void setCurrentPosition(int newPosition){
-        mCurrentPosition = newPosition;
-    }
-
-    public int getCurrentPosition() {
-        return mCurrentPosition;
-    }
-
     public void addAnimatedFilters(AnimatedFilter... animatedFilters){
         for(Filter f: animatedFilters){
-            mFilters.add(f);
+            super.addFilter(f);
         }
     }
 
-    public int getCurrentIndex(){
-        return mCurrentPosition;
-    }
-
-    public void clearFilterSelection(){
-        mCurrentPosition = 0;
-    }
-
-    public void dirtyDebuggingCode(Filter f){
-        mFilters.add(f);
-        mCurrentPosition = mFilters.size()-1;
-    }
 }

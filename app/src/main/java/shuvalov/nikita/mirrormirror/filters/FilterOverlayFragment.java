@@ -71,7 +71,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
 
     public void setUpFilterSelector() {
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mFilterRecycler.setAdapter(new FilterSelectorAdapter(this,FilterManager.getInstance().getFilters()));
+        mFilterRecycler.setAdapter(new FilterSelectorAdapter(this,FilterManager.getInstance()));
         mFilterRecycler.setLayoutManager(horizontalLayoutManager);
     }
 
@@ -82,7 +82,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
             mFilterOverlay.stopGraphicThread();
             mOverlayContainer.removeView(mFilterOverlay);
         }
-        FilterManager.getInstance().clearFilterSelection();
+        FilterManager.getInstance().clearSelectionIndex();
     }
 
     public void replaceBottomView(final View viewToHide, final View viewToShow) {
@@ -153,11 +153,11 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onFilterSelected(int i) {
-        FilterManager.getInstance().setCurrentPosition(i);
+        FilterManager.getInstance().setSelectedIndex(i);
         if(mFilterOverlay==null){
             setUpOverlay();
         }
-        FaceTracker.getInstance().setActive(FilterManager.getInstance().getCurrentIndex()>0);
+        FaceTracker.getInstance().setActive(FilterManager.getInstance().getSelectedIndex()>0);
         mFilterOverlay.notifyFilterChange();
     }
 
