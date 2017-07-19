@@ -27,23 +27,22 @@ public class GameOverlay extends BaseOverlay{
     private Paint mScorePaint;
     private Paint mRedPaint;
     private Paint mLinePaint;
-    private Rect mGoalBounds;
     private Path mTrianglePath;
     private static final float TEXT_SIZE = 40f;
     private static final float BOUNDARY_PAINT_WIDTH = 30f;
     private Path mGoalArrowPath, mBallArrowPath;
-
     private float mStartBlinkTime;
     private boolean mStartBlink;
 
     private SoccerEngine mSoccerEngine;
 
-    public GameOverlay(Context context) {
+    public GameOverlay(Context context, Rect screenBounds) {
         super(context);
         createPaints();
         mTrianglePath = new Path();
         mStartBlinkTime = 0;
         mStartBlink = true;
+        setSoccerEngine(new SoccerEngine(screenBounds));//ToDo: Implement lazy initialization.
     }
 
     private void createPaints(){
@@ -95,17 +94,18 @@ public class GameOverlay extends BaseOverlay{
     }
 
     private void createTutorialArrows(){
-        float goalRadius = mGoalBounds.width()/2f;
-        PointF goalArrowOrigin = new PointF(mGoalBounds.centerX() + goalRadius*2, mGoalBounds.centerY());
+        Rect goalBounds = mSoccerEngine.getGoalBounds();
+        float goalRadius = goalBounds.width()/2f;
+        PointF goalArrowOrigin = new PointF(goalBounds.centerX() + goalRadius*2, goalBounds.centerY());
         mGoalArrowPath = new Path();
         mGoalArrowPath.moveTo(goalArrowOrigin.x, goalArrowOrigin.y);
         mGoalArrowPath.rLineTo(goalRadius, goalRadius);
         mGoalArrowPath.rLineTo(0 ,-goalRadius/2);
-        mGoalArrowPath.arcTo(goalArrowOrigin.x, mGoalBounds.centerY() + mGoalBounds.width()/4, goalArrowOrigin.x + goalRadius*2, mGoalBounds.centerY() + mGoalBounds.width()/4 + goalRadius*2,270, 90, false);
+        mGoalArrowPath.arcTo(goalArrowOrigin.x, goalBounds.centerY() + goalBounds.width()/4, goalArrowOrigin.x + goalRadius*2, goalBounds.centerY() + goalBounds.width()/4 + goalRadius*2,270, 90, false);
         mGoalArrowPath.rLineTo(0, goalRadius);
         mGoalArrowPath.rLineTo(goalRadius, 0);
         mGoalArrowPath.rLineTo(0,-goalRadius);
-        mGoalArrowPath.arcTo(goalArrowOrigin.x - goalRadius, mGoalBounds.centerY() - goalRadius/2, goalArrowOrigin.x + goalRadius*3, mGoalBounds.centerY() + mGoalBounds.width()/4 +goalRadius*3, 0,-90,false);
+        mGoalArrowPath.arcTo(goalArrowOrigin.x - goalRadius, goalBounds.centerY() - goalRadius/2, goalArrowOrigin.x + goalRadius*3, goalBounds.centerY() + goalBounds.width()/4 +goalRadius*3, 0,-90,false);
         mGoalArrowPath.rLineTo(0, -goalRadius/2);
         mGoalArrowPath.close();
 
@@ -127,7 +127,8 @@ public class GameOverlay extends BaseOverlay{
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if(canvas!=null) {
+        if(canvas!=null && mSoccerEngine!=null) {
+            Rect goalBounds = mSoccerEngine.getGoalBounds();
             Ball soccerBall = mSoccerEngine.getSoccerBall();
             float soccerBallRadius = (float) soccerBall.getRadius();
             double soccerBallBottom = soccerBall.getCenterY() + soccerBallRadius;
@@ -136,7 +137,7 @@ public class GameOverlay extends BaseOverlay{
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             drawBoundaryLine(canvas);
             drawFaceOutline(canvas);
-            canvas.drawCircle(mGoalBounds.centerX(), mGoalBounds.centerY(), mGoalBounds.width() / 2, mGoalPaint);//Draws goal, aka black hole of death.
+            canvas.drawCircle(goalBounds.centerX(), goalBounds.centerY(), goalBounds.width() / 2, mGoalPaint);//Draws goal, aka black hole of death.
             drawScoreBox(canvas);
             canvas.drawCircle(soccerBallCenterX, soccerBallCenterY, soccerBallRadius, soccerBall.getPaint());
             if (soccerBallBottom <= 0) {
@@ -152,7 +153,7 @@ public class GameOverlay extends BaseOverlay{
                 canvas.drawPath(mBallArrowPath, mArrowPaint);
                 canvas.drawPath(mBallArrowPath, mArrowOutlinePaint);
 
-                canvas.drawText("The Goal", mGoalBounds.centerX () + (int)(mGoalBounds.width()*1.75), mGoalBounds.centerY() + (int)(mGoalBounds.width()*1.25) + TEXT_SIZE, mIdentifierPaint);
+                canvas.drawText("The Goal", goalBounds.centerX () + (int)(goalBounds.width()*1.75), goalBounds.centerY() + (int)(goalBounds.width()*1.25) + TEXT_SIZE, mIdentifierPaint);
                 canvas.drawText("The Ball", soccerBallCenterX - (5 * soccerBallRadius) - TEXT_SIZE, soccerBallCenterY - (5 * soccerBallRadius) - TEXT_SIZE, mIdentifierPaint);
                 drawFaceArrow(canvas,soccerBallRadius);
 
@@ -223,14 +224,13 @@ public class GameOverlay extends BaseOverlay{
         canvas.drawText(scoreText, boxStart + 16, boxMargin+ TEXT_SIZE, mScorePaint);
     }
 
-    public void setSoccerEngine(SoccerEngine soccerEngine){
+    private void setSoccerEngine(SoccerEngine soccerEngine){
         mSoccerEngine = soccerEngine;
-        mGoalBounds = mSoccerEngine.getGoalBounds();
         createTutorialArrows();
     }
 
     public void onScreenClick(){
-        if(mSoccerEngine.isTutorialMode()){
+        if(mSoccerEngine.isTutorialMode()){ //Should the soccer engine handle Tutorial mode at all?
             mSoccerEngine.exitTutorial();
         }else{
             mSoccerEngine.respawnBall();

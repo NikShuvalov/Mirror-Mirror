@@ -11,9 +11,9 @@
         <!--android:id="@+id/particle_option"-->
         <!--android:title="Particle"/>-->
 
-    <!--<item-->
-        <!--android:id="@+id/game_option"-->
-        <!--android:title="Face Game"/>-->
+    <item
+        android:id="@+id/game_option"
+        android:title="Face Game"/>
 
     <item
         android:id="@+id/component_option"

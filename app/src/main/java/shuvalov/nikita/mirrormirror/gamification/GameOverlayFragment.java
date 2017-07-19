@@ -23,7 +23,6 @@ public class GameOverlayFragment extends Fragment implements View.OnClickListene
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static GameOverlayFragment newInstance() {
         return new GameOverlayFragment();
     }
@@ -33,11 +32,8 @@ public class GameOverlayFragment extends Fragment implements View.OnClickListene
         super.onCreate(savedInstanceState);
     }
 
-    public void setUpOverlay(){
-        mGameOverlay = new GameOverlay(getContext());
-        Rect screenBounds = ((MainActivity)getActivity()).getScreenBounds();
-        SoccerEngine soccerEngine = new SoccerEngine(screenBounds);
-        mGameOverlay.setSoccerEngine(soccerEngine);
+    public void setUpOverlay(Rect screenBounds){
+        mGameOverlay = new GameOverlay(getContext(), screenBounds);
         mGameOverlay.setZOrderMediaOverlay(true);
         mOverlayContainer.addView(mGameOverlay);
         mGameOverlay.setOnClickListener(this);
@@ -48,7 +44,8 @@ public class GameOverlayFragment extends Fragment implements View.OnClickListene
                              Bundle savedInstanceState) {
         View gameFragment = inflater.inflate(R.layout.fragment_game_overlay, container, false);
         mOverlayContainer = (FrameLayout)gameFragment.findViewById(R.id.overlay_container);
-        setUpOverlay();
+        Rect screenBounds = new Rect(container.getLeft(),container.getTop(),container.getWidth(), container.getHeight());
+        setUpOverlay(screenBounds);
         return gameFragment;
     }
 

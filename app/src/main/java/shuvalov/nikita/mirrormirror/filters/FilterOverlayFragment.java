@@ -79,8 +79,8 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     public void onPause() {
         super.onPause();
         if(mFilterOverlay!=null) {
-            mFilterOverlay.stopGraphicThread();
             mOverlayContainer.removeView(mFilterOverlay);
+            mFilterOverlay.stopGraphicThread();
         }
         FilterManager.getInstance().clearSelectionIndex();
     }

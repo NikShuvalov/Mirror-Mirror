@@ -280,41 +280,31 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 //                break;
             case R.id.filter_options:
                 mDrawerLayout.closeDrawers();
-                if(mCurrentOverlay == GraphicType.FILTER){
+                if (mCurrentOverlay == GraphicType.FILTER) {
                     Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     mCurrentOverlay = GraphicType.FILTER;
                     notifyOverlayChanged();
                 }
                 break;
-//            case R.id. game_option:
-//                mDrawerLayout.closeDrawers();
-//                if(mCurrentOverlay== GraphicType.GAME){
-//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-//                }else{
-//                    mCurrentOverlay = GraphicType.GAME;
-//                    notifyOverlayChanged();
-//                }
-//                break;
-            case R.id.component_option:
+            case R.id. game_option:
                 mDrawerLayout.closeDrawers();
-                if(mCurrentOverlay == GraphicType.COMPONENT){
+                if(mCurrentOverlay== GraphicType.GAME){
                     Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
                 }else{
+                    mCurrentOverlay = GraphicType.GAME;
+                    notifyOverlayChanged();
+                }
+                break;
+            case R.id.component_option:
+                mDrawerLayout.closeDrawers();
+                if (mCurrentOverlay == GraphicType.COMPONENT) {
+                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+                } else {
                     mCurrentOverlay = GraphicType.COMPONENT;
                     notifyOverlayChanged();
                 }
                 break;
-//            case R.id.video_option:
-//                mDrawerLayout.closeDrawers();
-//
-//                if(mCurrentOverlay == GraphicType.VIDEO){
-//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-//                }else{
-//                    mCurrentOverlay = GraphicType.VIDEO;
-//                    notifyOverlayChanged();
-//                }
-//                break;
         }
         return false;
     }
