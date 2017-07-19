@@ -1,6 +1,7 @@
 package shuvalov.nikita.mirrormirror.video;
 
 
+import android.media.MediaCodec;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,17 +14,27 @@ import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
+import com.google.android.gms.vision.CameraSource;
+
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.filters.FilterSelectorAdapter;
 
-public class VideoFragment extends Fragment implements View.OnClickListener, FilterSelectorAdapter.FilterSelectorListener {
+public class VideoFragment extends Fragment implements View.OnClickListener, FilterSelectorAdapter.FilterSelectorListener, CameraSource.PictureCallback, CameraSource.ShutterCallback{
     private FrameLayout mOverlayContainer;
     private ImageButton mCameraButton, mFilterSelectionButton;
     private RecyclerView mFilterRecycler;
     private View mCameraHud;
     private boolean mFilterSelectorVisible;
     private VideoOverlay mVideoOverlay;
+    private boolean mRecording;
+    private ByteArrayOutputStream mBos;
+    private MediaCodec mMediaCodec;
+
 
     public VideoFragment() {
         // Required empty public constructor
@@ -44,6 +55,9 @@ public class VideoFragment extends Fragment implements View.OnClickListener, Fil
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_video, container, false);
         mFilterSelectorVisible = false;
+        mRecording = false;
+        mBos = new ByteArrayOutputStream();
+        createMediaCodec();
         findViews(view);
         setUpFilterSelector();
         setOnClickListeners();
@@ -53,6 +67,13 @@ public class VideoFragment extends Fragment implements View.OnClickListener, Fil
         return view;
     }
 
+    private void createMediaCodec(){
+        try {
+            mMediaCodec = MediaCodec.createEncoderByType("video/avc");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void setUpFilterSelector() {
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -64,7 +85,7 @@ public class VideoFragment extends Fragment implements View.OnClickListener, Fil
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.camera_button:
-                ((MainActivity)getActivity()).captureImage();
+                startVideoRecording();
                 break;
             case R.id.filter_button:
                 if (!mFilterSelectorVisible) {
@@ -156,5 +177,29 @@ public class VideoFragment extends Fragment implements View.OnClickListener, Fil
             mOverlayContainer.removeView(mVideoOverlay);
         }
         VideoFilterManager.getInstance().clearSelectionIndex();
+    }
+
+    private void startVideoRecording(){
+        CameraSource cameraSource = ((MainActivity)getActivity()).getCameraSource();
+        while(mRecording) { //Set a max FPS so that it doesn't take more frames than necessary.
+            cameraSource.takePicture(this, this);
+        }
+        for(byte b : mBos.toByteArray()){
+
+        }
+    }
+
+    @Override
+    public void onPictureTaken(byte[] bytes) {
+        try {
+            mBos.write(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onShutter() {
+
     }
 }

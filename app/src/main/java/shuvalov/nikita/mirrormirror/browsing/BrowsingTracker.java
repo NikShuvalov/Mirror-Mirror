@@ -1,8 +1,12 @@
 package shuvalov.nikita.mirrormirror.browsing;
 
+import android.util.Log;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by NikitaShuvalov on 4/7/17.
@@ -41,6 +45,7 @@ public class BrowsingTracker {
         if(mCurrentIndex>=mImageFiles.size()){
             mCurrentIndex=0;
         }
+        Log.d(TAG, "moveToNextPicture: " + mCurrentIndex);
     }
 
     public void moveToPreviousPicture(){
@@ -48,6 +53,8 @@ public class BrowsingTracker {
         if(mCurrentIndex<0){
             mCurrentIndex= mImageFiles.size()-1;
         }
+        Log.d(TAG, "moveToPreviousPicture: " + mCurrentIndex);
+
     }
 
     public boolean isAlbumEmpty(){

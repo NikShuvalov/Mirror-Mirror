@@ -20,6 +20,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -33,6 +34,7 @@ import java.io.FileOutputStream;
 
 
 import shuvalov.nikita.mirrormirror.browsing.BrowseFragment;
+import shuvalov.nikita.mirrormirror.browsing.BrowsingActivity;
 import shuvalov.nikita.mirrormirror.camera.CameraSourceGenerator;
 import shuvalov.nikita.mirrormirror.camera.FaceDetectorGenerator;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
@@ -183,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
     @Override
     public void onPictureTaken(byte[] bytes) {
+        Log.d("Pic", "onPictureTaken: Bytes " + bytes.length);
         try {
             File mirrorFolder = new File(AppConstants.getImageDirectoryPath());
             if (!mirrorFolder.exists()) {
@@ -257,24 +260,24 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
             case R.id.browse_option:
                 mDrawerLayout.closeDrawers();
-                if(mCurrentOverlay == GraphicType.BROWSE){
-                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-                }else{
-                    mCurrentOverlay = GraphicType.BROWSE;
-                    notifyOverlayChanged();
-                }
-//                Intent browseIntent = new Intent(this, BrowsingActivity.class);
-//                startActivity(browseIntent);
+//                if(mCurrentOverlay == GraphicType.BROWSE){
+//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+//                }else{
+//                    mCurrentOverlay = GraphicType.BROWSE;
+//                    notifyOverlayChanged();
+//                }
+                Intent browseIntent = new Intent(this, BrowsingActivity.class);
+                startActivity(browseIntent);
                 break;
-            case R.id.particle_option:
-                mDrawerLayout.closeDrawers();
-                if(mCurrentOverlay==GraphicType.PARTICLE){
-                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-                }else{
-                    mCurrentOverlay = GraphicType.PARTICLE;
-                    notifyOverlayChanged();
-                }
-                break;
+//            case R.id.particle_option:
+//                mDrawerLayout.closeDrawers();
+//                if(mCurrentOverlay==GraphicType.PARTICLE){
+//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+//                }else{
+//                    mCurrentOverlay = GraphicType.PARTICLE;
+//                    notifyOverlayChanged();
+//                }
+//                break;
             case R.id.filter_options:
                 mDrawerLayout.closeDrawers();
                 if(mCurrentOverlay == GraphicType.FILTER){
@@ -284,15 +287,15 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                     notifyOverlayChanged();
                 }
                 break;
-            case R.id. game_option:
-                mDrawerLayout.closeDrawers();
-                if(mCurrentOverlay== GraphicType.GAME){
-                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-                }else{
-                    mCurrentOverlay = GraphicType.GAME;
-                    notifyOverlayChanged();
-                }
-                break;
+//            case R.id. game_option:
+//                mDrawerLayout.closeDrawers();
+//                if(mCurrentOverlay== GraphicType.GAME){
+//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+//                }else{
+//                    mCurrentOverlay = GraphicType.GAME;
+//                    notifyOverlayChanged();
+//                }
+//                break;
             case R.id.component_option:
                 mDrawerLayout.closeDrawers();
                 if(mCurrentOverlay == GraphicType.COMPONENT){
@@ -302,16 +305,16 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                     notifyOverlayChanged();
                 }
                 break;
-            case R.id.video_option:
-                mDrawerLayout.closeDrawers();
-
-                if(mCurrentOverlay == GraphicType.VIDEO){
-                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-                }else{
-                    mCurrentOverlay = GraphicType.VIDEO;
-                    notifyOverlayChanged();
-                }
-                break;
+//            case R.id.video_option:
+//                mDrawerLayout.closeDrawers();
+//
+//                if(mCurrentOverlay == GraphicType.VIDEO){
+//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+//                }else{
+//                    mCurrentOverlay = GraphicType.VIDEO;
+//                    notifyOverlayChanged();
+//                }
+//                break;
         }
         return false;
     }
@@ -351,5 +354,10 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
     public enum GraphicType{
         PARTICLE, FILTER, GAME, COMPONENT, BROWSE, VIDEO
+    }
+
+    //Create a presenter class for the camera
+    public CameraSource getCameraSource(){
+        return mCameraSource;
     }
 }

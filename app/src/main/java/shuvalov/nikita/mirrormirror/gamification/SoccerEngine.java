@@ -52,6 +52,7 @@ public class SoccerEngine {
     private boolean mIsSurvivalMode;
     private boolean mBallHit, mBallDisappearing, mGoalMoving;
     private boolean mTutorialMode;
+    private boolean mActive;
     private long mLastUpdateTime;
     private PointF[] mGoalInterpolation;
     private int mGoalIndex;
