@@ -6,18 +6,19 @@ import android.view.SurfaceHolder;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import shuvalov.nikita.mirrormirror.GraphicThreadManager;
+
 /**
  * Created by NikitaShuvalov on 3/31/17.
  */
 
 public class GraphicThread extends Thread {
-    private final SurfaceHolder mSurfaceHolder;
-    private BaseOverlay mOverlayMod;
     private AtomicBoolean mStop = new AtomicBoolean();
 
-    public GraphicThread(SurfaceHolder surfaceHolder, BaseOverlay overlayMod) {
-        mSurfaceHolder = surfaceHolder;
-        mOverlayMod = overlayMod;
+    private GraphicThreadManager mGraphicThreadManager;
+
+    public GraphicThread(GraphicThreadManager graphicThreadManager) {
+        mGraphicThreadManager = graphicThreadManager;
         mStop.set(false);
     }
 
@@ -27,13 +28,16 @@ public class GraphicThread extends Thread {
         while(!mStop.get()){
             Canvas c = null;
             try{
-                c = mSurfaceHolder.lockCanvas();
-                synchronized (mSurfaceHolder){
-                    if(!mStop.get()) mOverlayMod.onDraw(c);
+                c = mGraphicThreadManager.getSurfaceHolder().lockCanvas();
+                synchronized (mGraphicThreadManager.getSurfaceHolder()){
+                    if(!mStop.get() && mGraphicThreadManager.getBaseOverlay()!=null) mGraphicThreadManager.getBaseOverlay().onDraw(c);
                 }
             }finally {
-                if(c != null)mSurfaceHolder.unlockCanvasAndPost(c);
+                if(c != null)mGraphicThreadManager.getSurfaceHolder().unlockCanvasAndPost(c);
             }
+        }
+        if(mStop.get()){
+            mGraphicThreadManager.release();
         }
     }
 

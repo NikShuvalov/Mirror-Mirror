@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
         mCurrentOverlay = GraphicType.FILTER;
         //toDo: Should put a static image for animated filters to put in the recycler.
+
+        //FixMe: Not sure why filterManager is referenced at all here. MainActivity doesn't use it at all, besides for adding a filter.
         AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
         FilterManager.getInstance().addAnimatedFilters(f);
     }
@@ -141,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("");
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_closed);
-        mDrawerLayout.setDrawerListener(toggle);
+        mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
 
@@ -331,12 +333,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, VideoFragment.newInstance()).commit();
                 break;
         }
-    }
-
-    public Rect getScreenBounds(){
-        Rect displayRect = new Rect();
-        mPreviewContainer.getHitRect(displayRect);
-        return displayRect;
     }
 
     @Override

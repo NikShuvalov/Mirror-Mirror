@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import shuvalov.nikita.mirrormirror.GraphicThreadManager;
 import shuvalov.nikita.mirrormirror.overlay.GraphicThread;
 
 /**
@@ -14,8 +15,8 @@ import shuvalov.nikita.mirrormirror.overlay.GraphicThread;
  */
 
 public abstract class BaseOverlay extends SurfaceView implements SurfaceHolder.Callback {
-
     private GraphicThread mGraphicThread;
+    private GraphicThreadManager mGraphicThreadManager;
 
     public BaseOverlay(Context context) {
         super(context);
@@ -26,7 +27,13 @@ public abstract class BaseOverlay extends SurfaceView implements SurfaceHolder.C
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if(mGraphicThread!=null) {return;}
-        mGraphicThread= new GraphicThread(surfaceHolder, this);
+        if(mGraphicThreadManager==null){
+            mGraphicThreadManager = new GraphicThreadManager(this, surfaceHolder);
+        }else{
+            mGraphicThreadManager.setValues(this, surfaceHolder);
+            Log.d("???", "I don't know if this is can ever happen");
+        }
+        mGraphicThread= new GraphicThread(mGraphicThreadManager);
         mGraphicThread.start();
     }
 
@@ -36,6 +43,7 @@ public abstract class BaseOverlay extends SurfaceView implements SurfaceHolder.C
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
     }
 
     @Override
