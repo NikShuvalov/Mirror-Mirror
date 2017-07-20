@@ -14,6 +14,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
@@ -29,6 +30,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     private ImageButton mCameraButton, mFilterSelectionButton;
     private View mCameraHud;
     public boolean mFilterSelectorVisible;
+    private ImageButton mGameOption, mBrowseOption;
 
     public FilterOverlayFragment() {
         // Required empty public constructor
@@ -59,11 +61,15 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mOverlayContainer.setOnClickListener(this);
         mCameraButton.setOnClickListener(this);
         mFilterSelectionButton.setOnClickListener(this);
+        mBrowseOption.setOnClickListener(this);
+        mGameOption.setOnClickListener(this);
     }
 
     public void findViews(View v){
         mCameraButton = (ImageButton) v.findViewById(R.id.camera_button);
         mFilterSelectionButton = (ImageButton) v.findViewById(R.id.filter_button);
+        mGameOption = (ImageButton) v.findViewById(R.id.game_option);
+        mBrowseOption = (ImageButton)v.findViewById(R.id.browse_option);
         mOverlayContainer = (FrameLayout) v.findViewById(R.id.overlay_container);
         mFilterRecycler = (RecyclerView) v.findViewById(R.id.filters_recycler);
         mCameraHud = v.findViewById(R.id.camera_hud);
@@ -96,7 +102,11 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
             @Override
             public void onAnimationEnd(Animation animation) {
                 viewToHide.clearAnimation();
-                showView(viewToShow);
+                if(viewToShow!=null) {
+                    showView(viewToShow);
+                }else{
+                    ((MainActivity)getActivity()).notifyOverlayChanged();
+                }
             }
 
             @Override
@@ -146,6 +156,18 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
                 if(mFilterSelectorVisible) {
                     replaceBottomView(mFilterRecycler, mCameraHud);
                     mFilterSelectorVisible = false;
+                }
+                break;
+            case R.id.browse_option:
+                ((MainActivity)getActivity()).changeOverlay(MainActivity.GraphicType.BROWSE);
+                replaceBottomView(mCameraHud, null);
+                break;
+            case R.id.game_option:
+                ((MainActivity)getActivity()).changeOverlay(MainActivity.GraphicType.GAME);
+                if(mFilterSelectorVisible) {
+                    replaceBottomView(mFilterRecycler, null);
+                }else{
+                    replaceBottomView(mCameraHud, null);
                 }
                 break;
         }

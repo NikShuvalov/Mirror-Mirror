@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         mCurrentOverlay = GraphicType.FILTER;
         //toDo: Should put a static image for animated filters to put in the recycler.
 
-        //FixMe: Not sure why filterManager is referenced at all here. MainActivity doesn't use it at all, besides for adding a filter.
+        //FixMe: Not sure why filterManager is referenced at all here. MainActivity doesn't use it at all, besides for adding a filter; It's because gettingBitMapList requires context.
         AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
         FilterManager.getInstance().addAnimatedFilters(f);
     }
@@ -329,17 +329,18 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
             case BROWSE:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, BrowseFragment.newInstance()).commit();
                 break;
-            case VIDEO:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, VideoFragment.newInstance()).commit();
-                break;
         }
+    }
+
+    public void changeOverlay(GraphicType graphicType){
+        mCurrentOverlay = graphicType;
     }
 
     @Override
     public void onShutter() {}
 
     public enum GraphicType{
-        PARTICLE, FILTER, GAME, COMPONENT, BROWSE, VIDEO
+        PARTICLE, FILTER, GAME, COMPONENT, BROWSE
     }
 
     //Create a presenter class for the camera
