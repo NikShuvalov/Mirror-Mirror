@@ -54,7 +54,7 @@
             android:layout_alignBottom="@id/filter_button"
             android:scaleType="fitXY"
             android:contentDescription="Opens Additional options"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/more_button_selector"
             />
 

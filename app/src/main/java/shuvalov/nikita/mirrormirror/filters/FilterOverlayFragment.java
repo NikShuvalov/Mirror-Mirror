@@ -195,4 +195,16 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mOverlayContainer.addView(mFilterOverlay);
     }
 
+    public boolean onBackPressed(){
+        if(mSelectorVisible){
+            replaceBottomView(mFilterRecycler.getVisibility() == View.VISIBLE ?
+                            mFilterRecycler : mAdditionalOptsHud,
+                    mCameraHud);
+            mSelectorVisible = false;
+            return true;
+        }
+        return false;
+
+    }
+
 }

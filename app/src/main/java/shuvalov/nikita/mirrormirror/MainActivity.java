@@ -13,16 +13,11 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
-import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -34,7 +29,6 @@ import java.io.FileOutputStream;
 
 
 import shuvalov.nikita.mirrormirror.browsing.BrowseFragment;
-import shuvalov.nikita.mirrormirror.browsing.BrowsingActivity;
 import shuvalov.nikita.mirrormirror.camera.CameraSourceGenerator;
 import shuvalov.nikita.mirrormirror.camera.FaceDetectorGenerator;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
@@ -46,21 +40,19 @@ import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.FilterOverlayFragment;
 import shuvalov.nikita.mirrormirror.filters.particles.ParticleOverlayFragment;
 import shuvalov.nikita.mirrormirror.gamification.GameOverlayFragment;
-import shuvalov.nikita.mirrormirror.video.VideoFragment;
 
 
-public class MainActivity extends AppCompatActivity implements  CameraSource.PictureCallback, CameraSource.ShutterCallback, NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements  CameraSource.PictureCallback, CameraSource.ShutterCallback{
     private FrameLayout mPreviewContainer;
     private Preview mPreview;
     private int mViewWidth, mViewHeight;
     public static final int CAMERA_PERMISSION_REQUEST = 9999;
     public static final int STORAGE_PERMISSION_REQUEST = 2;
-    private DrawerLayout mDrawerLayout;
-    private NavigationView mNavView;
-    private Toolbar mToolbar;
     public CameraSource mCameraSource;
     private FaceDetector mFaceDetector;
     public GraphicType mCurrentOverlay;
+
+    public static final String MAIN_FRAGMENT = "Main Fragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,24 +126,11 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     }
 
     public void setUp() {
-        setUpNavigationDrawer();
         mPreviewContainer.addView(mPreview);
-    }
-
-    public void setUpNavigationDrawer() {
-        mNavView.setNavigationItemSelectedListener(this);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("");
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.drawer_open, R.string.drawer_closed);
-        mDrawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
     }
 
     public void findViews() {
         mPreviewContainer = (FrameLayout) findViewById(R.id.preview);
-        mNavView = (NavigationView) findViewById(R.id.navigation_view);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
     }
 
     @Override
@@ -251,65 +230,65 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         startActivity(Intent.createChooser(intent, "View with..."));
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-
-            //ToDo: Consider whether or not it's worth changing Browsing into a fragment; Camerasource is still active in background.
-            //I can either stop the cameraSource and have it restart once we return to a fragment that requires it
-            // OR
-            // Go back to the previous architecture where browsing was an activity.
-
-            case R.id.browse_option:
-                mDrawerLayout.closeDrawers();
-//                if(mCurrentOverlay == GraphicType.BROWSE){
-//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-//                }else{
-//                    mCurrentOverlay = GraphicType.BROWSE;
-//                    notifyOverlayChanged();
-//                }
-                Intent browseIntent = new Intent(this, BrowsingActivity.class);
-                startActivity(browseIntent);
-                break;
-//            case R.id.particle_option:
+//    @Override
+//    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//        switch (item.getItemId()) {
+//
+//            //ToDo: Consider whether or not it's worth changing Browsing into a fragment; Camerasource is still active in background.
+//            //I can either stop the cameraSource and have it restart once we return to a fragment that requires it
+//            // OR
+//            // Go back to the previous architecture where browsing was an activity.
+//
+//            case R.id.browse_option:
 //                mDrawerLayout.closeDrawers();
-//                if(mCurrentOverlay==GraphicType.PARTICLE){
+////                if(mCurrentOverlay == GraphicType.BROWSE){
+////                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+////                }else{
+////                    mCurrentOverlay = GraphicType.BROWSE;
+////                    notifyOverlayChanged();
+////                }
+//                Intent browseIntent = new Intent(this, BrowsingActivity.class);
+//                startActivity(browseIntent);
+//                break;
+////            case R.id.particle_option:
+////                mDrawerLayout.closeDrawers();
+////                if(mCurrentOverlay==GraphicType.PARTICLE){
+////                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+////                }else{
+////                    mCurrentOverlay = GraphicType.PARTICLE;
+////                    notifyOverlayChanged();
+////                }
+////                break;
+//            case R.id.filter_options:
+//                mDrawerLayout.closeDrawers();
+//                if (mCurrentOverlay == GraphicType.FILTER) {
 //                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-//                }else{
-//                    mCurrentOverlay = GraphicType.PARTICLE;
+//                } else {
+//                    mCurrentOverlay = GraphicType.FILTER;
 //                    notifyOverlayChanged();
 //                }
 //                break;
-            case R.id.filter_options:
-                mDrawerLayout.closeDrawers();
-                if (mCurrentOverlay == GraphicType.FILTER) {
-                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-                } else {
-                    mCurrentOverlay = GraphicType.FILTER;
-                    notifyOverlayChanged();
-                }
-                break;
-            case R.id. game_option:
-                mDrawerLayout.closeDrawers();
-                if(mCurrentOverlay== GraphicType.GAME){
-                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-                }else{
-                    mCurrentOverlay = GraphicType.GAME;
-                    notifyOverlayChanged();
-                }
-                break;
-            case R.id.component_option:
-                mDrawerLayout.closeDrawers();
-                if (mCurrentOverlay == GraphicType.COMPONENT) {
-                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-                } else {
-                    mCurrentOverlay = GraphicType.COMPONENT;
-                    notifyOverlayChanged();
-                }
-                break;
-        }
-        return false;
-    }
+//            case R.id. game_option:
+//                mDrawerLayout.closeDrawers();
+//                if(mCurrentOverlay== GraphicType.GAME){
+//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+//                }else{
+//                    mCurrentOverlay = GraphicType.GAME;
+//                    notifyOverlayChanged();
+//                }
+//                break;
+//            case R.id.component_option:
+//                mDrawerLayout.closeDrawers();
+//                if (mCurrentOverlay == GraphicType.COMPONENT) {
+//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    mCurrentOverlay = GraphicType.COMPONENT;
+//                    notifyOverlayChanged();
+//                }
+//                break;
+//        }
+//        return false;
+//    }
 
     public void notifyOverlayChanged(){
         FaceTracker.getInstance().changeDetectionMode(mCurrentOverlay);
@@ -318,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ParticleOverlayFragment.newInstance()).commit();
                 break;
             case FILTER:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, FilterOverlayFragment.newInstance()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, FilterOverlayFragment.newInstance(), MAIN_FRAGMENT).commit();
                 break;
             case GAME:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, GameOverlayFragment.newInstance()).commit();
@@ -346,5 +325,22 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     //Create a presenter class for the camera
     public CameraSource getCameraSource(){
         return mCameraSource;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mCurrentOverlay == GraphicType.FILTER) {
+            FilterOverlayFragment frag = (FilterOverlayFragment)getSupportFragmentManager().findFragmentByTag(MAIN_FRAGMENT);
+            if(frag.isVisible()){
+                if(!frag.onBackPressed()){
+                    super.onBackPressed();
+                }
+            }else {
+                super.onBackPressed();
+            }
+        }else{
+            mCurrentOverlay = GraphicType.FILTER;
+            notifyOverlayChanged();
+        }
     }
 }
