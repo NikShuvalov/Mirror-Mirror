@@ -30,19 +30,12 @@ import shuvalov.nikita.mirrormirror.R;
 
 
 public class BrowseFragment extends Fragment implements View.OnClickListener, BrowseSwipeListener.OnSwipeListener{
-
-
-
     private ImageView mImageView;
     private static final int READ_STORAGE_REQUEST = 42;
     private BrowsingTracker mBrowsingTracker;
     private RelativeLayout mBottomPanel;
     private ImageButton mShareButton;
     private boolean mPanelShowing;
-
-
-
-
 
     public void findViews(View fragment){
         mImageView = (ImageView)fragment.findViewById(R.id.image_view);
@@ -51,15 +44,12 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
         mImageView.setOnTouchListener(new BrowseSwipeListener(this));
     }
 
-
-
-
     public BrowseFragment() {
         // Required empty public constructor
     }
 
     public static BrowseFragment newInstance() {
-        return  new BrowseFragment();
+        return new BrowseFragment();
 
     }
 
@@ -210,7 +200,11 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
             File firstFile = mBrowsingTracker.getCurrentImageFile();
             try {
                 Bitmap bitmap = BitmapFactory.decodeFile(firstFile.getAbsolutePath());
-                mImageView.setImageBitmap(bitmap);
+                if(bitmap==null){
+                    mImageView.setImageResource(R.drawable.beautify_mirror);
+                }else{
+                    mImageView.setImageBitmap(bitmap);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

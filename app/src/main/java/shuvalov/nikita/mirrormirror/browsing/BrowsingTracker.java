@@ -45,7 +45,6 @@ public class BrowsingTracker {
         if(mCurrentIndex>=mImageFiles.size()){
             mCurrentIndex=0;
         }
-        Log.d(TAG, "moveToNextPicture: " + mCurrentIndex);
     }
 
     public void moveToPreviousPicture(){
@@ -53,8 +52,6 @@ public class BrowsingTracker {
         if(mCurrentIndex<0){
             mCurrentIndex= mImageFiles.size()-1;
         }
-        Log.d(TAG, "moveToPreviousPicture: " + mCurrentIndex);
-
     }
 
     public boolean isAlbumEmpty(){

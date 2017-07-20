@@ -26,7 +26,6 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -277,7 +276,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     }
 
     private void verifyWithUser(final Bitmap bitmap){
-
         final AlertDialog alertDialog = new AlertDialog.Builder(this).setView(R.layout.picture_confirmation).create();
         alertDialog.show();
         ImageButton confirm = (ImageButton)alertDialog.findViewById(R.id.confirm_picture);
