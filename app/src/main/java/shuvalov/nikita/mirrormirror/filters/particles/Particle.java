@@ -125,7 +125,6 @@ public class Particle {
         return mStartY;
     }
 
-    //ToDo: Add a buffer of space to allow the particle to go off screen cause it might be able to come back on screen.
     public boolean isOutOfBounds(Rect screenBounds){
         return !screenBounds.contains((int)mXLoc, (int)mYLoc);
     }

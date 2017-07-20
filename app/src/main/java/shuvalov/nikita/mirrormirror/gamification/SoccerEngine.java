@@ -192,7 +192,7 @@ public class SoccerEngine {
             if (facePassedThroughBall) {
                 mBallHit = true;
                 if (mSoccerBall.getYSpeed() > 0) {
-                    if (mIsSurvivalMode) { //ToDo: Need to remove bounceFriction as well, except for maybe the side bounces.
+                    if (mIsSurvivalMode) {
                         verticalBallBounce((int) mFaceRect.top, bottomOfBall, 0);
                     } else {
                         verticalBallBounce((int) mFaceRect.top, bottomOfBall, calculateOpposingForce(elapsedTime, mPreviousRectPositions[3].top, mFaceRect.top));
@@ -405,7 +405,6 @@ public class SoccerEngine {
     }
 
     public void spawnNewGoal(){
-        //ToDo: Remove this if I Don't plan on using interpolater for whatever reason or decide to do some thingy of sort.
         if(mGoalBounds!=null) {
             Random rng = new Random();
             int spawnX = rng.nextInt(mScreenBounds.width()- (int)mSoccerRadius*2) + (int)mSoccerRadius;

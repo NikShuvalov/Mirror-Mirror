@@ -24,7 +24,6 @@ import shuvalov.nikita.mirrormirror.filters.FilterManager;
  */
 
 
-//ToDO: Add a variable to hold the position above the head?
 public class FaceTracker extends Tracker<Face>{
     private int mScreenWidth, mScreenHeight;
     private RectF mFaceRect;
@@ -138,7 +137,7 @@ public class FaceTracker extends Tracker<Face>{
         mRightEyeOpen = face.getIsRightEyeOpenProbability()>.70;
         calculateEyeLength(face);
         storeLandmarkPositions(face);
-        deduceIfMouthIsOpen(face);
+//        deduceIfMouthIsOpen(face);
     }
 
     private void storeLandmarkPositions(Face face){

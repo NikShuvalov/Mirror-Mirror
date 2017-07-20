@@ -42,7 +42,7 @@ public class GameOverlay extends BaseOverlay{
         mTrianglePath = new Path();
         mStartBlinkTime = 0;
         mStartBlink = true;
-        setSoccerEngine(new SoccerEngine(screenBounds));//ToDo: Implement lazy initialization.
+        setSoccerEngine(new SoccerEngine(screenBounds));
     }
 
     private void createPaints(){

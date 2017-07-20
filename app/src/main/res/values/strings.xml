@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Mirror Mirror</string>
-    <string name="drawer_open">Drawer opened</string>
-    <string name="drawer_closed">Drawer closed</string>
 
     <integer-array name="flame_animation_list">
         <item>@drawable/flamekey0</item>
@@ -26,7 +24,5 @@
         <item>@drawable/note_quarter_upside</item>
     </integer-array>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

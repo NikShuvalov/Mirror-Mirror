@@ -25,8 +25,7 @@ public class ParticleEngine {
     private PointF mCurrentPosition, mPreviousPosition;
     public static final int FACE_CACHE_SIZE = 10;
     private double mFaceXShift, mFaceYShift, mCumulativeXShift, mCumulativeYShift;
-    private static final double MAX_REPULSION_FORCE = 30; //ToDo: Adjust as necessary.
-    private int[] mParticleResourceImages;
+    private static final double MAX_REPULSION_FORCE = 30;
     private boolean mActive;
 
 
@@ -40,7 +39,6 @@ public class ParticleEngine {
         SNOWGLOBE, OSCILLATING, SIMPLE, RADIATING
     }
 
-    //ToDo: Have particles that are below a certain size(aka distance) not appear when within the bounds of the face
     // to give an effect of the particles traveling behind the face. Then have them come back into existance once they leave the bounds of the face?
     public ParticleEngine(PhysicsType physicsType, Rect screenBounds, @Nullable RectF faceRect) {
         mParticles = new ArrayList<>();
@@ -123,7 +121,6 @@ public class ParticleEngine {
             double scaledXSpeed = p.getXVel() * p.getScale();
             double xDisplacement = scaledXSpeed * (elapsedTime / Particle.REFRESH_RATE);
 
-            //ToDo: Add faceShifts to displacement?
             p.translatePosition(xDisplacement, yDisplacement);
             if (p.isOutOfBounds(mScreenBounds)) {
                 resetParticle(p);

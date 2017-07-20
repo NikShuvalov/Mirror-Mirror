@@ -14,14 +14,15 @@ import java.util.Random;
 public class AnimatedFilter extends Filter {
     private List<Bitmap> mAnimationList;
     private int mIndex;
-    private long mLastFrameMillis, mMillisPerFrame;
+    private long mLastFrameMillis;
+
+    private static final int MILLIS_PER_FRAME = 200;
 
 
     public AnimatedFilter(String filterName, int resourceInt, FilterType filterType, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent, List<Bitmap> animationList) {
         super(filterName, resourceInt, filterType, scaleX, scaleY, offsetXPercent, offsetYPercent);
         mAnimationList = animationList;
         mIndex = 0;
-        mMillisPerFrame = 200; //ToDo: Change from hard-coded value.
         mLastFrameMillis = 0;
     }
 
@@ -30,7 +31,7 @@ public class AnimatedFilter extends Filter {
         if(mLastFrameMillis == 0){
             mLastFrameMillis = currentMillis;
         }
-        else if(mLastFrameMillis+mMillisPerFrame<currentMillis){
+        else if(mLastFrameMillis+MILLIS_PER_FRAME<currentMillis){
             moveToNextFrame();
             mLastFrameMillis = currentMillis;
         }

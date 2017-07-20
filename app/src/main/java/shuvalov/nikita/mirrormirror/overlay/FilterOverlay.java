@@ -41,7 +41,6 @@ public class FilterOverlay extends BaseOverlay{
         canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
         if(face!=null && mBitmap!=null){
             face.round(mRect);
-            //ToDo: Consider just checking if we're using an animated filter here if issues arise. But for now it seems it would be more optimal if we update the boolean on filter change.
             if(mUsingAnimated){
                 mBitmap = FilterManager.getInstance().getSelectedFilter().getBitmap(SystemClock.uptimeMillis());
             }

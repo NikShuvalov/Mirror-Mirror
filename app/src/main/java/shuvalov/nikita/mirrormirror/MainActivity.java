@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         setContentView(R.layout.activity_main);
 
         mCurrentOverlay = GraphicType.FILTER;
-        //toDo: Should put a static image for animated filters to put in the recycler.
 
         //FixMe: Not sure why filterManager is referenced at all here. MainActivity doesn't use it at all, besides for adding a filter; It's because gettingBitMapList requires context.
         AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
@@ -166,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
     @Override
     public void onPictureTaken(byte[] bytes) {
-        Log.d("Pic", "onPictureTaken: Bytes " + bytes.length);
         try {
             File mirrorFolder = new File(AppConstants.getImageDirectoryPath());
             if (!mirrorFolder.exists()) {
@@ -190,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
             outputStream.flush();
             outputStream.close();
-            openScreenshot(imageFile);
+//            openScreenshot(imageFile);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -222,72 +220,12 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         return drawnTogether;
     }
 
-    public void openScreenshot(File imageFile) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        Uri uri = Uri.fromFile(imageFile);
-        intent.setDataAndType(uri, "image/*");
-        startActivity(Intent.createChooser(intent, "View with..."));
-    }
-
-//    @Override
-//    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//        switch (item.getItemId()) {
-//
-//            //ToDo: Consider whether or not it's worth changing Browsing into a fragment; Camerasource is still active in background.
-//            //I can either stop the cameraSource and have it restart once we return to a fragment that requires it
-//            // OR
-//            // Go back to the previous architecture where browsing was an activity.
-//
-//            case R.id.browse_option:
-//                mDrawerLayout.closeDrawers();
-////                if(mCurrentOverlay == GraphicType.BROWSE){
-////                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-////                }else{
-////                    mCurrentOverlay = GraphicType.BROWSE;
-////                    notifyOverlayChanged();
-////                }
-//                Intent browseIntent = new Intent(this, BrowsingActivity.class);
-//                startActivity(browseIntent);
-//                break;
-////            case R.id.particle_option:
-////                mDrawerLayout.closeDrawers();
-////                if(mCurrentOverlay==GraphicType.PARTICLE){
-////                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-////                }else{
-////                    mCurrentOverlay = GraphicType.PARTICLE;
-////                    notifyOverlayChanged();
-////                }
-////                break;
-//            case R.id.filter_options:
-//                mDrawerLayout.closeDrawers();
-//                if (mCurrentOverlay == GraphicType.FILTER) {
-//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    mCurrentOverlay = GraphicType.FILTER;
-//                    notifyOverlayChanged();
-//                }
-//                break;
-//            case R.id. game_option:
-//                mDrawerLayout.closeDrawers();
-//                if(mCurrentOverlay== GraphicType.GAME){
-//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-//                }else{
-//                    mCurrentOverlay = GraphicType.GAME;
-//                    notifyOverlayChanged();
-//                }
-//                break;
-//            case R.id.component_option:
-//                mDrawerLayout.closeDrawers();
-//                if (mCurrentOverlay == GraphicType.COMPONENT) {
-//                    Toast.makeText(this, "Already there", Toast.LENGTH_SHORT).show();
-//                } else {
-//                    mCurrentOverlay = GraphicType.COMPONENT;
-//                    notifyOverlayChanged();
-//                }
-//                break;
-//        }
-//        return false;
+//    public void openScreenshot(File imageFile) {
+//        Intent intent = new Intent();
+//        intent.setAction(Intent.ACTION_VIEW);
+//        Uri uri = Uri.fromFile(imageFile);
+//        intent.setDataAndType(uri, "image/*");
+//        startActivity(Intent.createChooser(intent, "View with..."));
 //    }
 
     public void notifyOverlayChanged(){
