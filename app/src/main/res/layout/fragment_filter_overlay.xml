@@ -12,18 +12,8 @@
     <include
         layout="@layout/camera_options_hud"/>
 
-    <ImageButton
-        android:id="@+id/game_option"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:scaleType="fitXY"
-        android:contentDescription="Game Button"
-        android:layout_marginTop="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@drawable/game_button_selector"
-        />
+    <include
+        layout="@layout/hud_additional_options"/>
 
 
 </RelativeLayout>

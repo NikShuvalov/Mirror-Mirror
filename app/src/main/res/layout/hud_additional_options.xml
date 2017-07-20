@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/additional_options"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="invisible">
+
+    <ImageButton
+        android:id="@+id/game_option"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:scaleType="fitXY"
+        android:contentDescription="Game Button"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/game_button_selector"
+        />
+
+    <ImageButton
+        android:id="@+id/duple_filter_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignTop="@id/game_option"
+        android:layout_alignBottom="@id/game_option"
+        android:scaleType="fitXY"
+        android:contentDescription="Open Filter Choices"
+        android:background="@drawable/filter_button_selector"
+        />
+
+    <ImageButton
+        android:id="@+id/browse_option"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@id/game_option"
+        android:layout_alignBottom="@id/game_option"
+        android:scaleType="fitXY"
+        android:contentDescription="Opens Picture Browsing"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/browse_button_selector"
+        />
+
+</RelativeLayout>

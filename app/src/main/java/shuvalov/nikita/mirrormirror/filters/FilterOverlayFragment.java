@@ -1,12 +1,10 @@
 package shuvalov.nikita.mirrormirror.filters;
 
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,22 +12,19 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
-import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
-import shuvalov.nikita.mirrormirror.overlay.ParticleOverlay;
 
 public class FilterOverlayFragment extends Fragment implements View.OnClickListener, FilterSelectorAdapter.FilterSelectorListener {
     private FrameLayout mOverlayContainer;
     private FilterOverlay mFilterOverlay;
     private RecyclerView mFilterRecycler;
-    private ImageButton mCameraButton, mFilterSelectionButton, mMoreButton;
-    private View mCameraHud;
-    public boolean mFilterSelectorVisible;
+    private ImageButton mCameraButton, mFilterSelectionButton, mMoreButton, mDupleFilterSelButton;
+    private View mCameraHud, mAdditionalOptsHud;
+    public boolean mSelectorVisible;
     private ImageButton mGameOption, mBrowseOption;
 
     public FilterOverlayFragment() {
@@ -50,7 +45,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View filterFragment = inflater.inflate(R.layout.fragment_filter_overlay, container, false);
-        mFilterSelectorVisible = false;
+        mSelectorVisible = false;
         findViews(filterFragment);
         setUpFilterSelector();
         setOnClickListeners();
@@ -64,6 +59,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mBrowseOption.setOnClickListener(this);
         mGameOption.setOnClickListener(this);
         mMoreButton.setOnClickListener(this);
+        mDupleFilterSelButton.setOnClickListener(this);
     }
 
     public void findViews(View v){
@@ -73,8 +69,10 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mBrowseOption = (ImageButton)v.findViewById(R.id.browse_option);
         mOverlayContainer = (FrameLayout) v.findViewById(R.id.overlay_container);
         mFilterRecycler = (RecyclerView) v.findViewById(R.id.filters_recycler);
-        mCameraHud = v.findViewById(R.id.camera_hud);
         mMoreButton = (ImageButton) v.findViewById(R.id.more_options);
+        mDupleFilterSelButton = (ImageButton)v.findViewById(R.id.duple_filter_button);
+        mCameraHud = v.findViewById(R.id.camera_hud);
+        mAdditionalOptsHud = v.findViewById(R.id.additional_options);
     }
 
     public void setUpFilterSelector() {
@@ -149,28 +147,34 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
                 ((MainActivity)getActivity()).captureImage();
                 break;
             case R.id.filter_button:
-                if (!mFilterSelectorVisible) {
+                if (!mSelectorVisible) {
                     replaceBottomView(mCameraHud, mFilterRecycler);
-                    mFilterSelectorVisible = true;
+                    mSelectorVisible = true;
                 }
                 break;
             case R.id.overlay_container:
-                if(mFilterSelectorVisible) {
-                    replaceBottomView(mFilterRecycler, mCameraHud);
-                    mFilterSelectorVisible = false;
+                if(mSelectorVisible) {
+                    replaceBottomView(mFilterRecycler.getVisibility() == View.VISIBLE ?
+                            mFilterRecycler : mAdditionalOptsHud,
+                            mCameraHud);
+                    mSelectorVisible = false;
                 }
+                break;
+            case R.id.more_options:
+                replaceBottomView(mCameraHud, mAdditionalOptsHud);
+                mSelectorVisible = true;
                 break;
             case R.id.browse_option:
                 ((MainActivity)getActivity()).changeOverlay(MainActivity.GraphicType.BROWSE);
-                replaceBottomView(mCameraHud, null);
+                replaceBottomView(mAdditionalOptsHud, null);
                 break;
             case R.id.game_option:
                 ((MainActivity)getActivity()).changeOverlay(MainActivity.GraphicType.GAME);
-                if(mFilterSelectorVisible) {
-                    replaceBottomView(mFilterRecycler, null);
-                }else{
-                    replaceBottomView(mCameraHud, null);
-                }
+                replaceBottomView(mAdditionalOptsHud, null);
+                break;
+            case R.id.duple_filter_button:
+                replaceBottomView(mAdditionalOptsHud, mFilterRecycler);
+                //This view is only visible if SelectorVisible is true, so no need to toggle it.
                 break;
         }
     }
