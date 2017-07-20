@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/picture_confirmation_form"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/prompt_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Is it a keeper?"
+        android:textSize="20sp"
+        android:textColor="#000"
+        android:layout_centerHorizontal="true"/>
+    <ImageView
+        android:id="@+id/picture_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/prompt_text"
+        android:contentDescription="Picture Preview"/>
+
+    <ImageButton
+        android:id="@+id/reject_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/picture_view"
+        android:layout_alignStart="@id/picture_view"
+        android:layout_margin="20dp"
+        android:background="@drawable/icon_reject"/>
+
+    <ImageButton
+        android:id="@+id/confirm_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/picture_view"
+        android:layout_alignEnd="@id/picture_view"
+        android:layout_margin="20dp"
+        android:background="@drawable/icon_confirm"/>
+
+</RelativeLayout>

@@ -1,7 +1,6 @@
 package shuvalov.nikita.mirrormirror;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,22 +9,26 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 import shuvalov.nikita.mirrormirror.browsing.BrowseFragment;
@@ -171,23 +174,14 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 mirrorFolder.mkdirs();
             }
 
-            String path = AppConstants.getImageSavePath();
-            File imageFile = new File(path);
-
-            //ToDo: Allow user instead to choose whether they want to keep or discard an image.
-            FileOutputStream outputStream = new FileOutputStream(imageFile);
             Bitmap unfiltered = BitmapFactory.decodeByteArray(bytes, 0, bytes.length); //This gets the photo as seen from the camera
-
             Matrix matrix = new Matrix();
             matrix.postRotate(270);
             unfiltered = Bitmap.createBitmap(unfiltered, 0, 0, unfiltered.getWidth(),
                     unfiltered.getHeight(), matrix, true);
-
             Bitmap bitmap = getFilteredImage(unfiltered);//Puts the filter on top of the photo
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            verifyWithUser(bitmap);
 
-            outputStream.flush();
-            outputStream.close();
 //            openScreenshot(imageFile);
         } catch (Exception e) {
             e.printStackTrace();
@@ -280,5 +274,39 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
             mCurrentOverlay = GraphicType.FILTER;
             notifyOverlayChanged();
         }
+    }
+
+    private void verifyWithUser(final Bitmap bitmap){
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).setView(R.layout.picture_confirmation).create();
+        alertDialog.show();
+        ImageButton confirm = (ImageButton)alertDialog.findViewById(R.id.confirm_picture);
+        ImageButton reject = (ImageButton)alertDialog.findViewById(R.id.reject_picture);
+        ImageView picPreview = (ImageView)alertDialog.findViewById(R.id.picture_view);
+        picPreview.setImageBitmap(bitmap);
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    String path = AppConstants.getImageSavePath();
+                    File imageFile = new File(path);
+                    FileOutputStream outputStream = new FileOutputStream(imageFile);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    outputStream.flush();
+                    outputStream.close();
+                    Toast.makeText(MainActivity.this, "Picture Saved", Toast.LENGTH_SHORT).show();
+                    alertDialog.dismiss();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        reject.setOnClickListener(new View.OnClickListener() {
+                                      @Override
+                                      public void onClick(View view) {
+                                          Toast.makeText(MainActivity.this, "Picture discarded", Toast.LENGTH_SHORT).show();
+                                          alertDialog.dismiss();
+                                      }
+                                  });
     }
 }
