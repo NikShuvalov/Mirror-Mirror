@@ -2,11 +2,11 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:drawable="@drawable/icon_filters"
+        android:drawable="@drawable/icon_more_opt"
         android:state_pressed="false"/>
 
     <item
-        android:drawable="@drawable/icon_filters_pressed"
+        android:drawable="@drawable/icon_more_opt_pressed"
         android:state_pressed="true"/>
 
 </selector>

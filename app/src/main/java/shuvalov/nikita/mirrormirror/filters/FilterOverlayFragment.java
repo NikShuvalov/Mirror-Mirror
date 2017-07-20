@@ -27,7 +27,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     private FrameLayout mOverlayContainer;
     private FilterOverlay mFilterOverlay;
     private RecyclerView mFilterRecycler;
-    private ImageButton mCameraButton, mFilterSelectionButton;
+    private ImageButton mCameraButton, mFilterSelectionButton, mMoreButton;
     private View mCameraHud;
     public boolean mFilterSelectorVisible;
     private ImageButton mGameOption, mBrowseOption;
@@ -63,6 +63,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mFilterSelectionButton.setOnClickListener(this);
         mBrowseOption.setOnClickListener(this);
         mGameOption.setOnClickListener(this);
+        mMoreButton.setOnClickListener(this);
     }
 
     public void findViews(View v){
@@ -73,6 +74,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mOverlayContainer = (FrameLayout) v.findViewById(R.id.overlay_container);
         mFilterRecycler = (RecyclerView) v.findViewById(R.id.filters_recycler);
         mCameraHud = v.findViewById(R.id.camera_hud);
+        mMoreButton = (ImageButton) v.findViewById(R.id.more_options);
     }
 
     public void setUpFilterSelector() {
@@ -189,17 +191,4 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
         mOverlayContainer.addView(mFilterOverlay);
     }
 
-
-//    private class FilterLoaderTask extends AsyncTask<Void, Void, Void>{
-//
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void aVoid) {
-//            super.onPostExecute(aVoid);
-//        }
-//    }
 }

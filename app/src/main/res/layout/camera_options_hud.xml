@@ -46,16 +46,16 @@
             />
 
         <ImageButton
-            android:id="@+id/browse_option"
+            android:id="@+id/more_options"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@id/filter_button"
             android:layout_alignBottom="@id/filter_button"
             android:scaleType="fitXY"
-            android:layout_margin="16dp"
-            android:contentDescription="Browse Button"
-            android:background="@android:drawable/ic_dialog_alert"
+            android:contentDescription="Opens Additional options"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/more_button_selector"
             />
 
     </RelativeLayout>

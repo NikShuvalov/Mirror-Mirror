@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
-        android:drawable="@drawable/icon_filters"
-        android:state_pressed="false"/>
-
-    <item
-        android:drawable="@drawable/icon_filters_pressed"
+        android:drawable="@drawable/icon_game_pressed"
         android:state_pressed="true"/>
+    <item
+        android:drawable="@drawable/icon_game"
+        android:state_pressed="false"/>
 
 </selector>
