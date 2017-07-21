@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import shuvalov.nikita.mirrormirror.R;
+import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 
 
 public class GameOverlayFragment extends Fragment implements View.OnClickListener{

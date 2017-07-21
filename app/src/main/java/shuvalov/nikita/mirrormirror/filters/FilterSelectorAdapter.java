@@ -16,9 +16,10 @@ import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
  * Created by NikitaShuvalov on 4/15/17.
  */
 
-public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorViewHolder> {
+public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorViewHolder>{
     private FilterSelectorListener mFilterSelectorListener;
     private BaseFilterManager mFilterManager;
+    private int mSelectedIndex;
 
     public FilterSelectorAdapter(FilterSelectorListener filterSelectorListener, BaseFilterManager baseFilterManager) {
         mFilterSelectorListener = filterSelectorListener;
@@ -50,6 +51,7 @@ public class FilterSelectorAdapter extends RecyclerView.Adapter<FilterSelectorVi
     public int getItemCount() {
         return mFilterManager.getFilters().size();
     }
+
 
     public interface FilterSelectorListener{
         void onFilterSelected(int index);

@@ -15,10 +15,9 @@ import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
  */
 
 public class FaceDetectorGenerator {
-    private FaceDetector mFaceDetector;
 
-    public FaceDetectorGenerator(Context context, int faceDetectorMode){
-        mFaceDetector = new FaceDetector.Builder(context)
+    public static FaceDetector createFaceDetector(Context context, int faceDetectorMode){
+        FaceDetector faceDetector = new FaceDetector.Builder(context)
                 .setLandmarkType(FaceDetector.ALL_LANDMARKS)
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .setTrackingEnabled(true)
@@ -29,11 +28,9 @@ public class FaceDetectorGenerator {
 
         Detector.Processor<Face> processor;
         Tracker<Face> tracker = FaceTracker.getInstance();
-        processor = new LargestFaceFocusingProcessor.Builder(mFaceDetector,tracker).build();
-        mFaceDetector.setProcessor(processor);
+        processor = new LargestFaceFocusingProcessor.Builder(faceDetector,tracker).build();
+        faceDetector.setProcessor(processor);
+        return faceDetector;
     }
 
-    public FaceDetector getFaceDetector() {
-        return mFaceDetector;
-    }
 }

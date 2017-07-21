@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -41,13 +42,11 @@ import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.FilterOverlayFragment;
 import shuvalov.nikita.mirrormirror.filters.particles.ParticleOverlayFragment;
-import shuvalov.nikita.mirrormirror.gamification.GameOverlayFragment;
 
 
 public class MainActivity extends AppCompatActivity implements  CameraSource.PictureCallback, CameraSource.ShutterCallback{
     private FrameLayout mPreviewContainer;
     private Preview mPreview;
-    private int mViewWidth, mViewHeight;
     public static final int CAMERA_PERMISSION_REQUEST = 9999;
     public static final int STORAGE_PERMISSION_REQUEST = 2;
     public CameraSource mCameraSource;
@@ -75,10 +74,8 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         Display display = getWindow().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        mViewWidth = size.x;
-        mViewHeight = size.y;
         FaceTracker faceTracker = FaceTracker.getInstance();
-        faceTracker.setScreenSize(mViewHeight, mViewWidth);
+        faceTracker.setScreenSize(size.y, size.x);
         faceTracker.changeDetectionMode(GraphicType.FILTER);
 
         int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
@@ -87,8 +84,8 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
             }
         } else {
-            updateDetectorMode(FaceDetector.FAST_MODE);
-            setUp();
+            prepCameraSource();
+            displayPreview();
         }
         notifyOverlayChanged();
     }
@@ -96,10 +93,12 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     /**
      * Updates the detector mode as well as handles creating a new camerasource and applying it to the preview.
      */
-    private void updateDetectorMode(int faceDetectorMode){ //Don't think I should change the detection mode after the fact since it will be detrimental to performance.
-        mFaceDetector = new FaceDetectorGenerator(this, faceDetectorMode).getFaceDetector();
+    private void prepCameraSource(){ //Don't think I should change the detection mode after the fact since it will be detrimental to performance.
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        mFaceDetector = FaceDetectorGenerator.createFaceDetector(this, FaceDetector.ACCURATE_MODE);
         //Note: Width and height are reversed here because we are using portrait mode instead of landscape mode.
-        mCameraSource = new CameraSourceGenerator(this, mFaceDetector, CameraSource.CAMERA_FACING_FRONT,mViewHeight,mViewWidth).getCameraSource();
+        mCameraSource = CameraSourceGenerator.createCameraSource(this, mFaceDetector, CameraSource.CAMERA_FACING_FRONT,size.y,size.x);
         if(mPreview == null) {
             mPreview = new Preview(this);
         }
@@ -112,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
             case CAMERA_PERMISSION_REQUEST:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setUp();
+                    displayPreview();
                 } else {
                     Toast.makeText(this, "This App requires Camera access", Toast.LENGTH_LONG).show();
                 }
@@ -126,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         }
     }
 
-    public void setUp() {
+    public void displayPreview() {
         mPreviewContainer.addView(mPreview);
     }
 
@@ -137,20 +136,15 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     @Override
     protected void onPause() {
         super.onPause();
+        FilterManager.getInstance().clearSelectionIndex();
+        FaceTracker.getInstance().pause();
         mPreviewContainer.removeView(mPreview);
         if(mCameraSource!=null){
             mCameraSource.stop();
+            mCameraSource.release();
         }
         if(mFaceDetector!=null && mFaceDetector.isOperational()){
             mFaceDetector.release();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if(mCameraSource!=null){
-            mCameraSource.release();
         }
     }
 
@@ -180,25 +174,25 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                     unfiltered.getHeight(), matrix, true);
             Bitmap bitmap = getFilteredImage(unfiltered);//Puts the filter on top of the photo
             verifyWithUser(bitmap);
-
-//            openScreenshot(imageFile);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public Bitmap getFilteredImage(Bitmap cameraPreview) {
-        Bitmap drawnTogether = Bitmap.createBitmap(mViewWidth, mViewHeight, cameraPreview.getConfig());
+        Point p = new Point();
+        getWindowManager().getDefaultDisplay().getSize(p);
+        Bitmap drawnTogether = Bitmap.createBitmap(p.x, p.y, cameraPreview.getConfig());
         Canvas canvas = new Canvas(drawnTogether);
 
         Filter filter = FilterManager.getInstance().getSelectedFilter();
         Bitmap filterBmp = null;
         FaceTracker faceTracker = FaceTracker.getInstance();
         RectF filterRect = faceTracker.getFaceRect();
-        Rect previewRect = new Rect(0,0,mViewWidth,mViewHeight);
+        Rect previewRect = new Rect(0,0,p.x,p.y);
 
         Matrix mirrorFilter = new Matrix();
-        mirrorFilter.postScale(-1, 1, mViewWidth/2, mViewHeight/2);
+        mirrorFilter.postScale(-1, 1, p.x/2, p.y/2);
         mirrorFilter.mapRect(filterRect);
         if(filter!=null){
             float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();
@@ -213,14 +207,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         return drawnTogether;
     }
 
-//    public void openScreenshot(File imageFile) {
-//        Intent intent = new Intent();
-//        intent.setAction(Intent.ACTION_VIEW);
-//        Uri uri = Uri.fromFile(imageFile);
-//        intent.setDataAndType(uri, "image/*");
-//        startActivity(Intent.createChooser(intent, "View with..."));
-//    }
-
     public void notifyOverlayChanged(){
         FaceTracker.getInstance().changeDetectionMode(mCurrentOverlay);
         switch(mCurrentOverlay){
@@ -229,9 +215,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 break;
             case FILTER:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, FilterOverlayFragment.newInstance(), MAIN_FRAGMENT).commit();
-                break;
-            case GAME:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, GameOverlayFragment.newInstance()).commit();
                 break;
             case COMPONENT:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ComponentOverlayFragment.newInstance()).commit();
@@ -250,10 +233,10 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     public void onShutter() {}
 
     public enum GraphicType{
-        PARTICLE, FILTER, GAME, COMPONENT, BROWSE
+        PARTICLE, FILTER, COMPONENT, BROWSE
     }
 
-    //Create a presenter class for the camera
+    //ToDo: Create a presenter class for the camera
     public CameraSource getCameraSource(){
         return mCameraSource;
     }
@@ -306,5 +289,11 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                                           alertDialog.dismiss();
                                       }
                                   });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("Test", "onDestroy: ");
     }
 }

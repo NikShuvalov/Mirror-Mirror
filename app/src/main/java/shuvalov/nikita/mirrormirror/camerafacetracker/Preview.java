@@ -16,7 +16,6 @@ import java.io.IOException;
  */
 
 public class Preview extends SurfaceView implements SurfaceHolder.Callback {
-    SurfaceHolder mSurfaceHolder;
     CameraSource mCameraSource;
 
 
@@ -34,23 +33,20 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
     public Preview(Context context) {
         super(context);
-
-        mSurfaceHolder = getHolder();
-        mSurfaceHolder.addCallback(this);
+        getHolder().addCallback(this);
     }
 
     //Only if we created the view without using the above constructor
     public void setCameraSource(CameraSource cameraSource){
         mCameraSource = cameraSource;
-        mSurfaceHolder = getHolder();
-        mSurfaceHolder.addCallback(this);
+        getHolder().addCallback(this);
     }
 
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         try {
-            mCameraSource.start(getHolder());
+            mCameraSource.start(surfaceHolder);
         } catch (IOException e) {
             e.printStackTrace();
         }

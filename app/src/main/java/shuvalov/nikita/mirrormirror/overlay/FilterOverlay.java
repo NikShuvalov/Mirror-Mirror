@@ -42,7 +42,11 @@ public class FilterOverlay extends BaseOverlay{
         if(face!=null && mBitmap!=null){
             face.round(mRect);
             if(mUsingAnimated){
-                mBitmap = FilterManager.getInstance().getSelectedFilter().getBitmap(SystemClock.uptimeMillis());
+                Filter f = FilterManager.getInstance().getSelectedFilter();
+                if(f!=null){
+                    mBitmap = f.getBitmap(SystemClock.uptimeMillis());
+                }
+
             }
             canvas.drawBitmap(mBitmap, null, mRect, null);
             mRect.setEmpty();

@@ -1,6 +1,7 @@
 package shuvalov.nikita.mirrormirror.camera;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -10,18 +11,15 @@ import com.google.android.gms.vision.Detector;
  */
 
 public class CameraSourceGenerator {
-    public CameraSource mCameraSource;
 
-    public CameraSourceGenerator(Context context, Detector detector, int cameraFacing, int previewHeight, int previewWidth){
-        mCameraSource = new CameraSource.Builder(context, detector)
+    public static CameraSource createCameraSource(Context context, Detector detector, int cameraFacing, int previewHeight, int previewWidth){
+        Log.d("This", "CameraSourceGenerator: " + previewHeight + "," + previewWidth);//ToDo: Reduce resolution to increase speed
+        return new CameraSource.Builder(context, detector)
                 .setFacing(cameraFacing)
                 .setRequestedPreviewSize(previewHeight, previewWidth)
-                .setRequestedFps(60.0f)
+                .setRequestedFps(30.0f)
                 .setAutoFocusEnabled(true)
                 .build();
     }
 
-    public CameraSource getCameraSource() {
-        return mCameraSource;
-    }
 }

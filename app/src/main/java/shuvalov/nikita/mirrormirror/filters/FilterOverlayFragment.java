@@ -1,6 +1,7 @@
 package shuvalov.nikita.mirrormirror.filters;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,7 @@ import android.widget.ImageButton;
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
+import shuvalov.nikita.mirrormirror.gamification.GameActivity;
 import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 
 public class FilterOverlayFragment extends Fragment implements View.OnClickListener, FilterSelectorAdapter.FilterSelectorListener {
@@ -166,11 +168,18 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
                 break;
             case R.id.browse_option:
                 ((MainActivity)getActivity()).changeOverlay(MainActivity.GraphicType.BROWSE);
+                if(mFilterOverlay!=null) {
+                    FilterManager.getInstance().clearSelectionIndex();
+                    FaceTracker.getInstance().pause();
+                    mFilterOverlay.notifyFilterChange();
+                }
                 replaceBottomView(mAdditionalOptsHud, null);
                 break;
             case R.id.game_option:
-                ((MainActivity)getActivity()).changeOverlay(MainActivity.GraphicType.GAME);
-                replaceBottomView(mAdditionalOptsHud, null);
+                Intent gameIntent = new Intent(getActivity(), GameActivity.class);
+                FilterManager.getInstance().clearSelectionIndex();
+                FaceTracker.getInstance().pause();
+                startActivity(gameIntent);
                 break;
             case R.id.duple_filter_button:
                 replaceBottomView(mAdditionalOptsHud, mFilterRecycler);

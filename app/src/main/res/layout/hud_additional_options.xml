@@ -7,7 +7,7 @@
     android:visibility="invisible">
 
     <ImageButton
-        android:id="@+id/game_option"
+        android:id="@+id/duple_filter_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -16,19 +16,19 @@
         android:contentDescription="Game Button"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
-        android:background="@drawable/game_button_selector"
+        android:background="@drawable/filter_button_selector"
         />
 
     <ImageButton
-        android:id="@+id/duple_filter_button"
+        android:id="@+id/game_option"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_alignTop="@id/game_option"
-        android:layout_alignBottom="@id/game_option"
+        android:layout_alignTop="@id/duple_filter_button"
+        android:layout_alignBottom="@id/duple_filter_button"
         android:scaleType="fitXY"
         android:contentDescription="Open Filter Choices"
-        android:background="@drawable/filter_button_selector"
+        android:background="@drawable/game_button_selector"
         />
 
     <ImageButton
@@ -36,8 +36,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_alignTop="@id/game_option"
-        android:layout_alignBottom="@id/game_option"
+        android:layout_alignTop="@id/duple_filter_button"
+        android:layout_alignBottom="@id/duple_filter_button"
         android:scaleType="fitXY"
         android:contentDescription="Opens Picture Browsing"
         android:layout_marginEnd="16dp"
