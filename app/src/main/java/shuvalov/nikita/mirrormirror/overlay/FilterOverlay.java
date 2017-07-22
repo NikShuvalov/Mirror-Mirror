@@ -10,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -18,6 +19,8 @@ import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 import shuvalov.nikita.mirrormirror.overlay.GraphicThread;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by NikitaShuvalov on 3/24/17.

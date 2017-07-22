@@ -103,7 +103,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             mPreview = new Preview(this);
         }
         mPreview.setCameraSource(mCameraSource);
-        mPreviewContainer.addView(mPreview);
+        if(mPreviewContainer.getChildCount()==0) {
+            mPreviewContainer.addView(mPreview);
+        }
     }
 
     public void findViews() {

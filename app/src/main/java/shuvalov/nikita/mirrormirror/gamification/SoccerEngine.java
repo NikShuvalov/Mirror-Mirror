@@ -1,5 +1,6 @@
 package shuvalov.nikita.mirrormirror.gamification;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -62,7 +63,8 @@ public class SoccerEngine {
     private PointF[] mGoalInterpolation;
     private int mGoalIndex;
     private int mBoundaryLine;
-    private Canvas mTutorialCanvas;
+    public Canvas mTutorialCanvas;
+    private Bitmap mTutorialOverlayBitmap;
 
     private static final float TEXT_SIZE = 40f;
     private static final float BOUNDARY_PAINT_WIDTH = 30f;
@@ -455,8 +457,8 @@ public class SoccerEngine {
         preRenderCanvas();
     }
 
-    public Canvas getTutorialCanvas(){
-        return mTutorialCanvas;
+    public Bitmap getTutorialOverlayBitmap(){
+        return mTutorialOverlayBitmap;
     }
 
     private void preRenderCanvas(){
@@ -465,48 +467,20 @@ public class SoccerEngine {
         float soccerBallCenterY = (float)soccerBall.getCenterY();
         float soccerBallRadius = (float) soccerBall.getRadius();
         GamePalette gamePalette = GamePalette.getInstance();
+        mTutorialOverlayBitmap = Bitmap.createBitmap(mScreenBounds.width(), mScreenBounds.height(), Bitmap.Config.RGB_565);
         mTutorialCanvas = new Canvas();
+        mTutorialCanvas.setBitmap(mTutorialOverlayBitmap);
         Rect goalBounds = getGoalBounds();
-        drawBoundaryLine(mTutorialCanvas);
-        drawFaceOutline(mTutorialCanvas);
-        mTutorialCanvas.drawCircle(goalBounds.centerX(), goalBounds.centerY(), goalBounds.width() / 2, gamePalette.getGoalPaint());//Draws goal, aka black hole of death.
-        drawScoreBox(mTutorialCanvas);
-        mTutorialCanvas.drawCircle(soccerBallCenterX, soccerBallCenterY, soccerBallRadius, soccerBall.getPaint());
-
-        mTutorialCanvas.drawColor(Color.argb(100, 0,0,0));
-
         mTutorialCanvas.drawPath(mGoalArrowPath, gamePalette.getArrowPaint());
         mTutorialCanvas.drawPath(mGoalArrowPath, gamePalette.getArrowOutlinePaint());
-
         mTutorialCanvas.drawPath(mBallArrowPath, gamePalette.getArrowPaint());
         mTutorialCanvas.drawPath(mBallArrowPath, gamePalette.getArrowOutlinePaint());
-
         mTutorialCanvas.drawText("The Goal", goalBounds.centerX () + (int)(goalBounds.width()*1.75), goalBounds.centerY() + (int)(goalBounds.width()*1.25) + TEXT_SIZE, gamePalette.getIdentifierPaint());
         mTutorialCanvas.drawText("The Ball", soccerBallCenterX - (5 * soccerBallRadius) - TEXT_SIZE, soccerBallCenterY - (5 * soccerBallRadius) - TEXT_SIZE, gamePalette.getIdentifierPaint());
-
-        mTutorialCanvas.drawText("You can't pass this line", mTutorialCanvas.getWidth()/3, mTutorialCanvas.getHeight()/2, gamePalette.getIdentifierPaint());
+        mTutorialCanvas.drawText("You can't pass this line", mTutorialCanvas.getWidth()/3, mTutorialCanvas.getHeight()/2 - soccerBallRadius, gamePalette.getIdentifierPaint());
     }
 
-    private void drawBoundaryLine(Canvas canvas){
-        int y = getBoundaryLine();
-        canvas.drawLine(0,y, mScreenBounds.width(), y, GamePalette.getInstance().getBoundaryPaint());
-    }
 
-    private void drawFaceOutline(Canvas canvas){
-        RectF face = getFaceRect();
-        if (face != null) {
-            canvas.drawRect(face, GamePalette.getInstance().getBluePaint());
-        }
-    }
-
-    private void drawScoreBox(Canvas canvas){
-        GamePalette gamePalette = GamePalette.getInstance();
-        String scoreText = "Score: " + getPlayerScore();
-        float boxStart = canvas.getWidth()*.75f;
-        float boxMargin = 16;
-        canvas.drawRect(boxStart, boxMargin, (float)canvas.getWidth() - boxMargin, (boxMargin*2) + TEXT_SIZE, gamePalette.getScoreBoxPaint());
-        canvas.drawText(scoreText, boxStart + 16, boxMargin+ TEXT_SIZE, gamePalette.getScorePaint());
-    }
 
     private void createTutorialArrows(){
         Rect goalBounds = getGoalBounds();
