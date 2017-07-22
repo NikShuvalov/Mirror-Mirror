@@ -9,8 +9,8 @@ import android.graphics.Path;
  */
 
 public class GamePalette {
-
     private static GamePalette sGamePalette;
+
     private Paint mBluePaint, mScoreBoxPaint, mGoalPaint;
     private Paint mArrowPaint, mArrowOutlinePaint;
     private Paint mStartPaint, mIdentifierPaint;

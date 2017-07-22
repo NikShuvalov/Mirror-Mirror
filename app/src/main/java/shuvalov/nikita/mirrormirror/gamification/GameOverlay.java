@@ -24,7 +24,6 @@ public class GameOverlay extends BaseOverlay{
     private Path mTrianglePath;
     private Paint mAlphaPaint;
     private static final float TEXT_SIZE = 40f;
-    private static final float BOUNDARY_PAINT_WIDTH = 30f;
     private static final int OVERLAY_ALPHA = 150;
     private float mStartBlinkTime;
     private boolean mStartBlink;
@@ -40,37 +39,7 @@ public class GameOverlay extends BaseOverlay{
         mStartBlink = true;
         new EngineLoaderTask().execute(screenBounds); //ToDo: Perform this in loading activity
     }
-//
-//    private void createTutorialArrows(){
-//        Rect goalBounds = mSoccerEngine.getGoalBounds();
-//        float goalRadius = goalBounds.width()/2f;
-//        PointF goalArrowOrigin = new PointF(goalBounds.centerX() + goalRadius*2, goalBounds.centerY());
-//        mGoalArrowPath = new Path();
-//        mGoalArrowPath.moveTo(goalArrowOrigin.x, goalArrowOrigin.y);
-//        mGoalArrowPath.rLineTo(goalRadius, goalRadius);
-//        mGoalArrowPath.rLineTo(0 ,-goalRadius/2);
-//        mGoalArrowPath.arcTo(goalArrowOrigin.x, goalBounds.centerY() + goalBounds.width()/4, goalArrowOrigin.x + goalRadius*2, goalBounds.centerY() + goalBounds.width()/4 + goalRadius*2,270, 90, false);
-//        mGoalArrowPath.rLineTo(0, goalRadius);
-//        mGoalArrowPath.rLineTo(goalRadius, 0);
-//        mGoalArrowPath.rLineTo(0,-goalRadius);
-//        mGoalArrowPath.arcTo(goalArrowOrigin.x - goalRadius, goalBounds.centerY() - goalRadius/2, goalArrowOrigin.x + goalRadius*3, goalBounds.centerY() + goalBounds.width()/4 +goalRadius*3, 0,-90,false);
-//        mGoalArrowPath.rLineTo(0, -goalRadius/2);
-//        mGoalArrowPath.close();
-//
-//        Ball soccerBall = mSoccerEngine.getSoccerBall();
-//        PointF ballCenter = new PointF((float)soccerBall.getCenterX(), (float)soccerBall.getCenterY());
-//        float ballRadius = (float) soccerBall.getRadius();
-//
-//        mBallArrowPath = new Path();
-//        mBallArrowPath.moveTo(ballCenter.x - ballRadius, ballCenter.y - ballRadius);
-//        mBallArrowPath.rLineTo(0,  - ballRadius * 2);
-//        mBallArrowPath.rLineTo( -ballRadius/1.5f, ballRadius/1.5f);
-//        mBallArrowPath.rLineTo(-ballRadius * 3 , - ballRadius * 3);
-//        mBallArrowPath.rLineTo(- ballRadius/1.5f,  ballRadius/1.5f);
-//        mBallArrowPath.rLineTo(ballRadius  * 3, ballRadius * 3);
-//        mBallArrowPath.rLineTo(-ballRadius /1.5f, ballRadius /1.5f);
-//        mBallArrowPath.close();
-//    }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -113,26 +82,6 @@ public class GameOverlay extends BaseOverlay{
             }
         }
     }
-
-//    private void drawFaceArrow(Canvas canvas, float ballRadius){
-//        RectF face = mSoccerEngine.getFaceRect();
-//        Path faceArrow = new Path();
-//        if(face!=null) {
-//            GamePalette gamePalette = GamePalette.getInstance();
-//            faceArrow.moveTo(face.centerX(), canvas.getHeight() / 2 - (ballRadius * 2));
-//            faceArrow.rLineTo(ballRadius, -ballRadius);
-//            faceArrow.rLineTo(-ballRadius / 2, 0);
-//            faceArrow.rLineTo(0, -ballRadius * 2);
-//            faceArrow.rLineTo(-ballRadius, 0);
-//            faceArrow.rLineTo(0, ballRadius * 2);
-//            faceArrow.rLineTo(-ballRadius / 2, 0);
-//            faceArrow.close();
-//
-//            canvas.drawPath(faceArrow, gamePalette.getArrowPaint());
-//            canvas.drawPath(faceArrow, gamePalette.getArrowOutlinePaint());
-//            canvas.drawText("Your Face", (face.centerX() + face.left)/2f, canvas.getHeight()/2 - (ballRadius *6) + TEXT_SIZE, gamePalette.getIdentifierPaint());
-//        }
-//    }
 
     private void drawBoundaryLine(Canvas canvas){
         int y = mSoccerEngine.getBoundaryLine();
@@ -183,13 +132,11 @@ public class GameOverlay extends BaseOverlay{
 
         @Override
         protected SoccerEngine doInBackground(Rect... screenBounds) {
-            Log.d("Test", "doInBackground: " + Thread.currentThread().getName());
             return new SoccerEngine(screenBounds[0]);
         }
 
         @Override
         protected void onPostExecute(SoccerEngine soccerEngine) {
-            Log.d("Test", "onPostExecute: " + Thread.currentThread().getName());
             setSoccerEngine(soccerEngine);
             FaceTracker.getInstance().start();
             super.onPostExecute(soccerEngine);

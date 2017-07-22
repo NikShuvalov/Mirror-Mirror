@@ -30,10 +30,14 @@ public class GraphicThread extends Thread {
             try{
                 c = mGraphicThreadManager.getSurfaceHolder().lockCanvas();
                 synchronized (mGraphicThreadManager.getSurfaceHolder()){
-                    if(!mStop.get() && mGraphicThreadManager.getBaseOverlay()!=null) mGraphicThreadManager.getBaseOverlay().onDraw(c);
+                    if(!mStop.get() && mGraphicThreadManager.getBaseOverlay()!=null) {
+                        mGraphicThreadManager.getBaseOverlay().onDraw(c);
+                    }
                 }
             }finally {
-                if(c != null)mGraphicThreadManager.getSurfaceHolder().unlockCanvasAndPost(c);
+                if(c != null){
+                    mGraphicThreadManager.getSurfaceHolder().unlockCanvasAndPost(c);
+                }
             }
         }
         if(mStop.get()){

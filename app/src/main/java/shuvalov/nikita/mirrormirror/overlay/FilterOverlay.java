@@ -49,7 +49,6 @@ public class FilterOverlay extends BaseOverlay{
                 if(mFilter!=null){
                     mBitmap = mFilter.getBitmap(SystemClock.uptimeMillis());
                 }
-
             }
             canvas.drawBitmap(mBitmap, null, mRect, null);
             mRect.setEmpty();

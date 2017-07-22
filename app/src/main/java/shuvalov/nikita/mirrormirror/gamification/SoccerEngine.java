@@ -58,7 +58,6 @@ public class SoccerEngine {
     private boolean mIsSurvivalMode;
     private boolean mBallHit, mBallDisappearing, mGoalMoving;
     private boolean mTutorialMode;
-    private boolean mActive;
     private long mLastUpdateTime;
     private PointF[] mGoalInterpolation;
     private int mGoalIndex;
@@ -68,7 +67,6 @@ public class SoccerEngine {
 
     private static final float TEXT_SIZE = 40f;
     private static final float BOUNDARY_PAINT_WIDTH = 30f;
-
     public static final int FACE_LENGTH = 400;
     public static final int SECOND = 1000;
     private static final double MAX_DEFLECTION_VALUE = 15.0;
@@ -92,7 +90,6 @@ public class SoccerEngine {
         mTutorialMode = true;
         spawnNewGoal();
         respawnBall();
-
         float centerX = mScreenBounds.exactCenterX();
         float centerY = mScreenBounds.exactCenterY();
         mFaceRect = new RectF(centerX-FACE_LENGTH/2, centerY-FACE_LENGTH/2, centerX+FACE_LENGTH/2, centerY+FACE_LENGTH/2);
@@ -103,7 +100,6 @@ public class SoccerEngine {
         */
         mPreviousRectPositions = new RectF[]{mFaceRect, mFaceRect, mFaceRect, mFaceRect};
     }
-
 
     public void gameStart(){
         mIsSurvivalMode = false;
@@ -131,7 +127,6 @@ public class SoccerEngine {
     public int getPlayerScore(){
         return mPlayerScore;
     }
-
 
     public RectF getFaceRect() {
         return mFaceRect;
@@ -341,7 +336,6 @@ public class SoccerEngine {
         mSoccerBall.setYSpeed(mSoccerBall.getYSpeed()+ GRAVITY_ACCELERATION*elapsedTime);
     }
 
-
 //    private void applyAirFriction(){
 //        double newSpeed = xSpeed;
 //        if(xSpeed>0){ //We are looking to move the value towards 0 with air Friction. So if value is neg, add air friction to speed, otherwise minus it.
@@ -432,10 +426,8 @@ public class SoccerEngine {
             mSoccerBall = new Ball(mScreenBounds.centerX(), mScreenBounds.centerY()-mScreenBounds.height()/4, mSoccerRadius, rng.nextInt(4)-4, -5, Color.YELLOW);
             return;
         }
-//        int spawnX = rng.nextInt(mScreenBounds.width()- (int)mSoccerRadius) + (int)mSoccerRadius;
         mSoccerBall.recycleBall(mGoalBounds.centerX(), mGoalBounds.centerY(), mSoccerRadius, rng.nextInt(10)-5, -5, Color.YELLOW);
     }
-
 
     public void adjustHitBox(RectF hitBox){
         float centerX = hitBox.centerX();
@@ -443,7 +435,6 @@ public class SoccerEngine {
         float faceRadius = SoccerEngine.FACE_LENGTH/2; //It's not really a radius because it's a rectangle, but it's easier to name it this way.
         hitBox.set(centerX-faceRadius, centerY-faceRadius, centerX+faceRadius, centerY+faceRadius);
     }
-
 
     public void exitTutorial(){
         mTutorialMode = false;
@@ -479,8 +470,6 @@ public class SoccerEngine {
         mTutorialCanvas.drawText("The Ball", soccerBallCenterX - (5 * soccerBallRadius) - TEXT_SIZE, soccerBallCenterY - (5 * soccerBallRadius) - TEXT_SIZE, gamePalette.getIdentifierPaint());
         mTutorialCanvas.drawText("You can't pass this line", mTutorialCanvas.getWidth()/3, mTutorialCanvas.getHeight()/2 - soccerBallRadius, gamePalette.getIdentifierPaint());
     }
-
-
 
     private void createTutorialArrows(){
         Rect goalBounds = getGoalBounds();

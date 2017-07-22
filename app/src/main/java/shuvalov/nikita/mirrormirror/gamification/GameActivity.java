@@ -18,11 +18,9 @@ import android.widget.Toast;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.face.FaceDetector;
 
-import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camera.CameraSourceGenerator;
 import shuvalov.nikita.mirrormirror.camera.FaceDetectorGenerator;
-import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
 
 import static shuvalov.nikita.mirrormirror.MainActivity.CAMERA_PERMISSION_REQUEST;
@@ -39,7 +37,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        Log.d("Test", "onCreate: ");
         findViews();
         Display display = getWindow().getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -58,8 +55,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("Test", "onResume: ");
-
         int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (checkPermission == PackageManager.PERMISSION_DENIED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -99,7 +94,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setUpPreview() {
         if(mPreview == null){
-            Log.d("Test", "setUpPreview: Preview Null");
             mPreview = new Preview(this);
         }
         mPreview.setCameraSource(mCameraSource);
@@ -116,10 +110,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("Test", "onPause: ");
         mGameOverlay.stopGraphicThread();
-//        mPreviewContainer.removeView(mPreview);
-//        mOverlayContainer.removeView(mGameOverlay);
         if (mCameraSource != null) {
             mCameraSource.stop();
             mCameraSource.release();

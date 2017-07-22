@@ -99,7 +99,6 @@ public class Ball {
         mRadius = radius;
         mOriginalRadius = radius;
 
-
         //Instead of using direction, I'm going to indicate vector velocity for horizontal and vertical motion since those 2 values will be affected by gravity and friction.
         mXSpeed = xSpeed;
         mYSpeed = ySpeed;
@@ -109,8 +108,6 @@ public class Ball {
     public int getShrinkage() {
         return mShrinkage;
     }
-
-
 
     public void shrinkBall(){
         mShrinkage++;

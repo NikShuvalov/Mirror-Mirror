@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -245,7 +246,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         PARTICLE, FILTER, COMPONENT, BROWSE
     }
 
-    //ToDo: Create a presenter class for the camera
     public CameraSource getCameraSource(){
         return mCameraSource;
     }
@@ -303,6 +303,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("Test", "onDestroy: ");
     }
+
 }

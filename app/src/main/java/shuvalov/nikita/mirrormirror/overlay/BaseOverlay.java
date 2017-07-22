@@ -31,7 +31,6 @@ public abstract class BaseOverlay extends SurfaceView implements SurfaceHolder.C
             mGraphicThreadManager = new GraphicThreadManager(this, surfaceHolder);
         }else{
             mGraphicThreadManager.setValues(this, surfaceHolder);
-            Log.d("???", "I don't know if this is can ever happen");
         }
         mGraphicThread= new GraphicThread(mGraphicThreadManager);
         mGraphicThread.start();
