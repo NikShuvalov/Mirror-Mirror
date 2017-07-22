@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     @Override
     protected void onStop() {
         super.onStop();
+        mPreview.getHolder().removeCallback(mPreview);
         mPreviewContainer.removeView(mPreview);
     }
 

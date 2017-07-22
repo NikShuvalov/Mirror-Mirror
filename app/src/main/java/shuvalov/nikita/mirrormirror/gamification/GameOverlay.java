@@ -44,7 +44,6 @@ public class GameOverlay extends BaseOverlay{
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.d(TAG, "onDraw: " + Thread.currentThread().getName());
         if(canvas!=null && mSoccerEngine!=null) {
             GamePalette gamePalette = GamePalette.getInstance();
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);

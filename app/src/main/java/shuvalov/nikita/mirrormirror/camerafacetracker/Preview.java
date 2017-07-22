@@ -59,6 +59,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
     }
 
 }
