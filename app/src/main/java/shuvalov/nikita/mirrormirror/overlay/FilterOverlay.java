@@ -25,6 +25,7 @@ import shuvalov.nikita.mirrormirror.overlay.GraphicThread;
 
 public class FilterOverlay extends BaseOverlay{
     private Bitmap mBitmap;
+    private Filter mFilter;
     private Rect mRect;
     private boolean mUsingAnimated;
 
@@ -42,9 +43,8 @@ public class FilterOverlay extends BaseOverlay{
         if(face!=null && mBitmap!=null){
             face.round(mRect);
             if(mUsingAnimated){
-                Filter f = FilterManager.getInstance().getSelectedFilter();
-                if(f!=null){
-                    mBitmap = f.getBitmap(SystemClock.uptimeMillis());
+                if(mFilter!=null){
+                    mBitmap = mFilter.getBitmap(SystemClock.uptimeMillis());
                 }
 
             }
@@ -55,11 +55,11 @@ public class FilterOverlay extends BaseOverlay{
 
 
     public void notifyFilterChange() {
-        Filter f = FilterManager.getInstance().getSelectedFilter();
-        if(f!=null) {
-            mBitmap = (mUsingAnimated = f.isAnimated()) ?
-                    f.getBitmap(SystemClock.uptimeMillis()) :
-                    BitmapFactory.decodeResource(getResources(), f.getResourceInt());
+        mFilter= FilterManager.getInstance().getSelectedFilter();
+        if(mFilter!=null) {
+            mBitmap = (mUsingAnimated = mFilter.isAnimated()) ?
+                    mFilter.getBitmap(SystemClock.uptimeMillis()) :
+                    BitmapFactory.decodeResource(getResources(), mFilter.getResourceInt());
             return;
         }
         mUsingAnimated = false;

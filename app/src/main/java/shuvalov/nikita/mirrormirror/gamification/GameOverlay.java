@@ -131,36 +131,24 @@ public class GameOverlay extends BaseOverlay{
         super.onDraw(canvas);
         if(canvas!=null && mSoccerEngine!=null) {
             GamePalette gamePalette = GamePalette.getInstance();
-            Rect goalBounds = mSoccerEngine.getGoalBounds();
-            Ball soccerBall = mSoccerEngine.getSoccerBall();
-            float soccerBallRadius = (float) soccerBall.getRadius();
-            double soccerBallBottom = soccerBall.getCenterY() + soccerBallRadius;
-            float soccerBallCenterX = (float) soccerBall.getCenterX();
-            float soccerBallCenterY = (float)soccerBall.getCenterY();
-            canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
-            drawBoundaryLine(canvas);
-            drawFaceOutline(canvas);
-            canvas.drawCircle(goalBounds.centerX(), goalBounds.centerY(), goalBounds.width() / 2, gamePalette.getGoalPaint());//Draws goal, aka black hole of death.
-            drawScoreBox(canvas);
-            canvas.drawCircle(soccerBallCenterX, soccerBallCenterY, soccerBallRadius, soccerBall.getPaint());
-            if (soccerBallBottom <= 0) {
-                drawIndicator(canvas, soccerBallRadius, soccerBallBottom, soccerBallCenterX);
+            if(mSoccerEngine.getTutorialCanvas()== null){
+                mSoccerEngine.createTutorialCanvas();
             }
-
             if (mSoccerEngine.isTutorialMode()) {
-                canvas.drawColor(Color.argb(100, 0,0,0));
-
-                canvas.drawPath(mGoalArrowPath, gamePalette.getArrowPaint());
-                canvas.drawPath(mGoalArrowPath, gamePalette.getArrowOutlinePaint());
-
-                canvas.drawPath(mBallArrowPath, gamePalette.getArrowPaint());
-                canvas.drawPath(mBallArrowPath, gamePalette.getArrowOutlinePaint());
-
-                canvas.drawText("The Goal", goalBounds.centerX () + (int)(goalBounds.width()*1.75), goalBounds.centerY() + (int)(goalBounds.width()*1.25) + TEXT_SIZE, gamePalette.getIdentifierPaint());
-                canvas.drawText("The Ball", soccerBallCenterX - (5 * soccerBallRadius) - TEXT_SIZE, soccerBallCenterY - (5 * soccerBallRadius) - TEXT_SIZE, gamePalette.getIdentifierPaint());
-                drawFaceArrow(canvas,soccerBallRadius);
-
-                canvas.drawText("You can't pass this line", canvas.getWidth()/3, canvas.getHeight()/2, gamePalette.getIdentifierPaint());
+                canvas = mSoccerEngine.getTutorialCanvas();
+//                canvas.drawColor(Color.argb(100, 0,0,0));
+//
+//                canvas.drawPath(mGoalArrowPath, gamePalette.getArrowPaint());
+//                canvas.drawPath(mGoalArrowPath, gamePalette.getArrowOutlinePaint());
+//
+//                canvas.drawPath(mBallArrowPath, gamePalette.getArrowPaint());
+//                canvas.drawPath(mBallArrowPath, gamePalette.getArrowOutlinePaint());
+//
+//                canvas.drawText("The Goal", goalBounds.centerX () + (int)(goalBounds.width()*1.75), goalBounds.centerY() + (int)(goalBounds.width()*1.25) + TEXT_SIZE, gamePalette.getIdentifierPaint());
+//                canvas.drawText("The Ball", soccerBallCenterX - (5 * soccerBallRadius) - TEXT_SIZE, soccerBallCenterY - (5 * soccerBallRadius) - TEXT_SIZE, gamePalette.getIdentifierPaint());
+//                drawFaceArrow(canvas,soccerBallRadius);
+//
+//                canvas.drawText("You can't pass this line", canvas.getWidth()/3, canvas.getHeight()/2, gamePalette.getIdentifierPaint());
                 if(mStartBlinkTime< 50 && mStartBlink){
                     canvas.drawText("Tap to Start", canvas.getWidth()/3f, canvas.getHeight()*.7f, gamePalette.getStartPaint());
                     mStartBlinkTime ++;
@@ -170,8 +158,23 @@ public class GameOverlay extends BaseOverlay{
                 }else{
                     mStartBlinkTime ++;
                 }
-
             } else {
+                Rect goalBounds = mSoccerEngine.getGoalBounds();
+                Ball soccerBall = mSoccerEngine.getSoccerBall();
+                float soccerBallRadius = (float) soccerBall.getRadius();
+                double soccerBallBottom = soccerBall.getCenterY() + soccerBallRadius;
+                float soccerBallCenterX = (float) soccerBall.getCenterX();
+                float soccerBallCenterY = (float)soccerBall.getCenterY();
+                canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
+                drawBoundaryLine(canvas);
+                mSoccerEngine.updateFacePosition(FaceTracker.getInstance().getFaceRect());
+                drawFaceOutline(canvas);
+                canvas.drawCircle(goalBounds.centerX(), goalBounds.centerY(), goalBounds.width() / 2, gamePalette.getGoalPaint());//Draws goal, aka black hole of death.
+                drawScoreBox(canvas);
+                canvas.drawCircle(soccerBallCenterX, soccerBallCenterY, soccerBallRadius, soccerBall.getPaint());
+                if (soccerBallBottom <= 0) {
+                    drawIndicator(canvas, soccerBallRadius, soccerBallBottom, soccerBallCenterX);
+                }
                 mSoccerEngine.process();
             }
         }else{
@@ -217,7 +220,6 @@ public class GameOverlay extends BaseOverlay{
     }
 
     private void drawFaceOutline(Canvas canvas){
-        mSoccerEngine.updateFacePosition(FaceTracker.getInstance().getFaceRect());
         RectF face = mSoccerEngine.getFaceRect();
         if (face != null) {
             canvas.drawRect(face, GamePalette.getInstance().getBluePaint());

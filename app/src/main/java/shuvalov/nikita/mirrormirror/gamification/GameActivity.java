@@ -40,6 +40,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         Log.d("Test", "onCreate: ");
+        findViews();
+        Display display = getWindow().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        generatePreview();
+        setUpOverlay(new Rect(0, 0, size.x, size.y));
     }
 
     private void generatePreview(){
@@ -53,14 +59,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         Log.d("Test", "onResume: ");
-        findViews();
-        Display display = getWindow().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        FaceTracker faceTracker = FaceTracker.getInstance();
-        faceTracker.setScreenSize(size.y, size.x);
-        faceTracker.changeDetectionMode(MainActivity.GraphicType.FILTER);
-        generatePreview();
+
         int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (checkPermission == PackageManager.PERMISSION_DENIED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -68,7 +67,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else {
             setUpPreview();
-            setUpOverlay(new Rect(0, 0, size.x, size.y));
         }
     }
 
@@ -118,8 +116,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         super.onPause();
         Log.d("Test", "onPause: ");
         mGameOverlay.stopGraphicThread();
-        mPreviewContainer.removeView(mPreview);
-        mOverlayContainer.removeView(mGameOverlay);
+//        mPreviewContainer.removeView(mPreview);
+//        mOverlayContainer.removeView(mGameOverlay);
         if (mCameraSource != null) {
             mCameraSource.stop();
             mCameraSource.release();

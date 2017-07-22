@@ -61,6 +61,16 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         setContentView(R.layout.activity_main);
 
         mCurrentOverlay = GraphicType.FILTER;
+        findViews();
+
+        Display display = getWindow().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        FaceTracker faceTracker = FaceTracker.getInstance();
+        faceTracker.setScreenSize(size.y, size.x);
+        faceTracker.changeDetectionMode(GraphicType.FILTER);
+
+
 
         //FixMe: Not sure why filterManager is referenced at all here. MainActivity doesn't use it at all, besides for adding a filter; It's because gettingBitMapList requires context.
         AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
@@ -70,14 +80,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     @Override
     protected void onResume() {
         super.onResume();
-        findViews();
-        Display display = getWindow().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        FaceTracker faceTracker = FaceTracker.getInstance();
-        faceTracker.setScreenSize(size.y, size.x);
-        faceTracker.changeDetectionMode(GraphicType.FILTER);
-
         int checkPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (checkPermission == PackageManager.PERMISSION_DENIED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -126,7 +128,9 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     }
 
     public void displayPreview() {
-        mPreviewContainer.addView(mPreview);
+        if(mPreviewContainer.getChildCount()==0) {
+            mPreviewContainer.addView(mPreview);
+        }
     }
 
     public void findViews() {
@@ -138,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         super.onPause();
         FilterManager.getInstance().clearSelectionIndex();
         FaceTracker.getInstance().pause();
-        mPreviewContainer.removeView(mPreview);
         if(mCameraSource!=null){
             mCameraSource.stop();
             mCameraSource.release();
@@ -146,6 +149,12 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         if(mFaceDetector!=null && mFaceDetector.isOperational()){
             mFaceDetector.release();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mPreviewContainer.removeView(mPreview);
     }
 
     public void captureImage() {

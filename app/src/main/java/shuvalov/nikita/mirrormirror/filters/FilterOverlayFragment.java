@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,6 +97,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     public void replaceBottomView(final View viewToHide, final View viewToShow) {
         Animation hideAnim = AnimationUtils.loadAnimation(getContext(), R.anim.bottom_panel_hide);
         hideAnim.setAnimationListener(new Animation.AnimationListener() {
+            boolean fired;
             @Override
             public void onAnimationStart(Animation animation) {
 
@@ -103,11 +105,13 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                viewToHide.clearAnimation();
-                if(viewToShow!=null) {
-                    showView(viewToShow);
-                }else{
-                    ((MainActivity)getActivity()).notifyOverlayChanged();
+                if(!fired) {
+                    fired = true;
+                    viewToHide.clearAnimation();
+                    Log.d("test", "onAnimationEnd: On Hide View");
+                    if (viewToShow != null) {
+                        showView(viewToShow);
+                    }
                 }
             }
 
@@ -123,6 +127,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     public void showView(final View v) {
         Animation showAnim = AnimationUtils.loadAnimation(getContext(), R.anim.bottom_panel_show);
         showAnim.setAnimationListener(new Animation.AnimationListener() {
+            boolean fired;
             @Override
             public void onAnimationStart(Animation animation) {
 
@@ -130,7 +135,11 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                v.clearAnimation();
+                if(!fired) {
+                    fired = true;
+                    Log.d("TEST", "onAnimationEnd: On Show View");
+                    v.clearAnimation();
+                }
             }
 
             @Override
@@ -173,7 +182,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
                     FaceTracker.getInstance().pause();
                     mFilterOverlay.notifyFilterChange();
                 }
-                replaceBottomView(mAdditionalOptsHud, null);
+                ((MainActivity)getActivity()).notifyOverlayChanged();
                 break;
             case R.id.game_option:
                 Intent gameIntent = new Intent(getActivity(), GameActivity.class);
@@ -201,7 +210,9 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
     public void setUpOverlay(){
         mFilterOverlay = new FilterOverlay(getContext());
         mFilterOverlay.setZOrderMediaOverlay(true);
-        mOverlayContainer.addView(mFilterOverlay);
+        if(mOverlayContainer.getChildCount()==0) {
+            mOverlayContainer.addView(mFilterOverlay);
+        }
     }
 
     public boolean onBackPressed(){

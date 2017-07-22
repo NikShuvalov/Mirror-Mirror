@@ -1,7 +1,11 @@
 package shuvalov.nikita.mirrormirror.gamification;
 
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
@@ -10,6 +14,7 @@ import android.util.Log;
 
 import java.util.Random;
 
+import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.filters.particles.Particle;
 
 import static android.content.ContentValues.TAG;
@@ -57,6 +62,10 @@ public class SoccerEngine {
     private PointF[] mGoalInterpolation;
     private int mGoalIndex;
     private int mBoundaryLine;
+    private Canvas mTutorialCanvas;
+
+    private static final float TEXT_SIZE = 40f;
+    private static final float BOUNDARY_PAINT_WIDTH = 30f;
 
     public static final int FACE_LENGTH = 400;
     public static final int SECOND = 1000;
@@ -437,5 +446,96 @@ public class SoccerEngine {
     public void exitTutorial(){
         mTutorialMode = false;
         mLastUpdateTime = SystemClock.elapsedRealtime();
+    }
+
+    private Path mGoalArrowPath, mBallArrowPath;
+
+    public void createTutorialCanvas(){
+        createTutorialArrows();
+        preRenderCanvas();
+    }
+
+    public Canvas getTutorialCanvas(){
+        return mTutorialCanvas;
+    }
+
+    private void preRenderCanvas(){
+        Ball soccerBall = getSoccerBall();
+        float soccerBallCenterX = (float)soccerBall.getCenterX();
+        float soccerBallCenterY = (float)soccerBall.getCenterY();
+        float soccerBallRadius = (float) soccerBall.getRadius();
+        GamePalette gamePalette = GamePalette.getInstance();
+        mTutorialCanvas = new Canvas();
+        Rect goalBounds = getGoalBounds();
+        drawBoundaryLine(mTutorialCanvas);
+        drawFaceOutline(mTutorialCanvas);
+        mTutorialCanvas.drawCircle(goalBounds.centerX(), goalBounds.centerY(), goalBounds.width() / 2, gamePalette.getGoalPaint());//Draws goal, aka black hole of death.
+        drawScoreBox(mTutorialCanvas);
+        mTutorialCanvas.drawCircle(soccerBallCenterX, soccerBallCenterY, soccerBallRadius, soccerBall.getPaint());
+
+        mTutorialCanvas.drawColor(Color.argb(100, 0,0,0));
+
+        mTutorialCanvas.drawPath(mGoalArrowPath, gamePalette.getArrowPaint());
+        mTutorialCanvas.drawPath(mGoalArrowPath, gamePalette.getArrowOutlinePaint());
+
+        mTutorialCanvas.drawPath(mBallArrowPath, gamePalette.getArrowPaint());
+        mTutorialCanvas.drawPath(mBallArrowPath, gamePalette.getArrowOutlinePaint());
+
+        mTutorialCanvas.drawText("The Goal", goalBounds.centerX () + (int)(goalBounds.width()*1.75), goalBounds.centerY() + (int)(goalBounds.width()*1.25) + TEXT_SIZE, gamePalette.getIdentifierPaint());
+        mTutorialCanvas.drawText("The Ball", soccerBallCenterX - (5 * soccerBallRadius) - TEXT_SIZE, soccerBallCenterY - (5 * soccerBallRadius) - TEXT_SIZE, gamePalette.getIdentifierPaint());
+
+        mTutorialCanvas.drawText("You can't pass this line", mTutorialCanvas.getWidth()/3, mTutorialCanvas.getHeight()/2, gamePalette.getIdentifierPaint());
+    }
+
+    private void drawBoundaryLine(Canvas canvas){
+        int y = getBoundaryLine();
+        canvas.drawLine(0,y, mScreenBounds.width(), y, GamePalette.getInstance().getBoundaryPaint());
+    }
+
+    private void drawFaceOutline(Canvas canvas){
+        RectF face = getFaceRect();
+        if (face != null) {
+            canvas.drawRect(face, GamePalette.getInstance().getBluePaint());
+        }
+    }
+
+    private void drawScoreBox(Canvas canvas){
+        GamePalette gamePalette = GamePalette.getInstance();
+        String scoreText = "Score: " + getPlayerScore();
+        float boxStart = canvas.getWidth()*.75f;
+        float boxMargin = 16;
+        canvas.drawRect(boxStart, boxMargin, (float)canvas.getWidth() - boxMargin, (boxMargin*2) + TEXT_SIZE, gamePalette.getScoreBoxPaint());
+        canvas.drawText(scoreText, boxStart + 16, boxMargin+ TEXT_SIZE, gamePalette.getScorePaint());
+    }
+
+    private void createTutorialArrows(){
+        Rect goalBounds = getGoalBounds();
+        float goalRadius = goalBounds.width()/2f;
+        PointF goalArrowOrigin = new PointF(goalBounds.centerX() + goalRadius*2, goalBounds.centerY());
+        mGoalArrowPath = new Path();
+        mGoalArrowPath.moveTo(goalArrowOrigin.x, goalArrowOrigin.y);
+        mGoalArrowPath.rLineTo(goalRadius, goalRadius);
+        mGoalArrowPath.rLineTo(0 ,-goalRadius/2);
+        mGoalArrowPath.arcTo(goalArrowOrigin.x, goalBounds.centerY() + goalBounds.width()/4, goalArrowOrigin.x + goalRadius*2, goalBounds.centerY() + goalBounds.width()/4 + goalRadius*2,270, 90, false);
+        mGoalArrowPath.rLineTo(0, goalRadius);
+        mGoalArrowPath.rLineTo(goalRadius, 0);
+        mGoalArrowPath.rLineTo(0,-goalRadius);
+        mGoalArrowPath.arcTo(goalArrowOrigin.x - goalRadius, goalBounds.centerY() - goalRadius/2, goalArrowOrigin.x + goalRadius*3, goalBounds.centerY() + goalBounds.width()/4 +goalRadius*3, 0,-90,false);
+        mGoalArrowPath.rLineTo(0, -goalRadius/2);
+        mGoalArrowPath.close();
+
+        Ball soccerBall = getSoccerBall();
+        PointF ballCenter = new PointF((float)soccerBall.getCenterX(), (float)soccerBall.getCenterY());
+        float ballRadius = (float) soccerBall.getRadius();
+
+        mBallArrowPath = new Path();
+        mBallArrowPath.moveTo(ballCenter.x - ballRadius, ballCenter.y - ballRadius);
+        mBallArrowPath.rLineTo(0,  - ballRadius * 2);
+        mBallArrowPath.rLineTo( -ballRadius/1.5f, ballRadius/1.5f);
+        mBallArrowPath.rLineTo(-ballRadius * 3 , - ballRadius * 3);
+        mBallArrowPath.rLineTo(- ballRadius/1.5f,  ballRadius/1.5f);
+        mBallArrowPath.rLineTo(ballRadius  * 3, ballRadius * 3);
+        mBallArrowPath.rLineTo(-ballRadius /1.5f, ballRadius /1.5f);
+        mBallArrowPath.close();
     }
 }
