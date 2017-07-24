@@ -28,6 +28,7 @@ public class RickComponentFilter extends ComponentFilter {
     private RectF mFaceRect;
     private Bitmap mRickVomit, mRickHair;
     private boolean mFaceRicking;
+    private Bitmap mPreviewImage;
 
     private static final String FILTER_NAME = "Rick Sanchez";
     private float mHairWidthScale = 2.1f;
@@ -76,6 +77,7 @@ public class RickComponentFilter extends ComponentFilter {
     private void loadBitmaps(Context c){
         mRickHair = BitmapFactory.decodeResource(c.getResources(), R.drawable.rick_hair);
         mRickVomit = BitmapFactory.decodeResource(c.getResources(), R.drawable.rick_vomit);
+//        mPreviewImage = BitmapFactory.decodeResource(c.getResources(), R.drawable.); ToDo: Get the preview Image of Rick Sanchez
     }
 
     @Override
@@ -110,6 +112,11 @@ public class RickComponentFilter extends ComponentFilter {
             drawMessage(canvas, faceTracker.getScreenHeight()*.8f, faceTracker.getScreenWidth());
         }
         return canvas;
+    }
+
+    @Override
+    public Bitmap getPreviewImage() {
+        return mPreviewImage;
     }
 
     private void drawVomit(Canvas canvas, PointF leftMouth, PointF rightMouth, float eyeballRadius){
@@ -282,6 +289,7 @@ public class RickComponentFilter extends ComponentFilter {
         }
 
     }
+
     @Override
     public String getName() {
         return FILTER_NAME;

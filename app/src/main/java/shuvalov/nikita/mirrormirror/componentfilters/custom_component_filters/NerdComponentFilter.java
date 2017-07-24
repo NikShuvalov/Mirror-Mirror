@@ -1,6 +1,7 @@
 package shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -21,6 +22,7 @@ import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
 public class NerdComponentFilter extends ComponentFilter {
     private Paint mFramePaint, mTapePaint, mLensPaint, mLinePaint, mErasePaint;
     private static final String FILTER_NAME = "Nerd";
+    private Bitmap mPreviewImage;
 
     public NerdComponentFilter(Context context) {
         super();
@@ -47,6 +49,11 @@ public class NerdComponentFilter extends ComponentFilter {
 
         mErasePaint = new Paint();
         mErasePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+    }
+
+    @Override
+    public Bitmap getPreviewImage() {
+        return mPreviewImage;
     }
 
     @Override

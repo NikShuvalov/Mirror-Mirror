@@ -1,5 +1,6 @@
 package shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.view.View;
 
@@ -11,6 +12,7 @@ import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
 
 //ToDo: Create for Talk Like a pirate day
 public class PirateComponentFilter extends ComponentFilter {
+    private Bitmap mPreviewImage;
 
 
 
@@ -27,5 +29,10 @@ public class PirateComponentFilter extends ComponentFilter {
     @Override
     public void onClick(View view) {
 
+    }
+
+    @Override
+    public Bitmap getPreviewImage() {
+        return mPreviewImage;
     }
 }

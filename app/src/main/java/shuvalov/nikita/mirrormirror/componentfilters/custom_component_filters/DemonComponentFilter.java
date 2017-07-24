@@ -29,6 +29,7 @@ public class DemonComponentFilter extends ComponentFilter {
     private static final String FILTER_NAME = "Demon";
     private AnimatedFilter mLeftFlame, mRightFlame;
     private Paint mLinePaint, mHornPaint, mGoateePaint;
+    private Bitmap mPreviewImage;
 
     public DemonComponentFilter(Context context) {
         mLeftFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
@@ -66,6 +67,11 @@ public class DemonComponentFilter extends ComponentFilter {
             drawGoatee(canvas, faceRect,leftMouth, rightMouth);
         }
         return canvas;
+    }
+
+    @Override
+    public Bitmap getPreviewImage() {
+        return mPreviewImage;
     }
 
     private void drawGoatee(Canvas canvas, RectF faceRect, PointF leftMouth, PointF rightMouth){

@@ -20,5 +20,6 @@ public abstract class ComponentFilter implements View.OnClickListener{
     public ComponentFilter() {}
     public abstract Canvas drawComponentsToCanvas(Canvas canvas);
     public abstract String getName();
+    public abstract Bitmap getPreviewImage();
 
 }
