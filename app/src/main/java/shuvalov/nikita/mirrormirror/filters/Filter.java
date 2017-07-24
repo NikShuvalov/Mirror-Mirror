@@ -1,21 +1,22 @@
 package shuvalov.nikita.mirrormirror.filters;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 
 /**
  * Created by NikitaShuvalov on 4/5/17.
  */
 
 public abstract class Filter {
-    private int mResourceInt;
     private float mScaleX, mScaleY;
     private float mOffsetXPercent, mOffsetYPercent;
     private String mFilterName;
     private FilterType mFilterType;
+    private Bitmap mInitialBitmap;
 
-    public Filter(String filterName, int resourceInt, FilterType filterType, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
+    public Filter(String filterName, Bitmap initialBitmap, FilterType filterType, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
         mFilterName = filterName;
-        mResourceInt = resourceInt;
+        mInitialBitmap = initialBitmap;
         mFilterType = filterType;
         mScaleX = scaleX;
         mScaleY = scaleY;
@@ -30,14 +31,11 @@ public abstract class Filter {
      */
     public abstract Bitmap getBitmap(long currentMillis);
 
-    public abstract boolean isAnimated();
+    public Bitmap getBitmap(){
+        return mInitialBitmap;
+    }
 
     public boolean isParticle(){return false;}
-
-
-    public int getResourceInt() {
-        return mResourceInt;
-    }
 
     public float getScaleX() {
         return mScaleX;
@@ -63,7 +61,9 @@ public abstract class Filter {
         return mFilterType;
     }
 
-    public enum FilterType{
-        FULL, CENTER, BANNER_TOP, BANNER_BOTTOM, FACE, TOP_OF_HEAD, BELOW_FACE, HAIRLINE
+    public enum FilterType{ //ToDo: Consider changing this to STATIC, ANIMATED, COMPONENT, PARTICLE, and the facebook profile ones FULL, CENTER, BANNER_TOP/BOTTOM
+        FULL, CENTER, BANNER_TOP, BANNER_BOTTOM, FACE, TOP_OF_HEAD, BELOW_FACE, HAIRLINE, COMPONENT
     }
+
+    public abstract void drawFilterToCanvas(Canvas canvas);
 }

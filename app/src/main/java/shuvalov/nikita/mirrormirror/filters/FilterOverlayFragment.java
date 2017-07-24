@@ -80,7 +80,8 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
 
     public void setUpFilterSelector() {
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mFilterRecycler.setAdapter(new FilterSelectorAdapter(this,FilterManager.getInstance()));
+        FilterSelectorAdapter filterSelectorAdapter = new FilterSelectorAdapter(this,FilterManager.getInstance());
+        mFilterRecycler.setAdapter(filterSelectorAdapter);
         mFilterRecycler.setLayoutManager(horizontalLayoutManager);
     }
 

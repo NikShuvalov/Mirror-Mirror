@@ -14,16 +14,9 @@ import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
 public class PirateComponentFilter extends ComponentFilter {
     private Bitmap mPreviewImage;
 
-
-
-    @Override
-    public Canvas drawComponentsToCanvas(Canvas canvas) {
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        return null;
+    public PirateComponentFilter(String name, Bitmap previewImage) {
+        super(name);
+        mPreviewImage = previewImage;
     }
 
     @Override
@@ -31,8 +24,20 @@ public class PirateComponentFilter extends ComponentFilter {
 
     }
 
+
     @Override
-    public Bitmap getPreviewImage() {
-        return mPreviewImage;
+    public Bitmap getBitmap(long currentMillis) {
+        return null;
+    }
+
+    @Override
+    public Bitmap getBitmap() {
+        return null;
+    }
+
+
+    @Override
+    public void drawFilterToCanvas(Canvas canvas) {
+
     }
 }

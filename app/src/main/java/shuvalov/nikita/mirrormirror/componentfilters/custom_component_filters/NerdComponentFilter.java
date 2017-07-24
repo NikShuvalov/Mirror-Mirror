@@ -25,7 +25,7 @@ public class NerdComponentFilter extends ComponentFilter {
     private Bitmap mPreviewImage;
 
     public NerdComponentFilter(Context context) {
-        super();
+        super(FILTER_NAME);
         createPaints();
     }
 
@@ -51,13 +51,19 @@ public class NerdComponentFilter extends ComponentFilter {
         mErasePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
     }
 
+
     @Override
-    public Bitmap getPreviewImage() {
+    public Bitmap getBitmap(long currentMillis) {
+        return null;
+    }
+
+    @Override
+    public Bitmap getBitmap() {
         return mPreviewImage;
     }
 
     @Override
-    public Canvas drawComponentsToCanvas(Canvas canvas) {
+    public void drawFilterToCanvas(Canvas canvas) {
         FaceTracker faceTracker = FaceTracker.getInstance();
         PointF leftEye = faceTracker.getLeftEye();
         PointF rightEye = faceTracker.getRightEye();
@@ -66,7 +72,6 @@ public class NerdComponentFilter extends ComponentFilter {
             eyeballRadius = Math.abs(leftEye.x - rightEye.x)/4f;
             drawGlasses(canvas, leftEye, rightEye, eyeballRadius);
         }
-        return canvas;
     }
 
     private void drawGlasses(Canvas canvas, PointF leftEye, PointF rightEye, float eyeballRadius){
@@ -125,11 +130,6 @@ public class NerdComponentFilter extends ComponentFilter {
         canvas.drawPath(bridgePath, mLinePaint);
 
         bridgePath.close();
-    }
-
-    @Override
-    public String getName() {
-        return FILTER_NAME;
     }
 
     @Override

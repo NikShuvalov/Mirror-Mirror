@@ -32,8 +32,9 @@ public class DemonComponentFilter extends ComponentFilter {
     private Bitmap mPreviewImage;
 
     public DemonComponentFilter(Context context) {
-        mLeftFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
-        mRightFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
+        super(FILTER_NAME);
+//        mLeftFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
+//        mRightFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
         preparePaints();
     }
 
@@ -52,7 +53,7 @@ public class DemonComponentFilter extends ComponentFilter {
         mGoateePaint.setStyle(Paint.Style.FILL);
     }
     @Override
-    public Canvas drawComponentsToCanvas(Canvas canvas) {
+    public void drawFilterToCanvas(Canvas canvas) {
         FaceTracker faceTracker = FaceTracker.getInstance();
         RectF faceRect = faceTracker.getFaceRect();
         PointF leftMouth = faceTracker.getLeftMouth();
@@ -66,12 +67,6 @@ public class DemonComponentFilter extends ComponentFilter {
 //            drawHorns(canvas, leftEye, rightEye, eyeballRadius);
             drawGoatee(canvas, faceRect,leftMouth, rightMouth);
         }
-        return canvas;
-    }
-
-    @Override
-    public Bitmap getPreviewImage() {
-        return mPreviewImage;
     }
 
     private void drawGoatee(Canvas canvas, RectF faceRect, PointF leftMouth, PointF rightMouth){
@@ -165,13 +160,19 @@ public class DemonComponentFilter extends ComponentFilter {
     }
 
     @Override
-    public String getName() {
-        return FILTER_NAME;
-    }
-
-    @Override
     public void onClick(View view) {
         Log.d("Face Angle", "onClick: " + FaceTracker.getInstance().getFaceAngle());
         Log.d("Face TILT", "onClick: " + FaceTracker.getInstance().getFaceTilt());
     }
+
+    @Override
+    public Bitmap getBitmap(long currentMillis) {
+        return null;
+    }
+
+    @Override
+    public Bitmap getBitmap() {
+        return null;
+    }
+
 }

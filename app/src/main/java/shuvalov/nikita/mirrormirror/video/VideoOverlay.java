@@ -67,9 +67,7 @@ public class VideoOverlay extends BaseOverlay{
     public void notifyFilterChange() {
         Filter f = VideoFilterManager.getInstance().getSelectedFilter();
         if(f!=null) {
-            mBitmap = (mUsingAnimated = f.isAnimated()) ?
-                    f.getBitmap(SystemClock.uptimeMillis()) :
-                    BitmapFactory.decodeResource(getResources(), f.getResourceInt());
+            mBitmap = f.getBitmap();
             return;
         }
         mUsingAnimated = false;

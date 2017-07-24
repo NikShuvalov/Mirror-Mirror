@@ -15,7 +15,7 @@ public class VideoFilterManager extends BaseFilterManager{
 
     private VideoFilterManager() {
         super();
-        populateFilterList();
+//        populateFilterList();
     }
 
     private static VideoFilterManager sVideoFilterManager;
@@ -27,14 +27,14 @@ public class VideoFilterManager extends BaseFilterManager{
         return sVideoFilterManager;
     }
 
-    private void populateFilterList(){
-        ArrayList<Filter> filters = new ArrayList<>();
-        filters.add(new StaticFilter("CenterTest", R.drawable.mirror_mirror_logo, Filter.FilterType.CENTER,0,0,0,0));
-        filters.add(new StaticFilter("FrameTest", R.drawable.mirror_mirror_logo, Filter.FilterType.FULL,0,0,0,0));
-        filters.add(new StaticFilter("BannerTopTest", R.drawable.mirror_mirror_logo, Filter.FilterType.BANNER_TOP,0,0,0,0));
-        filters.add(new StaticFilter("BannerBotTest", R.drawable.mirror_mirror_logo, Filter.FilterType.BANNER_BOTTOM, 0,0,0,0));
-        super.setFilters(filters);
-    }
+//    private void populateFilterList(){
+//        ArrayList<Filter> filters = new ArrayList<>();
+//        filters.add(new StaticFilter("CenterTest", R.drawable.mirror_mirror_logo, Filter.FilterType.CENTER,0,0,0,0));
+//        filters.add(new StaticFilter("FrameTest", R.drawable.mirror_mirror_logo, Filter.FilterType.FULL,0,0,0,0));
+//        filters.add(new StaticFilter("BannerTopTest", R.drawable.mirror_mirror_logo, Filter.FilterType.BANNER_TOP,0,0,0,0));
+//        filters.add(new StaticFilter("BannerBotTest", R.drawable.mirror_mirror_logo, Filter.FilterType.BANNER_BOTTOM, 0,0,0,0));
+//        super.setFilters(filters);
+//    }
 
 
 }

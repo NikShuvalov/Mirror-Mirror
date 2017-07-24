@@ -26,7 +26,7 @@ public class ComponentOverlay extends BaseOverlay{
         super.onDraw(canvas);
         synchronized (mCanvasLock){
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
-            mCurrentComponentFilter.drawComponentsToCanvas(canvas);
+            mCurrentComponentFilter.drawFilterToCanvas(canvas);
             try {
                 Thread.sleep(75); //FixMe: Find a more elegant solution to reduce FPS or figure out what else can be done to keep bitmaps from flickering.
             } catch (InterruptedException e) {

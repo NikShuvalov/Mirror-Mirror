@@ -10,6 +10,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -72,8 +73,10 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
 
         //FixMe: Not sure why filterManager is referenced at all here. MainActivity doesn't use it at all, besides for adding a filter; It's because gettingBitMapList requires context.
-        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
-        FilterManager.getInstance().addAnimatedFilters(f);
+        FilterManager.getInstance().prepareAllImages(this);
+        //ToDo: Just put this line into the prepareAllImages line once I refactor animatedFilters class
+//        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
+//        FilterManager.getInstance().addAnimatedFilters(f);
     }
 
     @Override
@@ -206,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         if(filter!=null){
             float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();
             float scaleY = drawnTogether.getHeight()/faceTracker.getScreenHeight();
-            filterBmp = BitmapFactory.decodeResource(getResources(), filter.getResourceInt()); //Create a bitmap using the Filter object's info
+            filterBmp = filter.getBitmap(SystemClock.elapsedRealtime()); //Create a bitmap using the Filter object's info
             filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth()*(int)scaleX, filterBmp.getHeight()*(int)scaleY, mirrorFilter, true); //Apply scaling and the matrix filter... again?
         }
         canvas.drawBitmap(cameraPreview, null, previewRect, null);

@@ -1,6 +1,7 @@
 package shuvalov.nikita.mirrormirror.filters.particles;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 
 import shuvalov.nikita.mirrormirror.filters.Filter;
 
@@ -11,8 +12,8 @@ import shuvalov.nikita.mirrormirror.filters.Filter;
 public class ParticleFilter extends Filter{
 
 
-    public ParticleFilter(String filterName, int resourceInt, FilterType filterType, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
-        super(filterName, resourceInt, filterType, scaleX, scaleY, offsetXPercent, offsetYPercent);
+    public ParticleFilter(String filterName, Bitmap previewBitmap, FilterType filterType, float scaleX, float scaleY, float offsetXPercent, float offsetYPercent) {
+        super(filterName, previewBitmap, filterType, scaleX, scaleY, offsetXPercent, offsetYPercent);
     }
 
     @Override
@@ -21,12 +22,12 @@ public class ParticleFilter extends Filter{
     }
 
     @Override
-    public boolean isAnimated() {
-        return false;
+    public boolean isParticle() {
+        return true;
     }
 
     @Override
-    public boolean isParticle() {
-        return true;
+    public void drawFilterToCanvas(Canvas canvas) {
+
     }
 }

@@ -41,17 +41,10 @@ public class FilterOverlay extends BaseOverlay{
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        RectF face =  FaceTracker.getInstance().getFaceRect();
+        Filter filter = FilterManager.getInstance().getSelectedFilter();
         canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
-        if(face!=null && mBitmap!=null){
-            face.round(mRect);
-            if(mUsingAnimated){
-                if(mFilter!=null){
-                    mBitmap = mFilter.getBitmap(SystemClock.uptimeMillis());
-                }
-            }
-            canvas.drawBitmap(mBitmap, null, mRect, null);
-            mRect.setEmpty();
+        if(filter!=null) {
+            filter.drawFilterToCanvas(canvas);
         }
     }
 
@@ -59,9 +52,7 @@ public class FilterOverlay extends BaseOverlay{
     public void notifyFilterChange() {
         mFilter= FilterManager.getInstance().getSelectedFilter();
         if(mFilter!=null) {
-            mBitmap = (mUsingAnimated = mFilter.isAnimated()) ?
-                    mFilter.getBitmap(SystemClock.uptimeMillis()) :
-                    BitmapFactory.decodeResource(getResources(), mFilter.getResourceInt());
+            mBitmap = mFilter.getBitmap(SystemClock.elapsedRealtime());
             return;
         }
         mUsingAnimated = false;

@@ -37,7 +37,7 @@ public class RickComponentFilter extends ComponentFilter {
 
 
     public RickComponentFilter(Context context) {
-        super();
+        super(FILTER_NAME);
         mFaceRicking = true;
         mTextSize = 200f;
         mEyeBrowThickness = 65f;
@@ -81,7 +81,7 @@ public class RickComponentFilter extends ComponentFilter {
     }
 
     @Override
-    public Canvas drawComponentsToCanvas(Canvas canvas) {
+    public void drawFilterToCanvas(Canvas canvas) {
         FaceTracker faceTracker = FaceTracker.getInstance();
         PointF leftEye = faceTracker.getLeftEye();
         PointF rightEye = faceTracker.getRightEye();
@@ -111,12 +111,6 @@ public class RickComponentFilter extends ComponentFilter {
         if(!mFaceRicking){
             drawMessage(canvas, faceTracker.getScreenHeight()*.8f, faceTracker.getScreenWidth());
         }
-        return canvas;
-    }
-
-    @Override
-    public Bitmap getPreviewImage() {
-        return mPreviewImage;
     }
 
     private void drawVomit(Canvas canvas, PointF leftMouth, PointF rightMouth, float eyeballRadius){
@@ -127,6 +121,35 @@ public class RickComponentFilter extends ComponentFilter {
         RectF vomitRect = new RectF(leftMouth.x, midY, rightMouth.x, midY + distance * .6f);
         canvas.drawBitmap(mRickVomit, null, vomitRect, null);
     }
+
+    //FixMe: Mouth detection doesn't trigger nearly accurately enough, but if I do improve it, revisit this code.
+
+//    private void drawMouth(Canvas canvas, PointF leftCorner, PointF rightCorner){
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+//            Path mouthPath = new Path();
+//
+//            float mouthWidth = Math.abs(leftCorner.x - rightCorner.x);
+//            float mouthHeight = mouthWidth/3;
+//            float cornerRadius = mouthWidth/4;
+//
+//            float bottomLeft = leftCorner.y + mouthHeight/2;
+//            float topLeft = leftCorner.y - mouthHeight/2;
+//            float topRight = rightCorner.y - mouthHeight/2;
+//            float bottomRight = rightCorner.y - mouthHeight/2;
+//            float midX = (leftCorner.x + rightCorner.x);
+//            float topLipY = (topLeft+topRight)/2-mouthHeight/4;
+//            float botLipY = (bottomLeft+bottomRight)/2-mouthHeight/4;
+//
+//
+//            mouthPath.moveTo(leftCorner.x, leftCorner.y+mouthHeight/2);
+//            mouthPath.arcTo(leftCorner.x-cornerRadius, topLeft, leftCorner.x + cornerRadius, bottomLeft,90, 180, false);
+//            mouthPath.arcTo(leftCorner.x,topLipY,rightCorner.x, botLipY, 180, 180,false);
+//            mouthPath.arcTo(rightCorner.x - cornerRadius, topRight, rightCorner.x + cornerRadius, bottomRight, 270, 180, false);
+//            mouthPath.arcTo(leftCorner.x, botLipY, rightCorner.x, botLipY+mouthHeight, 0, -180, false);
+//            canvas.drawPath(mouthPath,mMouthPaint);
+//            canvas.drawPath(mouthPath, mLinePaint);
+//        }
+//    }
 
     private void drawMouth(Canvas canvas, float eyeballRadius,PointF leftMouth, PointF rightMouth ){
         float left = leftMouth.x - eyeballRadius;
@@ -159,33 +182,7 @@ public class RickComponentFilter extends ComponentFilter {
         canvas.drawArc(mFaceRect.right-eyeballRadius/2, midYPoint, mFaceRect.right+eyeballRadius/2,midYPoint+eyeballRadius, 270, 180, true, mLinePaint);
     }
 
-    //FixMe: Mouth detection doesn't trigger nearly accurately enough, but if I do improve it, revisit this code.
-//    private void drawMouth(Canvas canvas, PointF leftCorner, PointF rightCorner){
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-//            Path mouthPath = new Path();
-//
-//            float mouthWidth = Math.abs(leftCorner.x - rightCorner.x);
-//            float mouthHeight = mouthWidth/3;
-//            float cornerRadius = mouthWidth/4;
-//
-//            float bottomLeft = leftCorner.y + mouthHeight/2;
-//            float topLeft = leftCorner.y - mouthHeight/2;
-//            float topRight = rightCorner.y - mouthHeight/2;
-//            float bottomRight = rightCorner.y - mouthHeight/2;
-//            float midX = (leftCorner.x + rightCorner.x);
-//            float topLipY = (topLeft+topRight)/2-mouthHeight/4;
-//            float botLipY = (bottomLeft+bottomRight)/2-mouthHeight/4;
-//
-//
-//            mouthPath.moveTo(leftCorner.x, leftCorner.y+mouthHeight/2);
-//            mouthPath.arcTo(leftCorner.x-cornerRadius, topLeft, leftCorner.x + cornerRadius, bottomLeft,90, 180, false);
-//            mouthPath.arcTo(leftCorner.x,topLipY,rightCorner.x, botLipY, 180, 180,false);
-//            mouthPath.arcTo(rightCorner.x - cornerRadius, topRight, rightCorner.x + cornerRadius, bottomRight, 270, 180, false);
-//            mouthPath.arcTo(leftCorner.x, botLipY, rightCorner.x, botLipY+mouthHeight, 0, -180, false);
-//            canvas.drawPath(mouthPath,mMouthPaint);
-//            canvas.drawPath(mouthPath, mLinePaint);
-//        }
-//    }
+
 
     private void drawFace(Canvas canvas){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -290,12 +287,6 @@ public class RickComponentFilter extends ComponentFilter {
 
     }
 
-    @Override
-    public String getName() {
-        return FILTER_NAME;
-    }
-
-
     private RectF getAdjustedRect(RectF faceRect){
         RectF adjustedRect = new RectF(faceRect);
         Matrix matrix = new Matrix();
@@ -336,4 +327,15 @@ public class RickComponentFilter extends ComponentFilter {
             mHairVerticalOffset = -0.3f;
         }
     }
+
+    @Override
+    public Bitmap getBitmap(long currentMillis) {
+        return mPreviewImage;
+    }
+
+    @Override
+    public Bitmap getBitmap() {
+        return mPreviewImage;
+    }
+
 }
