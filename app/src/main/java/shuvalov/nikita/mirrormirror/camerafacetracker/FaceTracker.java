@@ -136,7 +136,7 @@ public class FaceTracker extends Tracker<Face>{
         mLeftEyeOpen = face.getIsLeftEyeOpenProbability()>.70;
         mRightEyeOpen = face.getIsRightEyeOpenProbability()>.70;
 //        calculateEyeLength(face);
-//        storeLandmarkPositions(face);
+        storeLandmarkPositions(face);
 //        deduceIfMouthIsOpen(face);
     }
 
@@ -221,7 +221,7 @@ public class FaceTracker extends Tracker<Face>{
     private void updateData(Face face){
         mFace = face;
         setNewFacePosition(face);
-//        distinguishLandmarks(face);
+        distinguishLandmarks(face);
     }
 
 

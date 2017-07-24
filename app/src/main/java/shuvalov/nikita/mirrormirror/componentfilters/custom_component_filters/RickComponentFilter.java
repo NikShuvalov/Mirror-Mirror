@@ -28,7 +28,6 @@ public class RickComponentFilter extends ComponentFilter {
     private RectF mFaceRect;
     private Bitmap mRickVomit, mRickHair;
     private boolean mFaceRicking;
-    private Bitmap mPreviewImage;
 
     private static final String FILTER_NAME = "Rick Sanchez";
     private float mHairWidthScale = 2.1f;
@@ -36,8 +35,8 @@ public class RickComponentFilter extends ComponentFilter {
     private float mHairVerticalOffset = -0.35f;
 
 
-    public RickComponentFilter(Context context) {
-        super(FILTER_NAME);
+    public RickComponentFilter(Context context, Bitmap previewImage) {
+        super(FILTER_NAME,previewImage);
         mFaceRicking = true;
         mTextSize = 200f;
         mEyeBrowThickness = 65f;
@@ -77,39 +76,40 @@ public class RickComponentFilter extends ComponentFilter {
     private void loadBitmaps(Context c){
         mRickHair = BitmapFactory.decodeResource(c.getResources(), R.drawable.rick_hair);
         mRickVomit = BitmapFactory.decodeResource(c.getResources(), R.drawable.rick_vomit);
-//        mPreviewImage = BitmapFactory.decodeResource(c.getResources(), R.drawable.); ToDo: Get the preview Image of Rick Sanchez
     }
 
     @Override
     public void drawFilterToCanvas(Canvas canvas) {
-        FaceTracker faceTracker = FaceTracker.getInstance();
-        PointF leftEye = faceTracker.getLeftEye();
-        PointF rightEye = faceTracker.getRightEye();
-        float eyeballRadius = faceTracker.getEyeballRadius() * 1.75f;
-        PointF leftMouth = faceTracker.getLeftMouth();
-        PointF rightMouth = faceTracker.getRightMouth();
-        mFaceRect = faceTracker.getFaceRect();
-        if(mFaceRect!=null){
-            RectF adjustedRect = getAdjustedRect(mFaceRect);
-            adjustEyebrowThickness(adjustedRect);
-            canvas.drawBitmap(mRickHair, null, adjustedRect, null);
-            if(mFaceRicking){
-                drawFace(canvas);
-                drawEars(canvas, eyeballRadius);
-            }
-            if(eyeballRadius>=0) {
+        if(canvas!=null) {
+            FaceTracker faceTracker = FaceTracker.getInstance();
+            PointF leftEye = faceTracker.getLeftEye();
+            PointF rightEye = faceTracker.getRightEye();
+            float eyeballRadius = faceTracker.getEyeballRadius() * 1.75f;
+            PointF leftMouth = faceTracker.getLeftMouth();
+            PointF rightMouth = faceTracker.getRightMouth();
+            mFaceRect = faceTracker.getFaceRect();
+            if (mFaceRect != null) {
+                RectF adjustedRect = getAdjustedRect(mFaceRect);
+                adjustEyebrowThickness(adjustedRect);
+                canvas.drawBitmap(mRickHair, null, adjustedRect, null);
+//                if (mFaceRicking) {
+                    drawFace(canvas);
+                    drawEars(canvas, eyeballRadius);
+//                }
+                if (eyeballRadius >= 0) {
                     drawVomit(canvas, leftMouth, rightMouth, eyeballRadius);
-                if(mFaceRicking) {
-                    drawMouth(canvas, eyeballRadius, leftMouth, rightMouth);
-                    drawEyes(canvas, leftEye, rightEye, eyeballRadius);
-                    drawNose(canvas, leftEye, rightEye, eyeballRadius);
+//                    if (mFaceRicking) {
+                        drawMouth(canvas, eyeballRadius, leftMouth, rightMouth);
+                        drawEyes(canvas, leftEye, rightEye, eyeballRadius);
+                        drawNose(canvas, leftEye, rightEye, eyeballRadius);
+//                    }
+                    drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
                 }
-                drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
+                mFaceRect.setEmpty();
             }
-            mFaceRect.setEmpty();
-        }
-        if(!mFaceRicking){
-            drawMessage(canvas, faceTracker.getScreenHeight()*.8f, faceTracker.getScreenWidth());
+            if (!mFaceRicking) {
+                drawMessage(canvas, faceTracker.getScreenHeight() * .8f, faceTracker.getScreenWidth());
+            }
         }
     }
 
@@ -314,6 +314,7 @@ public class RickComponentFilter extends ComponentFilter {
         mEyeBrowPaint.setStrokeWidth(mEyeBrowThickness);
     }
 
+    //ToDo: Get rid of the onClick, doesn't really fit well here.
     @Override
     public void onClick(View view) {
         mFaceRicking = !mFaceRicking;
@@ -330,12 +331,12 @@ public class RickComponentFilter extends ComponentFilter {
 
     @Override
     public Bitmap getBitmap(long currentMillis) {
-        return mPreviewImage;
+        return super.getBitmap();
     }
 
     @Override
     public Bitmap getBitmap() {
-        return mPreviewImage;
+        return super.getBitmap();
     }
 
 }

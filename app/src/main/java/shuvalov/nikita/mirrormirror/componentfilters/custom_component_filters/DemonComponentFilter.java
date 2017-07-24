@@ -29,10 +29,9 @@ public class DemonComponentFilter extends ComponentFilter {
     private static final String FILTER_NAME = "Demon";
     private AnimatedFilter mLeftFlame, mRightFlame;
     private Paint mLinePaint, mHornPaint, mGoateePaint;
-    private Bitmap mPreviewImage;
 
-    public DemonComponentFilter(Context context) {
-        super(FILTER_NAME);
+    public DemonComponentFilter(Context context, Bitmap previewImage) {
+        super(FILTER_NAME, previewImage);
 //        mLeftFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
 //        mRightFlame = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)).randomizeStartFrame();
         preparePaints();

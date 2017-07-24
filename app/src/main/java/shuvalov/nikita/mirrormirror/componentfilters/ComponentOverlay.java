@@ -18,20 +18,20 @@ public class ComponentOverlay extends BaseOverlay{
     public ComponentOverlay(Context context, ComponentFilter componentFilter) {
         super(context);
         mCurrentComponentFilter = componentFilter;
-        mCanvasLock = new Object();
+        mCanvasLock = new Object();//FixMe: ...Why?
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        synchronized (mCanvasLock){
+        synchronized (mCanvasLock){ //Lock prevents
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             mCurrentComponentFilter.drawFilterToCanvas(canvas);
-            try {
-                Thread.sleep(75); //FixMe: Find a more elegant solution to reduce FPS or figure out what else can be done to keep bitmaps from flickering.
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(75); //FixMe: Find a more elegant solution to reduce FPS or figure out what else can be done to keep bitmaps from flickering.
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 

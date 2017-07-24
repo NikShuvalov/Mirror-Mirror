@@ -182,7 +182,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
                 if(mFilterOverlay!=null) {
                     FilterManager.getInstance().clearSelectionIndex();
                     FaceTracker.getInstance().pause();
-                    mFilterOverlay.notifyFilterChange();
+//                    mFilterOverlay.notifyFilterChange();
                 }
                 ((MainActivity)getActivity()).notifyOverlayChanged();
                 break;
@@ -206,7 +206,7 @@ public class FilterOverlayFragment extends Fragment implements View.OnClickListe
             setUpOverlay();
         }
         FaceTracker.getInstance().setActive(FilterManager.getInstance().getSelectedIndex()>0);
-        mFilterOverlay.notifyFilterChange();
+//        mFilterOverlay.notifyFilterChange();
     }
 
     public void setUpOverlay(){

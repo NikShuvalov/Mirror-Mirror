@@ -1,6 +1,8 @@
 package shuvalov.nikita.mirrormirror.componentfilters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -50,7 +52,8 @@ public class ComponentOverlayFragment extends Fragment {
     }
 
     public void setUpOverlay(){
-        ComponentFilter componentFilter = new RickComponentFilter(getContext());
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.mirror_mirror_logo);
+        ComponentFilter componentFilter = new RickComponentFilter(getContext(), bitmap);
         mComponentOverlay = new ComponentOverlay(getContext(), componentFilter);
         mComponentOverlay.setZOrderMediaOverlay(true);
         mOverlayContainer.addView(mComponentOverlay);

@@ -12,11 +12,9 @@ import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
 
 //ToDo: Create for Talk Like a pirate day
 public class PirateComponentFilter extends ComponentFilter {
-    private Bitmap mPreviewImage;
 
     public PirateComponentFilter(String name, Bitmap previewImage) {
-        super(name);
-        mPreviewImage = previewImage;
+        super(name, previewImage);
     }
 
     @Override

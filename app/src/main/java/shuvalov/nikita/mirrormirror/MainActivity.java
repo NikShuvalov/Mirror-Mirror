@@ -74,9 +74,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
 
         //FixMe: Not sure why filterManager is referenced at all here. MainActivity doesn't use it at all, besides for adding a filter; It's because gettingBitMapList requires context.
         FilterManager.getInstance().prepareAllImages(this);
-        //ToDo: Just put this line into the prepareAllImages line once I refactor animatedFilters class
-//        AnimatedFilter f = new AnimatedFilter("Flames", R.drawable.flamekey0, Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(this, R.array.flame_animation_list));
-//        FilterManager.getInstance().addAnimatedFilters(f);
     }
 
     @Override
@@ -202,24 +199,29 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         FaceTracker faceTracker = FaceTracker.getInstance();
         RectF filterRect = faceTracker.getFaceRect();
         Rect previewRect = new Rect(0,0,p.x,p.y);
-
-        Matrix mirrorFilter = new Matrix();
-        mirrorFilter.postScale(-1, 1, p.x/2, p.y/2);
-        mirrorFilter.mapRect(filterRect);
-        if(filter!=null){
-            float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();
-            float scaleY = drawnTogether.getHeight()/faceTracker.getScreenHeight();
-            filterBmp = filter.getBitmap(SystemClock.elapsedRealtime()); //Create a bitmap using the Filter object's info
-            filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth()*(int)scaleX, filterBmp.getHeight()*(int)scaleY, mirrorFilter, true); //Apply scaling and the matrix filter... again?
-        }
         canvas.drawBitmap(cameraPreview, null, previewRect, null);
-        if(filterBmp!=null ) {
-            canvas.drawBitmap(filterBmp, null, filterRect, null);
+
+        if(filter!=null){
+            filter.drawFilterToCanvas(canvas);
         }
+
+//        Matrix mirrorFilter = new Matrix();
+//        mirrorFilter.postScale(-1, 1, p.x/2, p.y/2);
+//        mirrorFilter.mapRect(filterRect);
+//        if(filter!=null){
+//            float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();
+//            float scaleY = drawnTogether.getHeight()/faceTracker.getScreenHeight();
+//            filterBmp = filter.getBitmap(SystemClock.elapsedRealtime()); //Create a bitmap using the Filter object's info
+//            filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth()*(int)scaleX, filterBmp.getHeight()*(int)scaleY, mirrorFilter, true); //Apply scaling and the matrix filter... again?
+//        }
+//        canvas.drawBitmap(cameraPreview, null, previewRect, null);
+//        if(filterBmp!=null ) {
+//            canvas.drawBitmap(filterBmp, null, filterRect, null);
+//        }
         return drawnTogether;
     }
 
-    public void notifyOverlayChanged(){
+    public void notifyOverlayChanged(){ //ToDo: Probably trashing this
         FaceTracker.getInstance().changeDetectionMode(mCurrentOverlay);
         switch(mCurrentOverlay){
             case PARTICLE:

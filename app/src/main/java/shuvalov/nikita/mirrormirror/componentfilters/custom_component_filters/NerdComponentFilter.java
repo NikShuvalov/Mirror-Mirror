@@ -22,10 +22,9 @@ import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
 public class NerdComponentFilter extends ComponentFilter {
     private Paint mFramePaint, mTapePaint, mLensPaint, mLinePaint, mErasePaint;
     private static final String FILTER_NAME = "Nerd";
-    private Bitmap mPreviewImage;
 
-    public NerdComponentFilter(Context context) {
-        super(FILTER_NAME);
+    public NerdComponentFilter(Context context, Bitmap previewImage) {
+        super(FILTER_NAME, previewImage);
         createPaints();
     }
 
@@ -57,10 +56,6 @@ public class NerdComponentFilter extends ComponentFilter {
         return null;
     }
 
-    @Override
-    public Bitmap getBitmap() {
-        return mPreviewImage;
-    }
 
     @Override
     public void drawFilterToCanvas(Canvas canvas) {

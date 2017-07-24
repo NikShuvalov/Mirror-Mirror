@@ -15,6 +15,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
+import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
@@ -27,35 +28,42 @@ import static android.content.ContentValues.TAG;
  */
 
 public class FilterOverlay extends BaseOverlay{
-    private Bitmap mBitmap;
-    private Filter mFilter;
-    private Rect mRect;
-    private boolean mUsingAnimated;
+    private final Object mCanvasLock;
 
     public FilterOverlay(Context context) {
         super(context);
-        notifyFilterChange();
-        mRect = new Rect();
+        mCanvasLock = new Object();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Filter filter = FilterManager.getInstance().getSelectedFilter();
-        canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
-        if(filter!=null) {
-            filter.drawFilterToCanvas(canvas);
+        synchronized (mCanvasLock) {
+            Filter filter = FilterManager.getInstance().getSelectedFilter();
+            if(canvas!=null) {
+                canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
+                if (filter != null) {
+                    filter.drawFilterToCanvas(canvas);
+                    if (filter instanceof ComponentFilter) {
+                        try {
+                            Thread.sleep(75);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
         }
     }
 
 
-    public void notifyFilterChange() {
-        mFilter= FilterManager.getInstance().getSelectedFilter();
-        if(mFilter!=null) {
-            mBitmap = mFilter.getBitmap(SystemClock.elapsedRealtime());
-            return;
-        }
-        mUsingAnimated = false;
-        mBitmap = null;
-    }
+//    public void notifyFilterChange() {
+//        mFilter= FilterManager.getInstance().getSelectedFilter();
+//        if(mFilter!=null) {
+//            mBitmap = mFilter.getBitmap(SystemClock.elapsedRealtime());
+//            return;
+//        }
+//        mUsingAnimated = false;
+//        mBitmap = null;
+//    }
 }
