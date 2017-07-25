@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -37,6 +40,7 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
     private RelativeLayout mBottomPanel;
     private ImageButton mShareButton;
     private boolean mPanelShowing;
+    private static final long KILOBYTE = 1024 * 1024;
 
 
     @Override
@@ -132,7 +136,9 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
         if(files.length>0) {
             ArrayList<File> imageFiles = new ArrayList<>();
             for (File f : files) {
-                if (!f.isDirectory() && f.getName().endsWith(".jpg")) {
+                if (!f.isDirectory() &&
+                        f.getName().endsWith(".jpg") &&
+                        f.length()>KILOBYTE) { //Ignores directories, non-jpgs, and files under 1kb
                     imageFiles.add(f);
                 }
             }
@@ -151,11 +157,32 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
         if(!mBrowsingTracker.isAlbumEmpty()){
             File firstFile = mBrowsingTracker.getCurrentImageFile();
             try {
-                Bitmap bitmap = BitmapFactory.decodeFile(firstFile.getAbsolutePath());
-                mImageView.setImageBitmap(bitmap);
+                Log.d("Howdy", "loadImage: "+ String.valueOf(firstFile==null));
+                if(firstFile!=null) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(firstFile.getAbsolutePath());
+                    mImageView.setImageBitmap(bitmap);
+                }else{
+                    Point size = new Point();
+                    getWindowManager().getDefaultDisplay().getSize(size);
+                    Bitmap bitmap = Bitmap.createBitmap(size.x, size.y, Bitmap.Config.RGB_565);
+                    Canvas canvas = new Canvas(bitmap);
+                    canvas.drawColor(Color.BLACK);
+                    canvas.drawText("Empty Picture", mImageView.getWidth()*.1f,mImageView.getHeight()/2, null);
+                    mImageView.setImageBitmap(bitmap);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else{
+            Log.d("Howdy", "loadImage: Empty Album ");
+            Point size = new Point();
+            getWindowManager().getDefaultDisplay().getSize(size);
+            Log.d("Howdy", "ScreenSize:" + size.x + ","+ size.y);
+            Bitmap bitmap = Bitmap.createBitmap(size.x, size.y, Bitmap.Config.RGB_565);
+            Canvas canvas = new Canvas(bitmap);
+            canvas.drawColor(Color.BLACK);
+            canvas.drawText("No pictures in album", mImageView.getWidth()*.1f,mImageView.getHeight()/2, null);
+            mImageView.setImageBitmap(bitmap);
         }
 
     }
@@ -192,10 +219,15 @@ public class BrowsingActivity extends AppCompatActivity implements BrowseSwipeLi
     public void shareImage() {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
-        Uri imageUri = Uri.fromFile(mBrowsingTracker.getCurrentImageFile());
-        intent.putExtra(Intent.EXTRA_STREAM, imageUri);
-        intent.setType("image/jpeg");
-        startActivity(Intent.createChooser(intent, "Share to: "));
+        File file = mBrowsingTracker.getCurrentImageFile();
+        if(file!=null && file.length()>KILOBYTE) {
+            Uri imageUri = Uri.fromFile(mBrowsingTracker.getCurrentImageFile());
+            intent.putExtra(Intent.EXTRA_STREAM, imageUri);
+            intent.setType("image/jpeg");
+            startActivity(Intent.createChooser(intent, "Share to: "));
+        }else{
+            Toast.makeText(this, "Can't share an empty image", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

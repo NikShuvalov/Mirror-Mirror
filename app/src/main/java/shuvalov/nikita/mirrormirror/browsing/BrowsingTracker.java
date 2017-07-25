@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 import static android.content.ContentValues.TAG;
@@ -31,13 +32,16 @@ public class BrowsingTracker {
     }
 
     public void setImageFiles(ArrayList<File> imageFiles) {
+        Collections.reverse(imageFiles);
         mImageFiles = imageFiles;
-        Collections.reverse(mImageFiles);
         mCurrentIndex = 0;
     }
 
     public File getCurrentImageFile(){
-        return mImageFiles.get(mCurrentIndex);
+        if(!mImageFiles.isEmpty()) {
+            return mImageFiles.get(mCurrentIndex);
+        }
+        return null;
     }
 
     public void moveToNextPicture(){

@@ -1,24 +1,16 @@
-package shuvalov.nikita.mirrormirror.gamification;
+package shuvalov.nikita.mirrormirror.game_mode;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.PointF;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.Random;
-
-import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
-import shuvalov.nikita.mirrormirror.filters.particles.Particle;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by NikitaShuvalov on 5/10/17.

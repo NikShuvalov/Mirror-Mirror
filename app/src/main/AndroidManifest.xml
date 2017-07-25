@@ -33,7 +33,7 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="face"/>
 
-        <activity android:name=".gamification.GameActivity"
+        <activity android:name=".game_mode.GameActivity"
                   android:screenOrientation="portrait">
         </activity>
     </application>

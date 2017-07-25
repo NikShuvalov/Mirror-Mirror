@@ -3,4 +3,4 @@
              android:id="@+id/overlay_container"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="shuvalov.nikita.mirrormirror.gamification.GameOverlayFragment"/>
+             tools:context="shuvalov.nikita.mirrormirror.game_mode.GameOverlayFragment"/>

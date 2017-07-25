@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.gamification;
+package shuvalov.nikita.mirrormirror.game_mode;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,12 +9,9 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by NikitaShuvalov on 5/10/17.

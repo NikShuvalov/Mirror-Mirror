@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="shuvalov.nikita.mirrormirror.gamification.GameActivity">
+    tools:context="shuvalov.nikita.mirrormirror.game_mode.GameActivity">
 
     <FrameLayout
         android:id="@+id/preview_container"

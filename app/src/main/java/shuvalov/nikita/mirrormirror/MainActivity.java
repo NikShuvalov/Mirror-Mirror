@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     public GraphicType mCurrentOverlay;
 
     public static final String MAIN_FRAGMENT = "Main Fragment";
+    public static final String BROWSE_FRAGMENT = "Browse Fragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,38 +206,23 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         if(filter!=null){
             filter.drawMirroredFilterToCanvas(canvas,mirrorFilter);
         }
-
-//        Bitmap filterBmp = null;
-//        FaceTracker faceTracker = FaceTracker.getInstance();
-//        RectF filterRect = faceTracker.getFaceRect();
-//        mirrorFilter.mapRect(filterRect);
-//        if(filter!=null){
-//            float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();
-//            float scaleY = drawnTogether.getHeight()/faceTracker.getScreenHeight();
-//            filterBmp = filter.getBitmap(SystemClock.elapsedRealtime()); //Create a bitmap using the Filter object's info
-//            filterBmp = Bitmap.createBitmap(filterBmp, 0, 0, filterBmp.getWidth()*(int)scaleX, filterBmp.getHeight()*(int)scaleY, mirrorFilter, true); //Apply scaling and the matrix filter... again?
-//        }
-//        canvas.drawBitmap(cameraPreview, null, previewRect, null);
-//        if(filterBmp!=null ) {
-//            canvas.drawBitmap(filterBmp, null, filterRect, null);
-//        }
         return drawnTogether;
     }
 
-    public void notifyOverlayChanged(){ //ToDo: Probably trashing this
+    public void notifyOverlayChanged(){
         FaceTracker.getInstance().changeDetectionMode(mCurrentOverlay);
         switch(mCurrentOverlay){
-            case PARTICLE:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ParticleOverlayFragment.newInstance()).commit();
-                break;
+//            case PARTICLE:
+//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ParticleOverlayFragment.newInstance()).commit();
+//                break;
             case FILTER:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, FilterOverlayFragment.newInstance(), MAIN_FRAGMENT).commit();
                 break;
-            case COMPONENT:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ComponentOverlayFragment.newInstance()).commit();
-                break;
+//            case COMPONENT:
+//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ComponentOverlayFragment.newInstance()).commit();
+//                break;
             case BROWSE:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, BrowseFragment.newInstance()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, BrowseFragment.newInstance(), BROWSE_FRAGMENT).commit();
                 break;
         }
     }
@@ -267,7 +253,19 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
             }else {
                 super.onBackPressed();
             }
-        }else{
+        }else if (mCurrentOverlay == GraphicType.BROWSE){
+            BrowseFragment frag = (BrowseFragment)getSupportFragmentManager().findFragmentByTag(BROWSE_FRAGMENT);
+            if(frag.isVisible()){
+                if(!frag.onBackPressed()){
+                    mCurrentOverlay = GraphicType.FILTER;
+                    notifyOverlayChanged();
+                }
+            }else{
+                super.onBackPressed();
+            }
+        }
+
+        else{
             mCurrentOverlay = GraphicType.FILTER;
             notifyOverlayChanged();
         }

@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters;
+package shuvalov.nikita.mirrormirror.componentfilters;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.gamification;
+package shuvalov.nikita.mirrormirror.game_mode;
 
 import android.graphics.Paint;
 import android.graphics.RectF;

@@ -1,9 +1,7 @@
 package shuvalov.nikita.mirrormirror.componentfilters;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,15 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import java.util.ArrayList;
-
 import shuvalov.nikita.mirrormirror.R;
-import shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters.DemonComponentFilter;
-import shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters.NerdComponentFilter;
-import shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters.RickComponentFilter;
-import shuvalov.nikita.mirrormirror.filters.Filter;
-import shuvalov.nikita.mirrormirror.filters.StaticFilter;
-import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 
 public class ComponentOverlayFragment extends Fragment {
     private FrameLayout mOverlayContainer;

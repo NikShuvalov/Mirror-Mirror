@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,6 +40,7 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
     private RelativeLayout mBottomPanel;
     private ImageButton mShareButton;
     private boolean mPanelShowing;
+    private static final long KILOBYTE = 1024 * 1024;
 
     public void findViews(View fragment){
         mImageView = (ImageView)fragment.findViewById(R.id.image_view);
@@ -68,7 +73,9 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
         mBrowsingTracker= BrowsingTracker.getInstance();
 
         permissionValidate();
-        if(mPanelShowing) hideBottomPanel();
+        if(mPanelShowing) { //FixMe: The Fuck am I doing this for?
+            hideBottomPanel();
+        }
         loadImage();
         mBottomPanel.setOnClickListener(this);
         mShareButton.setOnClickListener(this);
@@ -134,8 +141,12 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
                 loadImage();
                 break;
             case CLICK:
-                if(!mPanelShowing) showBottomPanel();
-                else hideBottomPanel();
+                if(!mPanelShowing) {
+                    showBottomPanel();
+                }
+                else {
+                    hideBottomPanel();
+                }
                 break;
         }
     }
@@ -144,10 +155,15 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
     public void shareImage() {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
-        Uri imageUri = Uri.fromFile(mBrowsingTracker.getCurrentImageFile());
-        intent.putExtra(Intent.EXTRA_STREAM, imageUri);
-        intent.setType("image/jpeg");
-        startActivity(Intent.createChooser(intent, "Share to: "));
+        File file = mBrowsingTracker.getCurrentImageFile();
+        if(file!=null && file.length()>KILOBYTE) {
+            Uri imageUri = Uri.fromFile(mBrowsingTracker.getCurrentImageFile());
+            intent.putExtra(Intent.EXTRA_STREAM, imageUri);
+            intent.setType("image/jpeg");
+            startActivity(Intent.createChooser(intent, "Share to: "));
+        }else{
+            Toast.makeText(getContext(), "Can't share an empty image", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -199,15 +215,32 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
         if(!mBrowsingTracker.isAlbumEmpty()){
             File firstFile = mBrowsingTracker.getCurrentImageFile();
             try {
-                Bitmap bitmap = BitmapFactory.decodeFile(firstFile.getAbsolutePath());
-                if(bitmap==null){
-                    mImageView.setImageResource(R.drawable.beautify_mirror);
+                if(firstFile==null){
+                    Point size = new Point();
+                    getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+                    Bitmap bitmap = Bitmap.createBitmap(size.x, size.y, Bitmap.Config.RGB_565);
+                    Canvas canvas = new Canvas(bitmap);
+                    canvas.drawColor(Color.BLACK);
+                    mImageView.setImageBitmap(bitmap);
                 }else{
+                    Bitmap bitmap = BitmapFactory.decodeFile(firstFile.getAbsolutePath());
                     mImageView.setImageBitmap(bitmap);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else{
+            //ToDo: Replace with a fixed bitmap a different
+            Paint textPaint = new Paint();
+            textPaint.setColor(Color.WHITE);
+            textPaint.setTextSize(50f);
+            Point size = new Point();
+            getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+            Bitmap bitmap = Bitmap.createBitmap(size.x, size.y, Bitmap.Config.RGB_565);
+            Canvas canvas = new Canvas(bitmap);
+            canvas.drawColor(Color.BLACK);
+            canvas.drawText("No pictures in album", size.x*.3f,size.y/2, textPaint);
+            mImageView.setImageBitmap(bitmap);
         }
 
     }
@@ -220,6 +253,14 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
         }else{
             Toast.makeText(getContext(), "Can't browse images without permission", Toast.LENGTH_LONG).show();
         }
+    }
+
+    public boolean onBackPressed(){
+        if(mPanelShowing){
+            hideBottomPanel();
+            return true;
+        }
+        return false;
     }
 
 }

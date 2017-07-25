@@ -4,13 +4,11 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import shuvalov.nikita.mirrormirror.AppConstants;
 import shuvalov.nikita.mirrormirror.BaseFilterManager;
 import shuvalov.nikita.mirrormirror.R;
-import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
-import shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters.RickComponentFilter;
+import shuvalov.nikita.mirrormirror.componentfilters.RickComponentFilter;
 
 /**
  * Created by NikitaShuvalov on 4/2/17.

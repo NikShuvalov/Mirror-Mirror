@@ -18,7 +18,7 @@ import android.widget.ImageButton;
 import shuvalov.nikita.mirrormirror.MainActivity;
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
-import shuvalov.nikita.mirrormirror.gamification.GameActivity;
+import shuvalov.nikita.mirrormirror.game_mode.GameActivity;
 import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 
 public class FilterOverlayFragment extends Fragment implements View.OnClickListener, FilterSelectorAdapter.FilterSelectorListener {

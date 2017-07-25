@@ -1,8 +1,7 @@
-package shuvalov.nikita.mirrormirror.gamification;
+package shuvalov.nikita.mirrormirror.game_mode;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 
 /**
  * Created by NikitaShuvalov on 7/21/17.
