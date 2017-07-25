@@ -195,18 +195,20 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         Canvas canvas = new Canvas(drawnTogether);
 
         Filter filter = FilterManager.getInstance().getSelectedFilter();
-        Bitmap filterBmp = null;
-        FaceTracker faceTracker = FaceTracker.getInstance();
-        RectF filterRect = faceTracker.getFaceRect();
+
         Rect previewRect = new Rect(0,0,p.x,p.y);
         canvas.drawBitmap(cameraPreview, null, previewRect, null);
 
+        Matrix mirrorFilter = new Matrix();
+        mirrorFilter.postScale(-1, 1, p.x/2, p.y/2);
+
         if(filter!=null){
-            filter.drawFilterToCanvas(canvas);
+            filter.drawMirroredFilterToCanvas(canvas,mirrorFilter);
         }
 
-//        Matrix mirrorFilter = new Matrix();
-//        mirrorFilter.postScale(-1, 1, p.x/2, p.y/2);
+//        Bitmap filterBmp = null;
+//        FaceTracker faceTracker = FaceTracker.getInstance();
+//        RectF filterRect = faceTracker.getFaceRect();
 //        mirrorFilter.mapRect(filterRect);
 //        if(filter!=null){
 //            float scaleX = drawnTogether.getWidth()/faceTracker.getScreenWidth();

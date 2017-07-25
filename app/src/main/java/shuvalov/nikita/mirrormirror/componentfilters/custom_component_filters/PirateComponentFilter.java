@@ -2,6 +2,7 @@ package shuvalov.nikita.mirrormirror.componentfilters.custom_component_filters;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.view.View;
 
 import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
@@ -36,6 +37,11 @@ public class PirateComponentFilter extends ComponentFilter {
 
     @Override
     public void drawFilterToCanvas(Canvas canvas) {
+
+    }
+
+    @Override
+    public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
 
     }
 }

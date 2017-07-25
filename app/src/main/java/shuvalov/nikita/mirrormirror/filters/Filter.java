@@ -2,6 +2,7 @@ package shuvalov.nikita.mirrormirror.filters;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 
 /**
  * Created by NikitaShuvalov on 4/5/17.
@@ -66,4 +67,6 @@ public abstract class Filter {
     }
 
     public abstract void drawFilterToCanvas(Canvas canvas);
+
+    public abstract void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix);
 }

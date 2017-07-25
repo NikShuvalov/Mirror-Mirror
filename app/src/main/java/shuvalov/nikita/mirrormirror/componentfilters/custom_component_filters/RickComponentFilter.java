@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 
 
@@ -105,10 +106,40 @@ public class RickComponentFilter extends ComponentFilter {
 //                    }
                     drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
                 }
-                mFaceRect.setEmpty();
+//                mFaceRect.setEmpty();
             }
             if (!mFaceRicking) {
                 drawMessage(canvas, faceTracker.getScreenHeight() * .8f, faceTracker.getScreenWidth());
+            }
+        }
+    }
+
+    @Override
+    public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
+        if(canvas!=null) {
+            FaceTracker faceTracker = FaceTracker.getInstance();
+            PointF leftEye = faceTracker.getLeftEye();
+            PointF rightEye = faceTracker.getRightEye();
+            float eyeballRadius = faceTracker.getEyeballRadius() * 1.75f;
+            PointF leftMouth = faceTracker.getLeftMouth();
+            PointF rightMouth = faceTracker.getRightMouth();
+            mFaceRect = faceTracker.getFaceRect();
+            mirrorMatrix.mapRect(mFaceRect);
+            if (mFaceRect != null) {
+                Log.d("RIck", "drawMirroredFilterToCanvas: Face is not null");
+//                RectF adjustedRect = getAdjustedRect(mFaceRect);
+//                adjustEyebrowThickness(adjustedRect);
+                canvas.drawBitmap(mRickHair, null, mFaceRect, null);
+                drawFace(canvas);
+                drawEars(canvas, eyeballRadius);
+                if (eyeballRadius >= 0) {
+                    drawVomit(canvas, leftMouth, rightMouth, eyeballRadius);
+                    drawMouth(canvas, eyeballRadius, leftMouth, rightMouth);
+                    drawEyes(canvas, leftEye, rightEye, eyeballRadius);
+                    drawNose(canvas, leftEye, rightEye, eyeballRadius);
+                    drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
+                }
+                mFaceRect.setEmpty();
             }
         }
     }
@@ -224,7 +255,7 @@ public class RickComponentFilter extends ComponentFilter {
 
         //Right-Eye draw logic
         canvas.drawCircle(rightEye.x, rightEye.y, eyeballRadius, mEyeBallPaint);
-        if(rightEyeOpenChance> .4f && rightEyeOpenChance<.7) {
+        if(rightEyeOpenChance> .3f && rightEyeOpenChance<.7) {
             canvas.drawCircle(rightEye.x, rightEye.y, eyeballRadius, mEyeBallPaint);
             canvas.drawArc(rightEye.x - eyeballRadius, rightEye.y - eyeballRadius, rightEye.x + eyeballRadius, rightEye.y + eyeballRadius, 180, 180, true, mFacePaint);
             canvas.drawArc(rightEye.x - eyeballRadius, rightEye.y - eyeballRadius, rightEye.x + eyeballRadius, rightEye.y + eyeballRadius, 180, 180, true, mLinePaint);

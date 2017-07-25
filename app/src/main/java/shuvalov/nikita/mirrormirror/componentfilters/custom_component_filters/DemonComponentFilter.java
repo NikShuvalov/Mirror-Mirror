@@ -68,6 +68,11 @@ public class DemonComponentFilter extends ComponentFilter {
         }
     }
 
+    @Override
+    public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
+
+    }
+
     private void drawGoatee(Canvas canvas, RectF faceRect, PointF leftMouth, PointF rightMouth){
 
         float goateeTopLeft = leftMouth.y + faceRect.height()/10;

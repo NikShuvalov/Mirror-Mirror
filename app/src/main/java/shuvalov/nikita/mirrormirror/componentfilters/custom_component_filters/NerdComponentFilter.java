@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
@@ -125,6 +126,11 @@ public class NerdComponentFilter extends ComponentFilter {
         canvas.drawPath(bridgePath, mLinePaint);
 
         bridgePath.close();
+    }
+
+    @Override
+    public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
+
     }
 
     @Override

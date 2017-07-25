@@ -2,6 +2,7 @@ package shuvalov.nikita.mirrormirror.filters.particles;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 
 import shuvalov.nikita.mirrormirror.filters.Filter;
 
@@ -28,6 +29,11 @@ public class ParticleFilter extends Filter{
 
     @Override
     public void drawFilterToCanvas(Canvas canvas) {
+
+    }
+
+    @Override
+    public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
 
     }
 }

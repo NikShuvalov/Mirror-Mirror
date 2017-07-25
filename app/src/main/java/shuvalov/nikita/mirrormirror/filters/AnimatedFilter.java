@@ -4,6 +4,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.os.SystemClock;
 
@@ -62,6 +63,17 @@ public class AnimatedFilter extends Filter {
         Bitmap bp = getBitmap(SystemClock.elapsedRealtime());
         if(face!=null){
             canvas.drawBitmap(bp, null, face, null);
+        }
+    }
+
+    @Override
+    public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
+        RectF faceRect = FaceTracker.getInstance().getFaceRect();
+        mirrorMatrix.mapRect(faceRect);
+        if(faceRect!=null){
+            Bitmap imageBitmap = getBitmap(SystemClock.elapsedRealtime());
+            imageBitmap = Bitmap.createBitmap(imageBitmap,0,0, imageBitmap.getWidth()*(int)getScaleX(), imageBitmap.getHeight()*(int)getScaleY(), mirrorMatrix, true);
+            canvas.drawBitmap(imageBitmap, null, faceRect, null);
         }
     }
 

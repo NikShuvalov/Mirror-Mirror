@@ -3,6 +3,7 @@ package shuvalov.nikita.mirrormirror.filters;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.RectF;
 
@@ -32,9 +33,20 @@ public class StaticFilter extends Filter {
 
     @Override
     public void drawFilterToCanvas(Canvas canvas) {
-        RectF face = FaceTracker.getInstance().getFaceRect();
-        if(face!=null){
-            canvas.drawBitmap(super.getBitmap(),null, face,null);
+        RectF faceRect = FaceTracker.getInstance().getFaceRect();
+        if(faceRect!=null){
+            canvas.drawBitmap(super.getBitmap(),null, faceRect,null);
+        }
+    }
+
+    @Override
+    public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
+        RectF faceRect = FaceTracker.getInstance().getFaceRect();
+        mirrorMatrix.mapRect(faceRect);
+        if(faceRect!=null){
+            Bitmap imageBitmap = super.getBitmap();
+            imageBitmap = Bitmap.createBitmap(imageBitmap,0,0, imageBitmap.getWidth()*(int)getScaleX(), imageBitmap.getHeight()*(int)getScaleY(), mirrorMatrix, true);
+            canvas.drawBitmap(imageBitmap, null, faceRect, null);
         }
     }
 }
