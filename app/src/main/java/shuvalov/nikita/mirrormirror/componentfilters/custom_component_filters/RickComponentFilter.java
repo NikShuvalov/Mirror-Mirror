@@ -26,7 +26,6 @@ import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
 public class RickComponentFilter extends ComponentFilter {
     private Paint mLinePaint, mTextPaint, mEyeBrowPaint, mEyeBallPaint, mPupilPaint, mFacePaint;
     private float mTextSize, mEyeBrowThickness;
-    private RectF mFaceRect;
     private Bitmap mRickVomit, mRickHair;
     private boolean mFaceRicking;
 
@@ -88,14 +87,14 @@ public class RickComponentFilter extends ComponentFilter {
             float eyeballRadius = faceTracker.getEyeballRadius() * 1.75f;
             PointF leftMouth = faceTracker.getLeftMouth();
             PointF rightMouth = faceTracker.getRightMouth();
-            mFaceRect = faceTracker.getFaceRect();
-            if (mFaceRect != null) {
-                RectF adjustedRect = getAdjustedRect(mFaceRect);
+            RectF faceRect = faceTracker.getFaceRect();
+            if (faceRect != null) {
+                RectF adjustedRect = getAdjustedRect(faceRect);
                 adjustEyebrowThickness(adjustedRect);
                 canvas.drawBitmap(mRickHair, null, adjustedRect, null);
 //                if (mFaceRicking) {
-                    drawFace(canvas);
-                    drawEars(canvas, eyeballRadius);
+                    drawFace(canvas, faceRect);
+                    drawEars(canvas, eyeballRadius, faceRect);
 //                }
                 if (eyeballRadius >= 0) {
                     drawVomit(canvas, leftMouth, rightMouth, eyeballRadius);
@@ -106,7 +105,6 @@ public class RickComponentFilter extends ComponentFilter {
 //                    }
                     drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
                 }
-//                mFaceRect.setEmpty();
             }
             if (!mFaceRicking) {
                 drawMessage(canvas, faceTracker.getScreenHeight() * .8f, faceTracker.getScreenWidth());
@@ -123,15 +121,15 @@ public class RickComponentFilter extends ComponentFilter {
             float eyeballRadius = faceTracker.getEyeballRadius() * 1.75f;
             PointF leftMouth = faceTracker.getLeftMouth();
             PointF rightMouth = faceTracker.getRightMouth();
-            mFaceRect = faceTracker.getFaceRect();
-            mirrorMatrix.mapRect(mFaceRect);
-            if (mFaceRect != null) {
+            RectF faceRect = faceTracker.getFaceRect();
+            mirrorMatrix.mapRect(faceRect);
+            if (faceRect != null) {
                 Log.d("RIck", "drawMirroredFilterToCanvas: Face is not null");
-//                RectF adjustedRect = getAdjustedRect(mFaceRect);
-//                adjustEyebrowThickness(adjustedRect);
-                canvas.drawBitmap(mRickHair, null, mFaceRect, null);
-                drawFace(canvas);
-                drawEars(canvas, eyeballRadius);
+                RectF adjustedRect = getAdjustedRect(faceRect);
+                adjustEyebrowThickness(adjustedRect);
+                canvas.drawBitmap(mRickHair, null, faceRect, null);
+                drawFace(canvas, faceRect);
+                drawEars(canvas, eyeballRadius, faceRect);
                 if (eyeballRadius >= 0) {
                     drawVomit(canvas, leftMouth, rightMouth, eyeballRadius);
                     drawMouth(canvas, eyeballRadius, leftMouth, rightMouth);
@@ -139,7 +137,7 @@ public class RickComponentFilter extends ComponentFilter {
                     drawNose(canvas, leftEye, rightEye, eyeballRadius);
                     drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
                 }
-                mFaceRect.setEmpty();
+                faceRect.setEmpty();
             }
         }
     }
@@ -201,31 +199,31 @@ public class RickComponentFilter extends ComponentFilter {
         canvas.drawArc(leftEye.x+eyeballRadius/1.5f, leftEye.y, rightEye.x - eyeballRadius/1.5f, Math.max(leftEye.y, rightEye.y)+ 2*eyeballRadius,0, 180, false, mLinePaint);
     }
 
-    public void drawEars(Canvas canvas, float eyeballRadius){
-        float midYPoint = (mFaceRect.top + mFaceRect.bottom)/2;
+    public void drawEars(Canvas canvas, float eyeballRadius, RectF faceRect){
+        float midYPoint = (faceRect.top + faceRect.bottom)/2;
 
         //Draw left ear
-        canvas.drawArc(mFaceRect.left-eyeballRadius/2, midYPoint, mFaceRect.left+eyeballRadius/2,midYPoint+eyeballRadius, 90, 180, false, mFacePaint);
-        canvas.drawArc(mFaceRect.left-eyeballRadius/2, midYPoint, mFaceRect.left+eyeballRadius/2,midYPoint+eyeballRadius, 90, 180, true, mLinePaint);
+        canvas.drawArc(faceRect.left-eyeballRadius/2, midYPoint, faceRect.left+eyeballRadius/2,midYPoint+eyeballRadius, 90, 180, false, mFacePaint);
+        canvas.drawArc(faceRect.left-eyeballRadius/2, midYPoint, faceRect.left+eyeballRadius/2,midYPoint+eyeballRadius, 90, 180, true, mLinePaint);
 
         //Draw  right ear
-        canvas.drawArc(mFaceRect.right-eyeballRadius/2, midYPoint, mFaceRect.right+eyeballRadius/2,midYPoint+eyeballRadius, 270, 180, false, mFacePaint);
-        canvas.drawArc(mFaceRect.right-eyeballRadius/2, midYPoint, mFaceRect.right+eyeballRadius/2,midYPoint+eyeballRadius, 270, 180, true, mLinePaint);
+        canvas.drawArc(faceRect.right-eyeballRadius/2, midYPoint, faceRect.right+eyeballRadius/2,midYPoint+eyeballRadius, 270, 180, false, mFacePaint);
+        canvas.drawArc(faceRect.right-eyeballRadius/2, midYPoint, faceRect.right+eyeballRadius/2,midYPoint+eyeballRadius, 270, 180, true, mLinePaint);
     }
 
 
 
-    private void drawFace(Canvas canvas){
+    private void drawFace(Canvas canvas, RectF faceRect){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            float verticalArcHeight = mFaceRect.height()/4;
-            float faceTop = mFaceRect.top + verticalArcHeight;
-            float faceBot = mFaceRect.bottom -verticalArcHeight/2;
+            float verticalArcHeight = faceRect.height()/4;
+            float faceTop = faceRect.top + verticalArcHeight;
+            float faceBot = faceRect.bottom -verticalArcHeight/2;
             Path facePath = new Path();
-            facePath.moveTo(mFaceRect.left, faceTop);
-            facePath.arcTo(mFaceRect.left, faceTop - verticalArcHeight, mFaceRect.right, faceTop + verticalArcHeight, 180, 180, false);
-            facePath.lineTo(mFaceRect.right, faceBot);
-            facePath.arcTo(mFaceRect.left, faceBot - verticalArcHeight, mFaceRect.right, faceBot + verticalArcHeight, 0, 180, false);
-            facePath.lineTo(mFaceRect.left, faceTop);
+            facePath.moveTo(faceRect.left, faceTop);
+            facePath.arcTo(faceRect.left, faceTop - verticalArcHeight, faceRect.right, faceTop + verticalArcHeight, 180, 180, false);
+            facePath.lineTo(faceRect.right, faceBot);
+            facePath.arcTo(faceRect.left, faceBot - verticalArcHeight, faceRect.right, faceBot + verticalArcHeight, 0, 180, false);
+            facePath.lineTo(faceRect.left, faceTop);
             canvas.drawPath(facePath, mFacePaint);
             canvas.drawPath(facePath, mLinePaint);
             facePath.close();
