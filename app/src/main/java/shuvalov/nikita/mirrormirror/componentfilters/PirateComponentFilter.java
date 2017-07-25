@@ -19,12 +19,6 @@ public class PirateComponentFilter extends ComponentFilter {
     }
 
     @Override
-    public void onClick(View view) {
-
-    }
-
-
-    @Override
     public Bitmap getBitmap(long currentMillis) {
         return null;
     }

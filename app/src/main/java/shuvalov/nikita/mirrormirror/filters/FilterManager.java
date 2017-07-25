@@ -9,6 +9,7 @@ import shuvalov.nikita.mirrormirror.AppConstants;
 import shuvalov.nikita.mirrormirror.BaseFilterManager;
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.componentfilters.RickComponentFilter;
+import shuvalov.nikita.mirrormirror.componentfilters.VikingComponentFilter;
 
 /**
  * Created by NikitaShuvalov on 4/2/17.
@@ -30,6 +31,7 @@ public class FilterManager extends BaseFilterManager{
             filters.add(new StaticFilter("Saiyan", BitmapFactory.decodeResource(context.getResources(), R.drawable.super_saiyan), Filter.FilterType.HAIRLINE, 1.75f, 1.5f, 0, -0.5f));
             filters.add(new AnimatedFilter("Flames", BitmapFactory.decodeResource(context.getResources(), R.drawable.flamekey0), Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)));
             filters.add(new RickComponentFilter(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.mirror_mirror_logo)));
+            filters.add(new VikingComponentFilter(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.mirror_mirror_logo)));
             super.setFilters(filters);
         }
     }

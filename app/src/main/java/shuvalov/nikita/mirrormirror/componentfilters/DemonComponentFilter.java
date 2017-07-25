@@ -164,12 +164,6 @@ public class DemonComponentFilter extends ComponentFilter {
     }
 
     @Override
-    public void onClick(View view) {
-        Log.d("Face Angle", "onClick: " + FaceTracker.getInstance().getFaceAngle());
-        Log.d("Face TILT", "onClick: " + FaceTracker.getInstance().getFaceTilt());
-    }
-
-    @Override
     public Bitmap getBitmap(long currentMillis) {
         return null;
     }

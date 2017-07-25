@@ -11,13 +11,10 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Build;
-import android.util.Log;
-import android.view.View;
 
 
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
-import shuvalov.nikita.mirrormirror.componentfilters.ComponentFilter;
 
 /**
  * Created by NikitaShuvalov on 5/19/17.
@@ -30,9 +27,9 @@ public class RickComponentFilter extends ComponentFilter {
     private boolean mFaceRicking;
 
     private static final String FILTER_NAME = "Rick Sanchez";
-    private float mHairWidthScale = 2.1f;
-    private float mHairHeightScale = 1.3f;
-    private float mHairVerticalOffset = -0.35f;
+    private static final float HAIR_WIDTH_SCALE = 2.1f;
+    private static final float HAIR_HEIGHT_SCALE = 1.3f;
+    private static final float HAIR_VERTICAL_OFFSET = -0.35f;
 
 
     public RickComponentFilter(Context context, Bitmap previewImage) {
@@ -211,8 +208,6 @@ public class RickComponentFilter extends ComponentFilter {
         canvas.drawArc(faceRect.right-eyeballRadius/2, midYPoint, faceRect.right+eyeballRadius/2,midYPoint+eyeballRadius, 270, 180, true, mLinePaint);
     }
 
-
-
     private void drawFace(Canvas canvas, RectF faceRect){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             float verticalArcHeight = faceRect.height()/4;
@@ -319,20 +314,20 @@ public class RickComponentFilter extends ComponentFilter {
     private RectF getAdjustedRect(RectF faceRect){
         RectF adjustedRect = new RectF(faceRect);
         Matrix matrix = new Matrix();
-        matrix.postTranslate(0, (int)(adjustedRect.height()*mHairVerticalOffset));
+        matrix.postTranslate(0, (int)(adjustedRect.height()* HAIR_VERTICAL_OFFSET));
         matrix.mapRect(adjustedRect);
 
         float centerY = adjustedRect.centerY();
         float yDelta = Math.abs(centerY - adjustedRect.top);
-        float newTop = centerY - (yDelta * mHairHeightScale);
-        float newBottom = centerY + (yDelta * mHairHeightScale);
+        float newTop = centerY - (yDelta * HAIR_HEIGHT_SCALE);
+        float newBottom = centerY + (yDelta * HAIR_HEIGHT_SCALE);
         adjustedRect.top = newTop;
         adjustedRect.bottom = newBottom;
 
         float centerX = adjustedRect.centerX();
         float xDelta = Math.abs(centerX - adjustedRect.left);
-        float newRight = centerX + (xDelta * mHairWidthScale);
-        float newLeft = centerX - (xDelta * mHairWidthScale);
+        float newRight = centerX + (xDelta * HAIR_WIDTH_SCALE);
+        float newLeft = centerX - (xDelta * HAIR_WIDTH_SCALE);
         adjustedRect.right = newRight;
         adjustedRect.left = newLeft;
         return adjustedRect;
@@ -341,21 +336,6 @@ public class RickComponentFilter extends ComponentFilter {
     private void adjustEyebrowThickness(RectF faceRect){
         mEyeBrowThickness = faceRect.height()/13;
         mEyeBrowPaint.setStrokeWidth(mEyeBrowThickness);
-    }
-
-    //ToDo: Get rid of the onClick, doesn't really fit well here.
-    @Override
-    public void onClick(View view) {
-        mFaceRicking = !mFaceRicking;
-        if(!mFaceRicking){
-            mHairWidthScale=1.75f;
-            mHairHeightScale =1f;
-            mHairVerticalOffset = -0.25f;
-        }else{
-            mHairWidthScale = 2.1f;
-            mHairHeightScale = 1.3f;
-            mHairVerticalOffset = -0.3f;
-        }
     }
 
     @Override

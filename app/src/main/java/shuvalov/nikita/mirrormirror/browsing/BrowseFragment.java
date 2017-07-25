@@ -156,7 +156,7 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         File file = mBrowsingTracker.getCurrentImageFile();
-        if(file!=null && file.length()>KILOBYTE) {
+        if(file!=null) {
             Uri imageUri = Uri.fromFile(mBrowsingTracker.getCurrentImageFile());
             intent.putExtra(Intent.EXTRA_STREAM, imageUri);
             intent.setType("image/jpeg");

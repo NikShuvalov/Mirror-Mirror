@@ -47,7 +47,7 @@ public class ComponentOverlayFragment extends Fragment {
         mComponentOverlay = new ComponentOverlay(getContext(), componentFilter);
         mComponentOverlay.setZOrderMediaOverlay(true);
         mOverlayContainer.addView(mComponentOverlay);
-        mComponentOverlay.setOnClickListener(componentFilter);
+//        mComponentOverlay.setOnClickListener(componentFilter);
     }
 
     @Override

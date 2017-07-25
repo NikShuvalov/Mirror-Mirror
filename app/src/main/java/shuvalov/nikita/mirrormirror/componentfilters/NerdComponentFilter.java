@@ -132,9 +132,4 @@ public class NerdComponentFilter extends ComponentFilter {
     public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
 
     }
-
-    @Override
-    public void onClick(View view) {
-
-    }
 }
