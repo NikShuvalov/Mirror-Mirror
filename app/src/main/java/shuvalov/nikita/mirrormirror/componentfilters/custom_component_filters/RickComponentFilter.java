@@ -115,6 +115,8 @@ public class RickComponentFilter extends ComponentFilter {
     @Override
     public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
         if(canvas!=null) {
+            canvas.save();
+            canvas.setMatrix(mirrorMatrix);
             FaceTracker faceTracker = FaceTracker.getInstance();
             PointF leftEye = faceTracker.getLeftEye();
             PointF rightEye = faceTracker.getRightEye();
@@ -122,12 +124,10 @@ public class RickComponentFilter extends ComponentFilter {
             PointF leftMouth = faceTracker.getLeftMouth();
             PointF rightMouth = faceTracker.getRightMouth();
             RectF faceRect = faceTracker.getFaceRect();
-            mirrorMatrix.mapRect(faceRect);
             if (faceRect != null) {
-                Log.d("RIck", "drawMirroredFilterToCanvas: Face is not null");
                 RectF adjustedRect = getAdjustedRect(faceRect);
                 adjustEyebrowThickness(adjustedRect);
-                canvas.drawBitmap(mRickHair, null, faceRect, null);
+                canvas.drawBitmap(mRickHair, null, adjustedRect, null);
                 drawFace(canvas, faceRect);
                 drawEars(canvas, eyeballRadius, faceRect);
                 if (eyeballRadius >= 0) {
@@ -137,7 +137,7 @@ public class RickComponentFilter extends ComponentFilter {
                     drawNose(canvas, leftEye, rightEye, eyeballRadius);
                     drawEyebrows(canvas, eyeballRadius * 1.1, leftEye, rightEye);
                 }
-                faceRect.setEmpty();
+                canvas.restore();
             }
         }
     }
