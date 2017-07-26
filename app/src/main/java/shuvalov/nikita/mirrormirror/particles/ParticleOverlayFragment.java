@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.filters.particles;
+package shuvalov.nikita.mirrormirror.particles;
 
 
 import android.graphics.Rect;
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import shuvalov.nikita.mirrormirror.AppConstants;
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
-import shuvalov.nikita.mirrormirror.overlay.ParticleOverlay;
 
 import static android.content.ContentValues.TAG;
 

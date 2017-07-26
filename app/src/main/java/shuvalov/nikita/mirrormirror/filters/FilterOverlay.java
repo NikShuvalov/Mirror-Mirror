@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.overlay;
+package shuvalov.nikita.mirrormirror.filters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -55,15 +55,4 @@ public class FilterOverlay extends BaseOverlay{
             }
         }
     }
-
-
-//    public void notifyFilterChange() {
-//        mFilter= FilterManager.getInstance().getSelectedFilter();
-//        if(mFilter!=null) {
-//            mBitmap = mFilter.getBitmap(SystemClock.elapsedRealtime());
-//            return;
-//        }
-//        mUsingAnimated = false;
-//        mBitmap = null;
-//    }
 }

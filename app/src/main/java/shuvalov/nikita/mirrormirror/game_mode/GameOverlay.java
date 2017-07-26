@@ -103,7 +103,7 @@ public class GameOverlay extends BaseOverlay{
         }
     }
 
-    private void drawScoreBox(Canvas canvas){
+    private void drawScoreBox(Canvas canvas){ //ToDo: Improve appearance/placement of this
         GamePalette gamePalette = GamePalette.getInstance();
         String scoreText = "Score: " + mSoccerEngine.getPlayerScore();
         float boxStart = canvas.getWidth()*.75f;

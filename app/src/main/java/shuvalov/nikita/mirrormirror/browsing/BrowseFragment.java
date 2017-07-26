@@ -43,7 +43,6 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
     private RelativeLayout mBottomPanel;
     private ImageButton mShareButton;
     private boolean mPanelShowing;
-//    private static final long KILOBYTE = 1024 * 1024;
 
     public void findViews(View fragment){
         mImageView = (ImageView)fragment.findViewById(R.id.image_view);

@@ -1,14 +1,11 @@
-package shuvalov.nikita.mirrormirror.filters.particles;
+package shuvalov.nikita.mirrormirror.particles;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import shuvalov.nikita.mirrormirror.R;
-import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
 
 /**
  * Created by NikitaShuvalov on 5/24/17.

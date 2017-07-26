@@ -1,8 +1,7 @@
-package shuvalov.nikita.mirrormirror.filters.particles;
+package shuvalov.nikita.mirrormirror.particles;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.support.annotation.Nullable;
 
 import java.util.List;
 import java.util.Random;

@@ -13,7 +13,8 @@ import com.google.android.gms.vision.Detector;
 public class CameraSourceGenerator {
 
     public static CameraSource createCameraSource(Context context, Detector detector, int cameraFacing, int previewHeight, int previewWidth){
-        Log.d("This", "CameraSourceGenerator: " + previewHeight + "," + previewWidth);//ToDo: Reduce resolution to increase speed
+        //ToDo: Consider scaling down previewHeight/Width to improve performance
+        //ToDo: Consider allowing user to use back-facing camera
         return new CameraSource.Builder(context, detector)
                 .setFacing(cameraFacing)
                 .setRequestedPreviewSize(previewHeight, previewWidth)

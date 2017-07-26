@@ -1,24 +1,18 @@
-package shuvalov.nikita.mirrormirror.overlay;
+package shuvalov.nikita.mirrormirror.particles;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
-import android.util.Log;
 
 import java.util.ArrayList;
 
-import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
-import shuvalov.nikita.mirrormirror.filters.particles.Particle;
-import shuvalov.nikita.mirrormirror.filters.particles.ParticleEngine;
-import shuvalov.nikita.mirrormirror.filters.particles.ParticleManager;
+import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
+import shuvalov.nikita.mirrormirror.particles.Particle;
+import shuvalov.nikita.mirrormirror.particles.ParticleEngine;
 
 /**
  * Created by NikitaShuvalov on 5/8/17.

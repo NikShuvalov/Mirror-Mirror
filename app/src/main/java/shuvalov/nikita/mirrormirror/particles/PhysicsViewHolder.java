@@ -1,4 +1,4 @@
-package shuvalov.nikita.mirrormirror.filters.particles;
+package shuvalov.nikita.mirrormirror.particles;
 
 import android.graphics.Color;
 import android.support.v7.widget.CardView;

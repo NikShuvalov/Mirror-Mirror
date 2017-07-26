@@ -17,27 +17,25 @@ import java.util.Random;
  */
 
 /*
-    Soccer Regulation dictates that a goal is 8 yards wide, while the width of the field is 70-80 yards wide, so let's just keep it simple
-    and say that the goal is 1/10th of the width of the field.
-    A typical soccer ball is 22cm which is 0.25 yards. But to make things simpler we can increase the size of the ball several-fold. Make the
-    ball a 1/4 of the size of the goal.
-
     Distance determined for an accelerating object:
     distance = initial velocity * Time + (acceleration*Time^2)/2
  */
 
+
 /*
-Idea: If I do a survival mode, remove the bounce friction and head momentum,
-so that people can't just balance it on their head and score a whole bunch of points.
-Or, have the ball need to travel some distance up after a hit to count towards a point.
+    Idea: If I do a survival mode, remove the bounce friction and head momentum,
+    so that people can't just balance it on their head and score a whole bunch of points.
+    Or, have the ball need to travel some distance up after a hit to count towards a point.
+
+    Idea; Make balls progressively smaller
+    Idea: Moving goals.
+    Idea 2: Color balls and goals, spawn several balls and have player get balls into corresponding color goals.
 
  */
 
 
 
-    //Idea; Make balls progressively smaller
-    //Idea: Moving goals.
-    //Idea 2: Color balls and goals, spawn several balls and have player get balls into corresponding color goals.
+
 public class SoccerEngine {
 
     // ============================================= Variables===============================================
@@ -58,14 +56,11 @@ public class SoccerEngine {
     private Bitmap mTutorialOverlayBitmap;
 
     private static final float TEXT_SIZE = 40f;
-    private static final float BOUNDARY_PAINT_WIDTH = 30f;
     public static final int FACE_LENGTH = 400;
     public static final int SECOND = 1000;
     private static final double MAX_DEFLECTION_VALUE = 15.0;
     private static final double GRAVITY_ACCELERATION = 10.0/SECOND;
-    private static final double AIR_FRICTION_ACCELERATION = 5.0/SECOND;
     private static final int REFRESH_DELAY = 30;
-    private static final double ZERO_TOLERANCE = 0.05f;
     private static final double  BALL_RIGIDITY = 3; //Reduces the acceleration after a bounce to keep ball from bouncing indefinitely without any force being applied to it.
 
     public enum Wall {
@@ -327,29 +322,6 @@ public class SoccerEngine {
     private void applyGravity(long elapsedTime){
         mSoccerBall.setYSpeed(mSoccerBall.getYSpeed()+ GRAVITY_ACCELERATION*elapsedTime);
     }
-
-//    private void applyAirFriction(){
-//        double newSpeed = xSpeed;
-//        if(xSpeed>0){ //We are looking to move the value towards 0 with air Friction. So if value is neg, add air friction to speed, otherwise minus it.
-//            newSpeed = xSpeed+(AIR_FRICTION_ACCELERATION*elapsedTime/REFRESH_DELAY);
-//            if(Math.abs(newSpeed)<ZERO_TOLERANCE) {//Taking a page out of Google's book/sample code, reduce the xSpeed to 0 if it's a trivially close to 0 already.
-//                newSpeed =0;
-//            }
-//            mSoccerBall.setXSpeed(newSpeed);
-//        }else if (xSpeed<0){
-//            newSpeed = xSpeed-(AIR_FRICTION_ACCELERATION*elapsedTime/REFRESH_DELAY);
-//            if(Math.abs(newSpeed)<ZERO_TOLERANCE){
-//                newSpeed =0;
-//            }
-//            mSoccerBall.setXSpeed(newSpeed);
-//        }
-        /*
-            Since horizontal deceleration isn't always affecting the xSpeed and it matters less compared to vertical movement,
-             I took a bit of a lazy approach and just found the average speed of before and after the acceleration is applied in order
-             to figure out the xDisplacement amount.
-         */
-//        return ((xSpeed * elapsedTime/REFRESH_DELAY)+(newSpeed * elapsedTime/REFRESH_DELAY))/2;
-//    }
 
     // ======================================== FaceStorage Methods ==================================================
 

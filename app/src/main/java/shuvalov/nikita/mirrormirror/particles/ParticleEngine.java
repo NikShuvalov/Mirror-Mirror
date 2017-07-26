@@ -1,11 +1,10 @@
-package shuvalov.nikita.mirrormirror.filters.particles;
+package shuvalov.nikita.mirrormirror.particles;
 
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Random;

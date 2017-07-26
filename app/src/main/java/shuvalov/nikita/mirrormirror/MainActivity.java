@@ -8,9 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.os.Build;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -36,13 +34,20 @@ import shuvalov.nikita.mirrormirror.camera.CameraSourceGenerator;
 import shuvalov.nikita.mirrormirror.camera.FaceDetectorGenerator;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 import shuvalov.nikita.mirrormirror.camerafacetracker.Preview;
-import shuvalov.nikita.mirrormirror.componentfilters.ComponentOverlayFragment;
-import shuvalov.nikita.mirrormirror.filters.AnimatedFilter;
 import shuvalov.nikita.mirrormirror.filters.Filter;
 import shuvalov.nikita.mirrormirror.filters.FilterManager;
 import shuvalov.nikita.mirrormirror.filters.FilterOverlayFragment;
-import shuvalov.nikita.mirrormirror.filters.particles.ParticleOverlayFragment;
 
+
+/**
+ * ToDo: Create custom component filters for the following holidays:
+ * Talk like a pirate Day (09/19) Pirate filter
+ * Halloween(10/31) jack-o-lantern head, vampire, other related stuff
+ * X-Mas (12/25) Santa Claus
+ * Arthur Conan Doyle's Birthday(05/22) or Sherlock's birthday (01/06) Sherlock Filter
+ *
+ * Create a filter that replaces eyes with user's mouth
+ */
 
 public class MainActivity extends AppCompatActivity implements  CameraSource.PictureCallback, CameraSource.ShutterCallback{
     private FrameLayout mPreviewContainer;
@@ -60,20 +65,14 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mCurrentOverlay = GraphicType.FILTER;
         findViews();
-
         Display display = getWindow().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         FaceTracker faceTracker = FaceTracker.getInstance();
         faceTracker.setScreenSize(size.y, size.x);
         faceTracker.changeDetectionMode(GraphicType.FILTER);
-
-
-
-        //FixMe: Not sure why filterManager is referenced at all here. MainActivity doesn't use it at all, besides for adding a filter; It's because gettingBitMapList requires context.
         FilterManager.getInstance().prepareAllImages(this);
     }
 
@@ -194,15 +193,11 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
         getWindowManager().getDefaultDisplay().getSize(p);
         Bitmap drawnTogether = Bitmap.createBitmap(p.x, p.y, cameraPreview.getConfig());
         Canvas canvas = new Canvas(drawnTogether);
-
         Filter filter = FilterManager.getInstance().getSelectedFilter();
-
         Rect previewRect = new Rect(0,0,p.x,p.y);
         canvas.drawBitmap(cameraPreview, null, previewRect, null);
-
         Matrix mirrorFilter = new Matrix();
         mirrorFilter.postScale(-1, 1, p.x/2, p.y/2);
-
         if(filter!=null){
             filter.drawMirroredFilterToCanvas(canvas,mirrorFilter);
         }
@@ -218,9 +213,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
             case FILTER:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, FilterOverlayFragment.newInstance(), MAIN_FRAGMENT).commit();
                 break;
-//            case COMPONENT:
-//                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, ComponentOverlayFragment.newInstance()).commit();
-//                break;
             case BROWSE:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, BrowseFragment.newInstance(), BROWSE_FRAGMENT).commit();
                 break;
@@ -264,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements  CameraSource.Pic
                 super.onBackPressed();
             }
         }
-
         else{
             mCurrentOverlay = GraphicType.FILTER;
             notifyOverlayChanged();

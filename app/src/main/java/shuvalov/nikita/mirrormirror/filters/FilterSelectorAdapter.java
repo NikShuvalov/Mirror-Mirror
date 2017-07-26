@@ -5,12 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import shuvalov.nikita.mirrormirror.BaseFilterManager;
 import shuvalov.nikita.mirrormirror.R;
-import shuvalov.nikita.mirrormirror.overlay.BaseOverlay;
-import shuvalov.nikita.mirrormirror.overlay.FilterOverlay;
 
 /**
  * Created by NikitaShuvalov on 4/15/17.

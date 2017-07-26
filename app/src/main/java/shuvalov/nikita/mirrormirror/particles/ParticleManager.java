@@ -1,9 +1,6 @@
-package shuvalov.nikita.mirrormirror.filters.particles;
+package shuvalov.nikita.mirrormirror.particles;
 
 import java.util.ArrayList;
-
-import shuvalov.nikita.mirrormirror.AppConstants;
-import shuvalov.nikita.mirrormirror.R;
 
 /**
  * Created by NikitaShuvalov on 5/24/17.
