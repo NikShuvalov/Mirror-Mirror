@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.graphics.RectF;
 
 import shuvalov.nikita.mirrormirror.R;
@@ -17,7 +18,7 @@ import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 public class VikingComponentFilter extends ComponentFilter {
     private static final String FILTER_NAME = "Viking";
     private Bitmap mBeardBitmap, mHatBitmap;
-    private static final float HAT_HORIZONTAL_SCALE = 1.25f;
+    private static final float HAT_HORIZONTAL_SCALE = 1.15f;
 
 
     public VikingComponentFilter(Context context, Bitmap previewBitmap) {
@@ -44,23 +45,39 @@ public class VikingComponentFilter extends ComponentFilter {
                 RectF hatRect = new RectF(faceRect);
                 RectF beardRect = new RectF(faceRect);
 
-                Matrix beardTranslate = new Matrix();
-                beardTranslate.postTranslate(0, faceRect.height()*0.55f);
-                beardTranslate.mapRect(beardRect);
-
-                Matrix hatTranslate = new Matrix();
-                hatTranslate.postTranslate(0, -faceRect.height() / 2);
-                hatTranslate.mapRect(hatRect);
+                adjustBeardRect(beardRect);
                 adjustHatRect(hatRect);
-
-
-                canvas.drawBitmap(mHatBitmap, null, hatRect, null);
-                canvas.drawBitmap(mBeardBitmap, null, beardRect, null);
+                drawComponents(canvas, hatRect, beardRect);
             }
         }
     }
 
+
+    private void drawComponents(Canvas canvas, RectF hatRect, RectF beardRect){
+        canvas.drawBitmap(mHatBitmap, null, hatRect, null);
+        canvas.drawBitmap(mBeardBitmap, null, beardRect, null);
+    }
+
+    private void adjustBeardRect(RectF beardRect){
+        FaceTracker faceTracker = FaceTracker.getInstance();
+        PointF noseBase = faceTracker.getNoseBase();
+        float deltaY;
+        if(noseBase!=null) {
+            float noseBaseY = faceTracker.getNoseBase().y;
+            float faceTop = beardRect.top;
+            deltaY = (noseBaseY - faceTop) *.9f;
+        }else{
+            deltaY = faceTracker.getFaceRect().height() * 0.55f;
+        }
+        Matrix matrix = new Matrix();
+        matrix.postTranslate(0, deltaY);
+        matrix.mapRect(beardRect);
+    }
+
     private void adjustHatRect(RectF hatRect){
+        Matrix hatTranslate = new Matrix();
+        hatTranslate.postTranslate(0, -hatRect.height()*0.6f);
+        hatTranslate.mapRect(hatRect);
         float centerX = hatRect.centerX();
         float xDelta = Math.abs(centerX - hatRect.left);
         float scaledLeft = centerX - (xDelta * HAT_HORIZONTAL_SCALE);
@@ -76,20 +93,13 @@ public class VikingComponentFilter extends ComponentFilter {
             canvas.setMatrix(mirrorMatrix);
             FaceTracker faceTracker = FaceTracker.getInstance();
             RectF faceRect = faceTracker.getFaceRect();
+
             RectF hatRect = new RectF(faceRect);
             RectF beardRect = new RectF(faceRect);
 
-            Matrix beardTranslate = new Matrix();
-            beardTranslate.postTranslate(0, faceRect.height()*0.55f);
-            beardTranslate.mapRect(beardRect);
-
-            Matrix hatTranslate = new Matrix();
-            hatTranslate.postTranslate(0, -faceRect.height()/2);
-            hatTranslate.mapRect(hatRect);
+            adjustBeardRect(beardRect);
             adjustHatRect(hatRect);
-
-            canvas.drawBitmap(mHatBitmap, null, hatRect, null);
-            canvas.drawBitmap(mBeardBitmap, null, beardRect, null);
+            drawComponents(canvas, beardRect, hatRect);
             canvas.restore();
         }
 
