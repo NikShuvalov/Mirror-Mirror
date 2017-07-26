@@ -13,6 +13,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +29,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 import shuvalov.nikita.mirrormirror.AppConstants;
 import shuvalov.nikita.mirrormirror.R;
@@ -40,7 +43,7 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
     private RelativeLayout mBottomPanel;
     private ImageButton mShareButton;
     private boolean mPanelShowing;
-    private static final long KILOBYTE = 1024 * 1024;
+//    private static final long KILOBYTE = 1024 * 1024;
 
     public void findViews(View fragment){
         mImageView = (ImageView)fragment.findViewById(R.id.image_view);
@@ -61,8 +64,8 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,14 +74,17 @@ public class BrowseFragment extends Fragment implements View.OnClickListener, Br
         findViews(view);
         mPanelShowing = true;
         mBrowsingTracker= BrowsingTracker.getInstance();
-
         permissionValidate();
-        if(mPanelShowing) { //FixMe: The Fuck am I doing this for?
-            hideBottomPanel();
-        }
         loadImage();
         mBottomPanel.setOnClickListener(this);
         mShareButton.setOnClickListener(this);
+        Runnable animateWait = new Runnable(){
+            @Override
+            public void run() {
+                hideBottomPanel();
+            }
+        };
+        mBottomPanel.postDelayed(animateWait, 1000);
         return view;
     }
 
