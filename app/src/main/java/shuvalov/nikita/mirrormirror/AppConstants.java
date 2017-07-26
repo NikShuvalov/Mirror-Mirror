@@ -19,6 +19,8 @@ import java.util.List;
 
 public class AppConstants {
 
+    public static final String GOD_ID = "669ec9813b4c140";
+
     /**
      *
      * @return The path to save the image based on current time.

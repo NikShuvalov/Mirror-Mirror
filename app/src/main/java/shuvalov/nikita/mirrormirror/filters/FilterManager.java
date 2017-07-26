@@ -2,6 +2,8 @@ package shuvalov.nikita.mirrormirror.filters;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.provider.Settings;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -25,12 +27,13 @@ public class FilterManager extends BaseFilterManager{
         if(super.getFilters()== null || super.getFilters().isEmpty()) {
             ArrayList<Filter> filters = new ArrayList<>();
             filters.add(null);
-            filters.add(new StaticFilter("Instant Beauty", BitmapFactory.decodeResource(context.getResources(), R.drawable.beautify_mirror), Filter.FilterType.FACE, 1.1f, 1.2f, 0, 0));
-            filters.add(new StaticFilter("Corgi", BitmapFactory.decodeResource(context.getResources(), R.drawable.corgi), Filter.FilterType.FACE, 1.1f, 1.2f, 0, 0));
-            filters.add(new StaticFilter("Truompee", BitmapFactory.decodeResource(context.getResources(), R.drawable.trump_toupee), Filter.FilterType.HAIRLINE, 0.85f, 0.4f, 0, -0.35f));
-            filters.add(new StaticFilter("Saiyan", BitmapFactory.decodeResource(context.getResources(), R.drawable.super_saiyan), Filter.FilterType.HAIRLINE, 1.75f, 1.5f, 0, -0.5f));
+            if(AppConstants.GOD_ID.equals(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID))){ //Will allow only my personal phone to have access to these filters.
+                filters.add(new StaticFilter("Instant Beauty", BitmapFactory.decodeResource(context.getResources(), R.drawable.beautify_mirror), Filter.FilterType.FACE, 1.1f, 1.2f, 0, 0));
+                filters.add(new StaticFilter("Corgi", BitmapFactory.decodeResource(context.getResources(), R.drawable.corgi), Filter.FilterType.FACE, 1.1f, 1.2f, 0, 0));
+                filters.add(new StaticFilter("Truompee", BitmapFactory.decodeResource(context.getResources(), R.drawable.trump_toupee), Filter.FilterType.HAIRLINE, 0.85f, 0.4f, 0, -0.35f));
+                filters.add(new RickComponentFilter(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.mirror_mirror_logo)));
+            }
             filters.add(new AnimatedFilter("Flames", BitmapFactory.decodeResource(context.getResources(), R.drawable.flamekey0), Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)));
-            filters.add(new RickComponentFilter(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.mirror_mirror_logo)));
             filters.add(new VikingComponentFilter(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.mirror_mirror_logo)));
             super.setFilters(filters);
         }
@@ -44,12 +47,6 @@ public class FilterManager extends BaseFilterManager{
             sFilterManager = new FilterManager();
         }
         return sFilterManager;
-    }
-
-    public void addAnimatedFilters(AnimatedFilter... animatedFilters){
-        for(Filter f: animatedFilters){
-            super.addFilter(f);
-        }
     }
 
 }

@@ -47,6 +47,7 @@ import shuvalov.nikita.mirrormirror.filters.FilterOverlayFragment;
  * Arthur Conan Doyle's Birthday(05/22) or Sherlock's birthday (01/06) Sherlock Filter
  *
  * Create a filter that replaces eyes with user's mouth
+ * Anime Hair Filter?
  */
 
 public class MainActivity extends AppCompatActivity implements  CameraSource.PictureCallback, CameraSource.ShutterCallback{

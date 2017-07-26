@@ -1,7 +1,6 @@
 package shuvalov.nikita.mirrormirror.componentfilters;
 
 import android.graphics.Bitmap;
-import android.view.View;
 
 import shuvalov.nikita.mirrormirror.filters.Filter;
 
