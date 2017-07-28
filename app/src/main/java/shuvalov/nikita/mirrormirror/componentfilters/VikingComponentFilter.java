@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.util.Log;
 
 import shuvalov.nikita.mirrormirror.R;
 import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
@@ -33,7 +34,7 @@ public class VikingComponentFilter extends ComponentFilter {
 
     @Override
     public Bitmap getBitmap(long currentMillis) {
-        return null;
+        return getBitmap();
     }
 
     @Override
@@ -42,12 +43,19 @@ public class VikingComponentFilter extends ComponentFilter {
             FaceTracker faceTracker = FaceTracker.getInstance();
             RectF faceRect = faceTracker.getFaceRect();
             if(faceRect!=null) {
+                //FiXMe: Allow for tilt detection
+//                canvas.save();
+//                Matrix rotateMatrix = new Matrix();
+//                rotateMatrix.setRotate(faceTracker.getFaceTilt(), canvas.getWidth()/2, canvas.getHeight()/2);
+//                canvas.setMatrix(rotateMatrix);
+
                 RectF hatRect = new RectF(faceRect);
                 RectF beardRect = new RectF(faceRect);
 
                 adjustBeardRect(beardRect);
                 adjustHatRect(hatRect);
                 drawComponents(canvas, hatRect, beardRect);
+//                canvas.restore();
             }
         }
     }
@@ -76,30 +84,29 @@ public class VikingComponentFilter extends ComponentFilter {
 
     private void adjustHatRect(RectF hatRect){
         Matrix hatTranslate = new Matrix();
-        hatTranslate.postTranslate(0, -hatRect.height()*0.6f);
+        hatTranslate.setTranslate(0, -hatRect.height()*0.6f);
+        hatTranslate.postScale(HAT_HORIZONTAL_SCALE, 1, hatRect.centerX(),hatRect.centerY());
         hatTranslate.mapRect(hatRect);
-        float centerX = hatRect.centerX();
-        float xDelta = Math.abs(centerX - hatRect.left);
-        float scaledLeft = centerX - (xDelta * HAT_HORIZONTAL_SCALE);
-        float scaledRight = centerX + (xDelta * HAT_HORIZONTAL_SCALE);
-        hatRect.left = scaledLeft;
-        hatRect.right = scaledRight;
     }
 
     @Override
     public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
         if(canvas!=null){
             canvas.save();
-            canvas.setMatrix(mirrorMatrix);
             FaceTracker faceTracker = FaceTracker.getInstance();
             RectF faceRect = faceTracker.getFaceRect();
+
+            //FiXMe: Allow for tilt detection
+//            mirrorMatrix.setRotate(faceTracker.getFaceAngle(), canvas.getWidth()/2, canvas.getHeight()/2);
+            canvas.setMatrix(mirrorMatrix);
 
             RectF hatRect = new RectF(faceRect);
             RectF beardRect = new RectF(faceRect);
 
+
             adjustBeardRect(beardRect);
             adjustHatRect(hatRect);
-            drawComponents(canvas, beardRect, hatRect);
+            drawComponents(canvas, hatRect, beardRect);
             canvas.restore();
         }
 
