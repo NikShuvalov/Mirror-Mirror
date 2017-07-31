@@ -107,8 +107,6 @@ public class ParticleEngine {
         }
     }
 
-
-    //ToDo: Make asynchronous?
     private void processSimpleMovement() {
         long currentTime = SystemClock.elapsedRealtime();
         long elapsedTime = currentTime - mLastUpdate;

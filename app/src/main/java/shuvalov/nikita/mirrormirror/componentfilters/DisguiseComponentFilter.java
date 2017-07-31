@@ -17,7 +17,6 @@ import shuvalov.nikita.mirrormirror.camerafacetracker.FaceTracker;
 
 public class DisguiseComponentFilter extends ComponentFilter {
     private static final String FILTER_NAME = "Master of Disguise";
-
     private Bitmap mNoseGlasses, mMustache;
 
 
@@ -36,30 +35,53 @@ public class DisguiseComponentFilter extends ComponentFilter {
         return getBitmap();
     }
 
+
+    private boolean adjustGlassesRect(RectF glassesRect){
+        FaceTracker faceTracker = FaceTracker.getInstance();
+        PointF leftEye = faceTracker.getLeftEye();
+        PointF rightEye = faceTracker.getRightEye();
+        RectF faceRect = faceTracker.getFaceRect();
+        float eyeRadius = faceTracker.getEyeballRadius();
+        if(faceRect!=null){
+            float meanEyeY = (leftEye.y + rightEye.y)/2;
+            if(eyeRadius==-1){
+                glassesRect.set(faceRect.left, meanEyeY - faceRect.height()/5, faceRect.right, meanEyeY + faceRect.height()/5);
+                return true;
+            }else {
+                glassesRect.set(faceRect.left, meanEyeY - eyeRadius * 3, faceRect.right, meanEyeY + eyeRadius * 3);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean adjustMustacheRect(RectF mustacheRect, RectF glassesRect){
+        FaceTracker faceTracker = FaceTracker.getInstance();
+        PointF leftMouth = faceTracker.getLeftMouth();
+        PointF rightMouth = faceTracker.getRightMouth();
+        PointF bottomLip = faceTracker.getBottomLip();
+        float eyeRadius = faceTracker.getEyeballRadius();
+        if(leftMouth!=null && rightMouth!=null) {
+            if (bottomLip != null) {
+                mustacheRect.set(leftMouth.x, glassesRect.bottom - eyeRadius, rightMouth.x, bottomLip.y);
+                return true;
+            } else {
+                mustacheRect.set(leftMouth.x, glassesRect.bottom - eyeRadius, rightMouth.x, Math.max(leftMouth.y, rightMouth.y));
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void drawFilterToCanvas(Canvas canvas) {
-        FaceTracker faceTracker = FaceTracker.getInstance();
-        RectF faceRect = faceTracker.getFaceRect();
         RectF glassesRect = new RectF();
         RectF mustacheRect = new RectF();
-        if(faceRect!=null){
-            PointF leftEye = faceTracker.getLeftEye();
-            PointF rightEye = faceTracker.getRightEye();
-            PointF leftMouth = faceTracker.getLeftMouth();
-            PointF rightMouth = faceTracker.getRightMouth();
-            PointF bottomLip = faceTracker.getBottomLip();
-            if(leftEye!=null && rightEye!=null){
-                float meanEyeY = (leftEye.y + rightEye.y)/2;
-                float eyeRadius = faceTracker.getEyeballRadius();
-                glassesRect.set(faceRect.left,meanEyeY-eyeRadius*3, faceRect.right, meanEyeY + eyeRadius*3);
-                if(leftMouth!=null && rightMouth!=null){
-                    if(bottomLip!=null) {
-                        mustacheRect.set(leftMouth.x, glassesRect.bottom- eyeRadius, rightMouth.x, bottomLip.y);
-                    }else{
-                        mustacheRect.set(leftMouth.x, glassesRect.bottom-eyeRadius, rightMouth.x, Math.max(leftMouth.y, rightMouth.y));
-                    }
-                    canvas.drawBitmap(mMustache, null, mustacheRect, null);
-                }
+        if(adjustGlassesRect(glassesRect)){
+            if(adjustMustacheRect(mustacheRect, glassesRect)){
+                canvas.drawBitmap(mMustache, null, mustacheRect, null);
+                canvas.drawBitmap(mNoseGlasses, null, glassesRect, null);
+            }else{
                 canvas.drawBitmap(mNoseGlasses, null, glassesRect, null);
             }
         }
@@ -69,28 +91,13 @@ public class DisguiseComponentFilter extends ComponentFilter {
     public void drawMirroredFilterToCanvas(Canvas canvas, Matrix mirrorMatrix) {
         canvas.save();
         canvas.setMatrix(mirrorMatrix);
-        FaceTracker faceTracker = FaceTracker.getInstance();
-        RectF faceRect = faceTracker.getFaceRect();
         RectF glassesRect = new RectF();
         RectF mustacheRect = new RectF();
-        if(faceRect!=null){
-            PointF leftEye = faceTracker.getLeftEye();
-            PointF rightEye = faceTracker.getRightEye();
-            PointF leftMouth = faceTracker.getLeftMouth();
-            PointF rightMouth = faceTracker.getRightMouth();
-            PointF bottomLip = faceTracker.getBottomLip();
-            if(leftEye!=null && rightEye!=null){
-                float meanEyeY = (leftEye.y + rightEye.y)/2;
-                float eyeRadius = faceTracker.getEyeballRadius();
-                glassesRect.set(faceRect.left,meanEyeY-eyeRadius*3, faceRect.right, meanEyeY + eyeRadius*3);
-                if(leftMouth!=null && rightMouth!=null){
-                    if(bottomLip!=null) {
-                        mustacheRect.set(leftMouth.x, glassesRect.bottom- eyeRadius, rightMouth.x, bottomLip.y);
-                    }else{
-                        mustacheRect.set(leftMouth.x, glassesRect.bottom-eyeRadius, rightMouth.x, Math.max(leftMouth.y, rightMouth.y));
-                    }
-                    canvas.drawBitmap(mMustache, null, mustacheRect, null);
-                }
+        if(adjustGlassesRect(glassesRect)){
+            if(adjustMustacheRect(mustacheRect, glassesRect)){
+                canvas.drawBitmap(mMustache, null, mustacheRect, null);
+                canvas.drawBitmap(mNoseGlasses, null, glassesRect, null);
+            }else{
                 canvas.drawBitmap(mNoseGlasses, null, glassesRect, null);
             }
         }

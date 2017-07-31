@@ -43,25 +43,30 @@ public class VikingComponentFilter extends ComponentFilter {
             FaceTracker faceTracker = FaceTracker.getInstance();
             RectF faceRect = faceTracker.getFaceRect();
             if(faceRect!=null) {
-                //FiXMe: Allow for tilt detection
-//                canvas.save();
-//                Matrix rotateMatrix = new Matrix();
-//                rotateMatrix.setRotate(faceTracker.getFaceTilt(), canvas.getWidth()/2, canvas.getHeight()/2);
-//                canvas.setMatrix(rotateMatrix);
-
+                //ToDo: Allow for tilt detection
                 RectF hatRect = new RectF(faceRect);
                 RectF beardRect = new RectF(faceRect);
 
                 adjustBeardRect(beardRect);
                 adjustHatRect(hatRect);
                 drawComponents(canvas, hatRect, beardRect);
-//                canvas.restore();
             }
         }
     }
 
 
     private void drawComponents(Canvas canvas, RectF hatRect, RectF beardRect){
+//        float faceAngle = -FaceTracker.getInstance().getFaceAngle();
+//        if(faceAngle!= Float.MIN_VALUE){
+//            canvas.save();
+//            canvas.rotate(faceAngle, hatRect.centerX(), hatRect.centerY());
+//            canvas.drawBitmap(mHatBitmap, null, hatRect, null);
+//            canvas.restore();
+//            canvas.save();
+//            canvas.rotate(faceAngle, beardRect.centerX(), beardRect.centerY());
+//            canvas.drawBitmap(mBeardBitmap, null, beardRect, null);
+//            canvas.restore();
+//        }else{
         canvas.drawBitmap(mHatBitmap, null, hatRect, null);
         canvas.drawBitmap(mBeardBitmap, null, beardRect, null);
     }
@@ -78,7 +83,7 @@ public class VikingComponentFilter extends ComponentFilter {
             deltaY = faceTracker.getFaceRect().height() * 0.55f;
         }
         Matrix matrix = new Matrix();
-        matrix.postTranslate(0, deltaY);
+        matrix.setTranslate(0, deltaY);
         matrix.mapRect(beardRect);
     }
 
@@ -96,13 +101,10 @@ public class VikingComponentFilter extends ComponentFilter {
             FaceTracker faceTracker = FaceTracker.getInstance();
             RectF faceRect = faceTracker.getFaceRect();
 
-            //FiXMe: Allow for tilt detection
-//            mirrorMatrix.setRotate(faceTracker.getFaceAngle(), canvas.getWidth()/2, canvas.getHeight()/2);
             canvas.setMatrix(mirrorMatrix);
 
             RectF hatRect = new RectF(faceRect);
             RectF beardRect = new RectF(faceRect);
-
 
             adjustBeardRect(beardRect);
             adjustHatRect(hatRect);

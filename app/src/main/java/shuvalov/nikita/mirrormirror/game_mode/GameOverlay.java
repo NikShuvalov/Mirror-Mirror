@@ -34,7 +34,7 @@ public class GameOverlay extends BaseOverlay{
         mTrianglePath = new Path();
         mStartBlinkTime = 0;
         mStartBlink = true;
-        new EngineLoaderTask().execute(screenBounds); //ToDo: Perform this in loading activity
+        new EngineLoaderTask().execute(screenBounds);
     }
 
 
@@ -45,7 +45,7 @@ public class GameOverlay extends BaseOverlay{
             GamePalette gamePalette = GamePalette.getInstance();
             canvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR);
             if (mSoccerEngine.mTutorialCanvas == null) {
-                mSoccerEngine.createTutorialCanvas(); //ToDo: Perform this in loading activity
+                mSoccerEngine.createTutorialCanvas();
             }
             if (mSoccerEngine.isTutorialMode()) {
                 canvas.drawBitmap(mSoccerEngine.getTutorialOverlayBitmap(), null, mSoccerEngine.getScreenBounds(), mAlphaPaint);

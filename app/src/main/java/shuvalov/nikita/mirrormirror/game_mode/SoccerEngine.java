@@ -23,18 +23,15 @@ import java.util.Random;
 
 
 /*
+    ToDo: Make balls progressively smaller
+    ToDo: Moving goals
+    ToDo: Colored balls and goals, multi-ball spawn
+
     Idea: If I do a survival mode, remove the bounce friction and head momentum,
     so that people can't just balance it on their head and score a whole bunch of points.
     Or, have the ball need to travel some distance up after a hit to count towards a point.
 
-    Idea; Make balls progressively smaller
-    Idea: Moving goals.
-    Idea 2: Color balls and goals, spawn several balls and have player get balls into corresponding color goals.
-
  */
-
-
-
 
 public class SoccerEngine {
 
