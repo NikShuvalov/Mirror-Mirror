@@ -36,7 +36,7 @@ public class FilterManager extends BaseFilterManager{
 //            }
             filters.add(new AnimatedFilter("Flames", BitmapFactory.decodeResource(context.getResources(), R.drawable.flamekey0), Filter.FilterType.FACE, 1.25f, 1.5f, 0, -0.65f, AppConstants.getBitmapList(context, R.array.flame_animation_list)));
             filters.add(new DisguiseComponentFilter(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.mod_preview)));
-            filters.add(new VikingComponentFilter(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.mirror_mirror_logo)));
+            filters.add(new VikingComponentFilter(context, BitmapFactory.decodeResource(context.getResources(), R.drawable.viking_preview)));
             super.setFilters(filters);
         }
     }
